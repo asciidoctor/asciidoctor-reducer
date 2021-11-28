@@ -1,0 +1,29 @@
+= Asciidoctor Reducer
+Dan Allen <https://github.com/mojavelinux[@mojavelinux]>
+// settings:
+:idprefix:
+:idseparator: -
+ifndef::env-github[:icons: font]
+ifdef::env-github[]
+:caution-caption: :fire:
+:important-caption: :exclamation:
+:note-caption: :paperclip:
+:tip-caption: :bulb:
+:warning-caption: :warning:
+endif::[]
+
+Asciidoctor Reducer is a tool to generate a single AsciiDoc document from a set of AsciiDoc documents reachable from a parent document by expanding all its top-level and nested include directives.
+
+IMPORTANT: This project is still in prototype.
+As such, there is no release available.
+
+== Copyright and License
+
+Copyright (C) 2021-present Dan Allen.
+Use of this software is granted under the terms of the MIT License.
+
+See the link:LICENSE[LICENSE] for the full license text.
+
+== Trademarks
+
+AsciiDoc(R) and AsciiDoc Language(TM) are trademarks of the Eclipse Foundation, Inc.

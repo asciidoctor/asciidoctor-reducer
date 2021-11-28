@@ -1,0 +1,6 @@
+/coverage/
+/deep_cover/
+/Gemfile.lock
+/pkg/
+/.bundle/
+/.ruby-version

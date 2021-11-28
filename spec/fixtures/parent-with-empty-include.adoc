@@ -1,0 +1,9 @@
+before include
+include::empty.adoc[]
+after include
+
+before include
+
+include::empty.adoc[]
+
+after include

@@ -1,0 +1,5 @@
+before nested include
+
+include::no-includes.adoc[]
+
+after nested include

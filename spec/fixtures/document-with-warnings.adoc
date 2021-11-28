@@ -1,0 +1,8 @@
+= Document Title
+:attribute-missing: warn
+
+{no-such-attribute}
+
+|===
+cell
+|===

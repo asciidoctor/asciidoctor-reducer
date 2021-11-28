@@ -1,0 +1,5 @@
+before include
+
+include::subdir/with-relative-include.adoc[]
+
+after include
