@@ -1,0 +1,5 @@
+before include
+
+include::multiple-paragraphs.adoc[]
+
+after include

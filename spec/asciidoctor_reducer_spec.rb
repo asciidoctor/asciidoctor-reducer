@@ -91,6 +91,23 @@ describe 'Asciidoctor::Reducer' do
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 7]
   end
 
+  it 'should resolve include with multiple paragraphs' do
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-multiple-paragraphs.adoc'), safe: :safe
+    expected_lines = <<~'EOS'.chomp.split ?\n
+    before include
+
+    first paragraph
+
+    second paragraph
+    with two lines
+
+    after include
+    EOS
+    (expect doc.source_lines).to eql expected_lines
+    (expect doc.blocks.size).to be 4
+    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 8]
+  end
+
   it 'should skip top-level include that cannot be resolved' do
     doc = nil
     with_memory_logger do |logger|
