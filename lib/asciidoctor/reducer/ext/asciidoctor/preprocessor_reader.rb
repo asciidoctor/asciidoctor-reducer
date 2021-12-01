@@ -6,6 +6,7 @@ module Asciidoctor::Reducer
       def preprocess_include_directive target, attrlist
         @x_include_directive_line = %(include::#{target}[#{attrlist}])
         @x_push_include_called = false
+        inc_lineno = @lineno - 1
         result = super
         return result if @x_push_include_called
         parent_depth = (parents = @x_parents).length
@@ -16,7 +17,7 @@ module Asciidoctor::Reducer
         @x_include_replacements << {
           lines: lines,
           into: parents[parent_depth - 1],
-          index: @lineno - lines.length - 1,
+          index: inc_lineno,
           replace: @x_include_directive_line,
         }
       end

@@ -117,12 +117,13 @@ describe 'Asciidoctor::Reducer' do
     expected_lines = <<~'EOS'.chomp.split ?\n
     before include
 
-    include::no-such-file.adoc[]
+    Unresolved directive in parent-with-unresolved-include.adoc - include::no-such-file.adoc[]
 
     after include
     EOS
     (expect doc.source_lines).to eql expected_lines
     (expect doc.blocks.size).to be 3
+    (expect doc.blocks[1].source).to start_with 'Unresolved directive'
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
 
