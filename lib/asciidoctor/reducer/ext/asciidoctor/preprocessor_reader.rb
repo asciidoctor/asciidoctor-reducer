@@ -6,7 +6,7 @@ module Asciidoctor::Reducer
       def preprocess_include_directive target, attrlist
         @x_include_directive_line = %(include::#{target}[#{attrlist}])
         @x_push_include_called = false
-        inc_lineno = @lineno - 1
+        inc_lineno = @lineno - 1 # we're on the include line, which is 1-based
         result = super
         return result if @x_push_include_called
         parent_depth = (parents = @x_parents).length
@@ -24,7 +24,7 @@ module Asciidoctor::Reducer
 
       def push_include data, file, path, lineno, attrs
         @x_push_include_called = true
-        inc_lineno = @lineno - 1
+        inc_lineno = @lineno - 2 # we're below the include line, which is 1-based
         prev_inc_depth = @include_stack.length
         # Q: can we do this without resetting the lineno?
         lineno = 1 # rubocop:disable Lint/ShadowedArgument
@@ -38,7 +38,7 @@ module Asciidoctor::Reducer
           @x_include_replacements << {
             lines: [],
             into: parents[parent_depth - 1],
-            index: inc_lineno - 1,
+            index: inc_lineno,
             replace: @x_include_directive_line,
           }
         else
@@ -52,7 +52,7 @@ module Asciidoctor::Reducer
           @x_include_replacements << {
             lines: @lines.reverse,
             into: parents[parent_depth - 1],
-            index: inc_lineno - 1,
+            index: inc_lineno,
             replace: @x_include_directive_line,
           }
         end
