@@ -127,6 +127,23 @@ describe 'Asciidoctor::Reducer' do
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
 
+  it 'should skip optional top-level include that cannot be resolved' do
+    doc = nil
+    with_memory_logger do |logger|
+      doc = Asciidoctor.load_file (fixture_file 'parent-with-optional-unresolved-include.adoc'), safe: :safe
+      (expect logger).to be_empty
+    end
+    expected_lines = <<~'EOS'.chomp.split ?\n
+    before include
+
+
+    after include
+    EOS
+    (expect doc.source_lines).to eql expected_lines
+    (expect doc.blocks.size).to be 2
+    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 4]
+  end
+
   it 'should skip empty include' do
     doc = Asciidoctor.load_file (fixture_file 'parent-with-empty-include.adoc'), safe: :safe
     expected_lines = <<~'EOS'.chomp.split ?\n
