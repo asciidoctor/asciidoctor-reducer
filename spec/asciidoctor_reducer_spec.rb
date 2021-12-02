@@ -176,6 +176,25 @@ describe 'Asciidoctor::Reducer' do
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
   end
 
+  it 'should resolve include with lines' do
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-lines.adoc'), safe: :safe
+    expected_lines = <<~'EOS'.chomp.split ?\n
+    before include
+
+    first paragraph, second line
+
+    second paragraph, first line
+    second paragraph, second line
+
+    third paragraph
+
+    after include
+    EOS
+    (expect doc.source_lines).to eql expected_lines
+    (expect doc.blocks.size).to be 5
+    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 8, 10]
+  end
+
   it 'should preserve attribute entries in the document header' do
     doc = Asciidoctor.load_file (fixture_file 'parent-with-header-attributes.adoc'), safe: :safe
     expected_lines = <<~'EOS'.chomp.split ?\n

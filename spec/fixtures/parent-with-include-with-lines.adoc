@@ -1,0 +1,5 @@
+before include
+
+include::include-by-lines.adoc[lines=2..7]
+
+after include
