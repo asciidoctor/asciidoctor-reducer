@@ -1,0 +1,7 @@
+= Include with Tags
+
+// tag::body[]
+Start of body.
+
+End of body.
+// end::body[]

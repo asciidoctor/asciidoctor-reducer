@@ -1,0 +1,5 @@
+before include
+
+include::include-with-tag.adoc[tag=body]
+
+after include
