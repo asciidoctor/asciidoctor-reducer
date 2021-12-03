@@ -195,6 +195,29 @@ describe 'Asciidoctor::Reducer' do
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 8, 10]
   end
 
+  it 'should resolve include with leveloffset' do
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-leveloffset.adoc'), safe: :safe
+    expected_lines = <<~'EOS'.chomp.split ?\n
+    = Document Title
+
+    == Section
+
+    :leveloffset: +1
+
+    == Subsection
+
+    === Nested Subsection
+
+    :leveloffset!:
+
+    == Another Section
+    EOS
+    (expect doc.source_lines).to eql expected_lines
+    blocks = doc.find_by context: :section
+    (expect blocks.size).to be 5
+    (expect (blocks.map {|it| it.lineno })).to eql [1, 3, 7, 9, 13]
+  end
+
   it 'should preserve attribute entries in the document header' do
     doc = Asciidoctor.load_file (fixture_file 'parent-with-header-attributes.adoc'), safe: :safe
     expected_lines = <<~'EOS'.chomp.split ?\n

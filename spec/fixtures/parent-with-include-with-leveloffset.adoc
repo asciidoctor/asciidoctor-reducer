@@ -1,0 +1,7 @@
+= Document Title
+
+== Section
+
+include::subsections.adoc[leveloffset=+1]
+
+== Another Section
