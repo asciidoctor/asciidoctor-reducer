@@ -1,0 +1,5 @@
+= Book Title
+
+Chapters are located in {chaptersdir}.
+
+include::{chaptersdir}/ch1.adoc[]
