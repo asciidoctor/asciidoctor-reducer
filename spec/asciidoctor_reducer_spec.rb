@@ -108,6 +108,23 @@ describe 'Asciidoctor::Reducer' do
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 8]
   end
 
+  it 'should assign same line number to preamble and its paragraph' do
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-preamble.adoc'), safe: :safe
+    expected_lines = <<~'EOS'.chomp.split ?\n
+    = Document Title
+
+    single line paragraph
+
+    == Chapter A
+
+    == Chapter B
+    EOS
+    (expect doc.source_lines).to eql expected_lines
+    blocks = doc.find_by {|it| it.context != :document }
+    (expect blocks.size).to be 5
+    (expect (blocks.map {|it| it.lineno })).to eql [1, 3, 3, 5, 7]
+  end
+
   it 'should skip top-level include that cannot be resolved' do
     doc = nil
     with_memory_logger do |logger|
