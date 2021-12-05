@@ -108,6 +108,21 @@ describe 'Asciidoctor::Reducer' do
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 8]
   end
 
+  it 'should resolve adjacent includes' do
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-adjacent-includes.adoc'), safe: :safe
+    expected_lines = <<~'EOS'.chomp.split ?\n
+    before includes
+
+    single line paragraph
+    single line paragraph
+
+    after includes
+    EOS
+    (expect doc.source_lines).to eql expected_lines
+    (expect doc.blocks.size).to be 3
+    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 6]
+  end
+
   it 'should assign same line number to preamble and its paragraph' do
     doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-preamble.adoc'), safe: :safe
     expected_lines = <<~'EOS'.chomp.split ?\n

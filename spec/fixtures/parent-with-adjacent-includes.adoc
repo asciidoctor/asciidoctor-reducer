@@ -1,0 +1,6 @@
+before includes
+
+include::single-line-paragraph.adoc[]
+include::single-line-paragraph.adoc[]
+
+after includes
