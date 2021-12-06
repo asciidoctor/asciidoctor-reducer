@@ -192,6 +192,20 @@ describe 'Asciidoctor::Reducer' do
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 4, 7]
   end
 
+  it 'should skip include that custom include processor handles but does not push' do
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-single-line-paragraph.adoc'), safe: :safe,
+      extensions: proc { include_processor { process {} } }
+    expected_lines = <<~'EOS'.chomp.split ?\n
+    before include
+
+
+    after include
+    EOS
+    (expect doc.source_lines).to eql expected_lines
+    (expect doc.blocks.size).to be 2
+    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 4]
+  end
+
   it 'should resolve include with tag' do
     doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-tag.adoc'), safe: :safe
     expected_lines = <<~'EOS'.chomp.split ?\n
