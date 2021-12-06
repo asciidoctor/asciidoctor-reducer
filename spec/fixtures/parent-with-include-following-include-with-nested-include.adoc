@@ -1,0 +1,9 @@
+before
+
+include::include-with-include.adoc[]
+
+then
+
+include::no-includes.adoc[]
+
+after

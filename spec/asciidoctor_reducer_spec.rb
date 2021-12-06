@@ -123,6 +123,33 @@ describe 'Asciidoctor::Reducer' do
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 6]
   end
 
+  it 'should resolve include that follows include with nested include' do
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-following-include-with-nested-include.adoc'),
+      safe: :safe
+    expected_lines = <<~'EOS'.chomp.split ?\n
+    before
+
+    before nested include
+
+    no includes here
+
+    just good old-fashioned paragraph text
+
+    after nested include
+
+    then
+
+    no includes here
+
+    just good old-fashioned paragraph text
+
+    after
+    EOS
+    (expect doc.source_lines).to eql expected_lines
+    (expect doc.blocks.size).to be 9
+    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9, 11, 13, 15, 17]
+  end
+
   it 'should assign same line number to preamble and its paragraph' do
     doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-preamble.adoc'), safe: :safe
     expected_lines = <<~'EOS'.chomp.split ?\n
