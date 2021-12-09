@@ -19,7 +19,7 @@ describe 'Asciidoctor::Reducer' do
     after include
     EOS
     (expect doc.source_lines).to eql expected_lines
-    (expect doc.blocks.size).to be 4
+    (expect doc.blocks).to have_size 4
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
   end
 
@@ -39,7 +39,7 @@ describe 'Asciidoctor::Reducer' do
     after include
     EOS
     (expect doc.source_lines).to eql expected_lines
-    (expect doc.blocks.size).to be 6
+    (expect doc.blocks).to have_size 6
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9, 11]
   end
 
@@ -57,7 +57,7 @@ describe 'Asciidoctor::Reducer' do
     after include
     EOS
     (expect doc.source_lines).to eql expected_lines
-    (expect doc.blocks.size).to be 5
+    (expect doc.blocks).to have_size 5
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9]
   end
 
@@ -71,7 +71,7 @@ describe 'Asciidoctor::Reducer' do
     after include
     EOS
     (expect doc.source_lines).to eql expected_lines
-    (expect doc.blocks.size).to be 3
+    (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
 
@@ -87,7 +87,7 @@ describe 'Asciidoctor::Reducer' do
     after include
     EOS
     (expect doc.source_lines).to eql expected_lines
-    (expect doc.blocks.size).to be 3
+    (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 7]
   end
 
@@ -104,7 +104,7 @@ describe 'Asciidoctor::Reducer' do
     after include
     EOS
     (expect doc.source_lines).to eql expected_lines
-    (expect doc.blocks.size).to be 4
+    (expect doc.blocks).to have_size 4
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 8]
   end
 
@@ -119,7 +119,7 @@ describe 'Asciidoctor::Reducer' do
     after includes
     EOS
     (expect doc.source_lines).to eql expected_lines
-    (expect doc.blocks.size).to be 3
+    (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 6]
   end
 
@@ -146,7 +146,7 @@ describe 'Asciidoctor::Reducer' do
     after
     EOS
     (expect doc.source_lines).to eql expected_lines
-    (expect doc.blocks.size).to be 9
+    (expect doc.blocks).to have_size 9
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9, 11, 13, 15, 17]
   end
 
@@ -163,7 +163,7 @@ describe 'Asciidoctor::Reducer' do
     EOS
     (expect doc.source_lines).to eql expected_lines
     blocks = doc.find_by {|it| it.context != :document }
-    (expect blocks.size).to be 5
+    (expect blocks).to have_size 5
     (expect (blocks.map {|it| it.lineno })).to eql [1, 3, 3, 5, 7]
   end
 
@@ -181,7 +181,7 @@ describe 'Asciidoctor::Reducer' do
     after include
     EOS
     (expect doc.source_lines).to eql expected_lines
-    (expect doc.blocks.size).to be 3
+    (expect doc.blocks).to have_size 3
     (expect doc.blocks[1].source).to start_with 'Unresolved directive'
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
@@ -199,7 +199,7 @@ describe 'Asciidoctor::Reducer' do
     after include
     EOS
     (expect doc.source_lines).to eql expected_lines
-    (expect doc.blocks.size).to be 2
+    (expect doc.blocks).to have_size 2
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 4]
   end
 
@@ -215,7 +215,7 @@ describe 'Asciidoctor::Reducer' do
     after include
     EOS
     (expect doc.source_lines).to eql expected_lines
-    (expect doc.blocks.size).to be 3
+    (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 4, 7]
   end
 
@@ -229,7 +229,7 @@ describe 'Asciidoctor::Reducer' do
     after include
     EOS
     (expect doc.source_lines).to eql expected_lines
-    (expect doc.blocks.size).to be 2
+    (expect doc.blocks).to have_size 2
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 4]
   end
 
@@ -252,7 +252,7 @@ describe 'Asciidoctor::Reducer' do
     after include
     EOS
     (expect doc.source_lines).to eql expected_lines
-    (expect doc.blocks.size).to be 4
+    (expect doc.blocks).to have_size 4
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
   end
 
@@ -268,7 +268,7 @@ describe 'Asciidoctor::Reducer' do
     after include
     EOS
     (expect doc.source_lines).to eql expected_lines
-    (expect doc.blocks.size).to be 4
+    (expect doc.blocks).to have_size 4
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
   end
 
@@ -287,7 +287,7 @@ describe 'Asciidoctor::Reducer' do
     after include
     EOS
     (expect doc.source_lines).to eql expected_lines
-    (expect doc.blocks.size).to be 5
+    (expect doc.blocks).to have_size 5
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 8, 10]
   end
 
@@ -310,7 +310,7 @@ describe 'Asciidoctor::Reducer' do
     EOS
     (expect doc.source_lines).to eql expected_lines
     blocks = doc.find_by context: :section
-    (expect blocks.size).to be 5
+    (expect blocks).to have_size 5
     (expect (blocks.map {|it| it.lineno })).to eql [1, 3, 7, 9, 13]
   end
 
@@ -331,7 +331,7 @@ describe 'Asciidoctor::Reducer' do
     EOS
     (expect doc.source_lines).to eql expected_lines
     blocks = doc.find_by {|it| it.context != :document }
-    (expect blocks.size).to be 5
+    (expect blocks).to have_size 5
     (expect (blocks.map {|it| it.lineno })).to eql [1, 3, 6, 8, 11]
   end
 
@@ -350,7 +350,7 @@ describe 'Asciidoctor::Reducer' do
     after include
     EOS
     (expect doc.source_lines).to eql expected_lines
-    (expect doc.blocks.size).to be 3
+    (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [6, 8, 10]
     (expect (doc.attr? 'sectnums')).to be true
     (expect (doc.attr? 'icons', 'font')).to be true
@@ -369,7 +369,7 @@ describe 'Asciidoctor::Reducer' do
     EOS
     (expect doc.source_lines).to eql expected_lines
     blocks = doc.find_by {|it| it.context != :document }
-    (expect blocks.size).to be 3
+    (expect blocks).to have_size 3
     (expect (blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
 
@@ -386,7 +386,7 @@ describe 'Asciidoctor::Reducer' do
     after include
     EOS
     (expect doc.source_lines).to eql expected_lines
-    (expect doc.blocks.size).to be 4
+    (expect doc.blocks).to have_size 4
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
   end
 
