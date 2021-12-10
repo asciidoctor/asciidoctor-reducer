@@ -256,6 +256,31 @@ describe 'Asciidoctor::Reducer' do
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
   end
 
+  it 'should not replace lines if the target line does not match the expected line' do
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-single-line-paragraph.adoc'), safe: :safe,
+      extensions: proc {
+        tree_processor do
+          prefer
+          process do |interim_doc|
+            unless interim_doc.options[:reduced]
+              inc_replacements = interim_doc.reader.instance_variable_get :@x_include_replacements
+              inc_replacements[0][:replace] = 'include::not-a-match[]'
+            end
+          end
+        end
+      }
+    expected_lines = <<~'EOS'.chomp.split ?\n
+    before include
+
+    include::single-line-paragraph.adoc[]
+
+    after include
+    EOS
+    (expect doc.source_lines).to eql expected_lines
+    (expect doc.blocks).to have_size 3
+    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
+  end
+
   it 'should resolve include with tag' do
     doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-tag.adoc'), safe: :safe
     expected_lines = <<~'EOS'.chomp.split ?\n
