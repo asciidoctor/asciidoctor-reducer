@@ -12,8 +12,7 @@ module Asciidoctor::Reducer
         parent_depth = (parents = @x_parents).length
         depth_change = @include_stack.length - (parent_depth - 1)
         parent_depth -= (parents.slice! parent_depth + depth_change, -depth_change).length if depth_change < 0
-        next_line = @lines[-1]
-        lines = (next_line&.start_with? 'Unresolved directive in ') && (next_line.end_with? ']') ? [next_line] : []
+        lines = ((line = @lines[-1].to_s).start_with? 'Unresolved directive in ') && (line.end_with? ']') ? [line] : []
         @x_include_replacements << {
           lines: lines,
           into: parents[parent_depth - 1],
