@@ -34,8 +34,10 @@ describe 'Asciidoctor::Reducer' do
 
     after include
     EOS
+    (expect doc.options[:reduced]).to be true
     (expect doc.source_lines).to eql expected_lines
     (expect doc.blocks).to have_size 4
+    (expect doc.sourcemap).to be true
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
     (expect (doc.blocks.map {|it| it.file }).uniq).to eql [source_file]
   end
