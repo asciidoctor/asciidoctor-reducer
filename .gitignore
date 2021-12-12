@@ -2,5 +2,6 @@
 /deep_cover/
 /Gemfile.lock
 /pkg/
+/vendor/bundle/
 /.bundle/
 /.ruby-version
