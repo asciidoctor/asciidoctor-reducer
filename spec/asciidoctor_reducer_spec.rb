@@ -7,6 +7,21 @@ describe 'Asciidoctor::Reducer' do
     (expect Asciidoctor::Reducer::VERSION).to match %r/^\d+\.\d+\.\d+(\.\S+)?$/
   end
 
+  it 'should load document with no includes' do
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-no-includes.adoc'), safe: :safe
+    expected_lines = <<~'EOS'.chomp.split ?\n
+    no includes to be found here
+
+    not a one
+    EOS
+    (expect doc.options[:reduced]).to be_falsy
+    (expect doc.source_lines).to eql expected_lines
+    (expect doc.blocks).to have_size 2
+    # NOTE for now, sourcemap is enabled implicitly
+    (expect doc.sourcemap).to be true
+    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3]
+  end
+
   it 'should resolve top-level include with no includes' do
     source_file = fixture_file 'parent-with-single-include.adoc'
     doc = Asciidoctor.load_file source_file, safe: :safe
