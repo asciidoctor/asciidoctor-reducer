@@ -61,7 +61,7 @@ jobs:
         bundle --jobs 3 --retry 3
         echo 'COVERAGE=deep' >> $GITHUB_ENV
     - name: Run tests
-      run: bundle exec ruby -w $(bundle exec ruby -e 'print File.join Gem.bindir, %q(rake)') spec
+      run: bundle exec rake spec
     - name: Run linter
       if: matrix.primary
       run: bundle exec rake lint
