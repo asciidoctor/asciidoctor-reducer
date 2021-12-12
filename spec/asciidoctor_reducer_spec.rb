@@ -8,7 +8,8 @@ describe 'Asciidoctor::Reducer' do
   end
 
   it 'should resolve top-level include with no includes' do
-    doc = Asciidoctor.load_file (fixture_file 'parent-with-single-include.adoc'), safe: :safe
+    source_file = fixture_file 'parent-with-single-include.adoc'
+    doc = Asciidoctor.load_file source_file, safe: :safe
     expected_lines = <<~'EOS'.chomp.split ?\n
     before include
 
@@ -21,10 +22,12 @@ describe 'Asciidoctor::Reducer' do
     (expect doc.source_lines).to eql expected_lines
     (expect doc.blocks).to have_size 4
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
+    (expect (doc.blocks.map {|it| it.file }).uniq).to eql [source_file]
   end
 
   it 'should resolve top-level include with nested include' do
-    doc = Asciidoctor.load_file (fixture_file 'parent-with-single-include-with-include.adoc'), safe: :safe
+    source_file = fixture_file 'parent-with-single-include-with-include.adoc'
+    doc = Asciidoctor.load_file source_file, safe: :safe
     expected_lines = <<~'EOS'.chomp.split ?\n
     before include
 
@@ -41,6 +44,7 @@ describe 'Asciidoctor::Reducer' do
     (expect doc.source_lines).to eql expected_lines
     (expect doc.blocks).to have_size 6
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9, 11]
+    (expect (doc.blocks.map {|it| it.file }).uniq).to eql [source_file]
   end
 
   it 'should resolve nested include relative to include file' do
