@@ -1,4 +1,4 @@
-= Include with Tags
+= Include with Tag
 
 // tag::body[]
 Start of body.

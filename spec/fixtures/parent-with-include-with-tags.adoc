@@ -1,0 +1,5 @@
+before include
+
+include::include-with-tags.adoc[tags=beginning;end]
+
+after include

@@ -1,0 +1,13 @@
+= Include with Tags
+
+// tag::beginning[]
+The beginning.
+// end::beginning[]
+
+// tag::middle[]
+The middle.
+// end::middle[]
+
+// tag::end[]
+The end.
+// end::end[]

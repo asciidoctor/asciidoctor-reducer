@@ -318,6 +318,21 @@ describe 'Asciidoctor::Reducer' do
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
   end
 
+  it 'should resolve include with tags' do
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-tags.adoc'), safe: :safe
+    expected_lines = <<~'EOS'.chomp.split ?\n
+    before include
+
+    The beginning.
+    The end.
+
+    after include
+    EOS
+    (expect doc.source_lines).to eql expected_lines
+    (expect doc.blocks).to have_size 3
+    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 6]
+  end
+
   it 'should resolve include with lines' do
     doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-lines.adoc'), safe: :safe
     expected_lines = <<~'EOS'.chomp.split ?\n
