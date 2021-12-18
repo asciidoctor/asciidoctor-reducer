@@ -1,0 +1,3 @@
+include::single-line-paragraph.adoc[]
+
+after include

@@ -96,6 +96,18 @@ describe 'Asciidoctor::Reducer' do
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
 
+  it 'should resolve include at start of document' do
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-at-start.adoc'), safe: :safe
+    expected_lines = <<~'EOS'.chomp.split ?\n
+    single line paragraph
+
+    after include
+    EOS
+    (expect doc.source_lines).to eql expected_lines
+    (expect doc.blocks).to have_size 2
+    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3]
+  end
+
   it 'should resolve include with multiline paragraph' do
     doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-multiline-paragraph.adoc'), safe: :safe
     expected_lines = <<~'EOS'.chomp.split ?\n
