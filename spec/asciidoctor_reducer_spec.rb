@@ -22,7 +22,7 @@ describe 'Asciidoctor::Reducer' do
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3]
   end
 
-  it 'should resolve top-level include with no includes' do
+  it 'should resolve top-level include with no nested includes' do
     source_file = fixture_file 'parent-with-single-include.adoc'
     doc = Asciidoctor.load_file source_file, safe: :safe
     expected_lines = <<~'EOS'.chomp.split ?\n
