@@ -486,7 +486,19 @@ describe 'Asciidoctor::Reducer' do
     with_memory_logger do |logger|
       Asciidoctor.load_file (fixture_file 'document-with-warnings.adoc'), safe: :safe
       (expect logger.messages).to be_empty
-      (expect logger).to be Asciidoctor::LoggerManager.logger
+      (expect Asciidoctor::LoggerManager.logger).to be logger
     end
+  end
+
+  it 'should restore original logger' do
+    default_logger = Asciidoctor::LoggerManager.logger
+    custom_logger = Asciidoctor::LoggerManager.logger = Asciidoctor::MemoryLogger.new
+    custom_logger.warn 'before'
+    Asciidoctor.load_file (fixture_file 'document-with-warnings.adoc'), safe: :safe
+    (expect Asciidoctor::LoggerManager.logger).to be custom_logger
+    (expect custom_logger.messages).to have_size 1
+    (expect custom_logger.messages[0][:message]).to eql 'before'
+  ensure
+    Asciidoctor::LoggerManager.logger = default_logger
   end
 end
