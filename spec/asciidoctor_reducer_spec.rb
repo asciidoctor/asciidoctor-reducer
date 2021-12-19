@@ -44,6 +44,9 @@ describe 'Asciidoctor::Reducer' do
     (expect doc.sourcemap).to be true
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
     (expect (doc.blocks.map {|it| it.file }).uniq).to eql [source_file]
+    (expect doc.attr 'docname').to eql 'parent-with-single-include'
+    (expect doc.attr 'docfile').to eql source_file
+    (expect doc.attr 'docdir').to eql (File.dirname source_file)
   end
 
   it 'should resolve top-level include with nested include' do
