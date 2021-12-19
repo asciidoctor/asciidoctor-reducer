@@ -8,18 +8,22 @@ describe 'Asciidoctor::Reducer' do
   end
 
   it 'should load document with no includes' do
-    doc = Asciidoctor.load_file (fixture_file 'parent-with-no-includes.adoc'), safe: :safe
+    source_file = fixture_file 'parent-with-no-includes.adoc'
+    doc = Asciidoctor.load_file source_file, safe: :safe
     expected_lines = <<~'EOS'.chomp.split ?\n
     no includes to be found here
 
     not a one
     EOS
-    (expect doc.options[:reduced]).to be_falsy
     (expect doc.source_lines).to eql expected_lines
     (expect doc.blocks).to have_size 2
+    (expect doc.options[:reduced]).to be_falsy
     # NOTE for now, sourcemap is enabled implicitly
     (expect doc.sourcemap).to be true
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3]
+    (expect doc.attr 'docname').to eql 'parent-with-no-includes'
+    (expect doc.attr 'docfile').to eql source_file
+    (expect doc.attr 'docdir').to eql (File.dirname source_file)
   end
 
   it 'should resolve top-level include with no nested includes' do
