@@ -333,6 +333,20 @@ describe 'Asciidoctor::Reducer' do
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
 
+  it 'should not rebuild document if no includes are found' do
+    captured_interim_doc = nil
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-no-includes.adoc'), safe: :safe,
+      extensions: proc {
+        tree_processor do
+          prefer
+          process do |interim_doc|
+            interim_doc.options[:reduced] ? interim_doc : (captured_interim_doc = interim_doc)
+          end
+        end
+      }
+    expect(captured_interim_doc).to be doc
+  end
+
   it 'should resolve include with tag' do
     doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-tag.adoc'), safe: :safe
     expected_lines = <<~'EOS'.chomp.split ?\n
