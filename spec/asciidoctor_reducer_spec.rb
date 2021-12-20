@@ -8,7 +8,7 @@ describe 'Asciidoctor::Reducer' do
   end
 
   it 'should be able to require library using the alias asciidoctor-reducer' do
-    (expect require 'asciidoctor-reducer').to_not be_nil
+    (expect require 'asciidoctor-reducer').not_to be_nil
   end
 
   it 'should load document with no includes' do
