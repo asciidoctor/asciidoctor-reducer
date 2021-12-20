@@ -7,6 +7,10 @@ describe 'Asciidoctor::Reducer' do
     (expect Asciidoctor::Reducer::VERSION).to match %r/^\d+\.\d+\.\d+(\.\S+)?$/
   end
 
+  it 'should be able to require library using the alias asciidoctor-reducer' do
+    (expect require 'asciidoctor-reducer').to_not be_nil
+  end
+
   it 'should load document with no includes' do
     source_file = fixture_file 'parent-with-no-includes.adoc'
     doc = Asciidoctor.load_file source_file, safe: :safe
