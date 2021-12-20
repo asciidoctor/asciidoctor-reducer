@@ -12,7 +12,8 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
-Asciidoctor Reducer is a tool to generate a single AsciiDoc document from a set of AsciiDoc documents reachable from a parent document by expanding all its top-level and nested include directives.
+Asciidoctor Reducer is a tool that reduces an AsciiDoc document with includes into a single document by expanding all includes reachable from the specified parent document.
+If the document does not contain any includes, it returns the original source.
 
 IMPORTANT: This project is still in prototype.
 As such, there is no release available.
