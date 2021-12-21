@@ -18,6 +18,34 @@ If the document does not contain any includes, it returns the original source.
 IMPORTANT: This project is still in prototype.
 As such, there is no release available.
 
+== Usage
+
+=== As extension
+
+You can use this tool as an Asciidoctor extension when using the Asciidoctor API.
+To do so, require it before calling the `Asciidoctor.load` method.
+
+[,ruby]
+----
+require 'asciidoctor/reducer'
+----
+
+Next, load a parent document that contains includes.
+
+[,ruby]
+----
+doc = Asciidoctor.load_file 'sample.adoc', safe: :safe
+----
+
+Finally, you can retrieve the reduced source from the returned document.
+
+[,ruby]
+----
+puts doc.source
+----
+
+You can write this source to a file to save the reduced document.
+
 == Copyright and License
 
 Copyright (C) 2021-present Dan Allen.
