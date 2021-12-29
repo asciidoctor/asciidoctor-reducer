@@ -6,7 +6,7 @@ module Asciidoctor::Reducer
       def preprocess_include_directive target, attrlist
         @x_include_directive_line = %(include::#{target}[#{attrlist}])
         @x_push_include_called = false
-        inc_lineno = @lineno - 1 # we're on the include line, which is 1-based
+        inc_lineno = @lineno - 1 # we're currently on the include line, which is 1-based
         result = super
         return result if @x_push_include_called
         parent_depth = (parents = @x_parents).length
