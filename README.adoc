@@ -20,6 +20,40 @@ As such, there is no release available.
 
 == Usage
 
+=== As command
+
+You can run this tool using the provided command (i.e., CLI), named `asciidoctor-reducer`.
+To learn how to use the command, and to verify it's available, run the command with the `-h` option:
+
+ $ asciidoctor-reducer -h
+
+On the first line of the help text, you'll see a synopsis of the command:
+
+....
+asciidoctor-reducer [OPTION]... FILE
+....
+
+The argument `FILE` is the AsciiDoc file you want to reduce.
+To use the command, pass the AsciiDoc file as the sole argument:
+
+ $ asciidoctor-reducer input.adoc
+
+By default, the command will output the reduced AsciiDoc document to the terminal (via stdout).
+To write the output to a file, specify an output file using the `-o` option.
+
+ $ asciidoctor-reducer -o output.adoc input.adoc
+
+The command can also read the input document from stdin instead of a file.
+To use the command in this way, pass `-` as the first argument:
+
+ $ cat input.adoc | asciidoctor-reducer -
+
+To write the output to a file, also specify the `-o` option:
+
+ $ cat input.adoc | asciidoctor-reducer -o output.adoc -
+
+Note that top-level include files in the input AsciiDoc document are resolved relative to current working directory.
+
 === As extension
 
 You can use this tool as an Asciidoctor extension when using the Asciidoctor API.
