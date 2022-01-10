@@ -13,7 +13,7 @@ ifdef::env-github[]
 endif::[]
 
 Asciidoctor Reducer is a tool that reduces an AsciiDoc document with includes to a single document by expanding the includes reachable from the specified parent document.
-If the document does not contain any includes, it returns the original source.
+If the document does not contain any includes, the tool returns the original source.
 
 IMPORTANT: This project is still in prototype.
 As such, there is no release available.
