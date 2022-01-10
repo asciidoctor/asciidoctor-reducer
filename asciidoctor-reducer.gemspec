@@ -9,8 +9,8 @@ Gem::Specification.new do |s|
   s.version = Asciidoctor::Reducer::VERSION
   # Reduces a set of AsciiDoc documents into a single document by expanding all includes reachable from the parent document.
 
-  s.summary = 'Reduces an AsciiDoc document with includes into a single document.'
-  s.description = 'A tool that reduces an AsciiDoc document with includes into a single document by expanding all includes reachable from the specified parent document.'
+  s.summary = 'Reduces an AsciiDoc document with includes to a single AsciiDoc document.'
+  s.description = 'A tool that reduces an AsciiDoc document with includes to a single AsciiDoc document by expanding the includes reachable from the specified parent document.'
   s.authors = ['Dan Allen']
   s.email = 'dan.j.allen@gmail.com'
   s.homepage = 'https://asciidoctor.org'
