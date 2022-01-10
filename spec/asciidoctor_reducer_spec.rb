@@ -7,6 +7,12 @@ describe 'Asciidoctor::Reducer' do
     (expect Asciidoctor::Reducer::VERSION).to match %r/^\d+\.\d+\.\d+(\.\S+)?$/
   end
 
+  it 'should be able to require library from Ruby process' do
+    script_file = fixture_file 'print_version.rb'
+    output = %x(#{ruby} #{Shellwords.escape script_file}).chomp
+    (expect output).to eql Asciidoctor::Reducer::VERSION
+  end
+
   it 'should be able to require library using the alias asciidoctor-reducer' do
     (expect require 'asciidoctor-reducer').not_to be_nil
   end

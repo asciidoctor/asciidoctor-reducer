@@ -11,6 +11,7 @@ end
 
 require 'asciidoctor/reducer'
 require 'pathname'
+require 'shellwords'
 
 RSpec.configure do
   def fixtures_dir
@@ -32,6 +33,10 @@ RSpec.configure do
     yield logger
   ensure
     Asciidoctor::LoggerManager.logger = old_logger
+  end
+
+  def ruby
+    Shellwords.escape File.join RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name']
   end
 end
 
