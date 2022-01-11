@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+asciidoctor_reducer = File.absolute_path '../lib/asciidoctor/reducer', __dir__
+if File.exist? asciidoctor_reducer
+  require asciidoctor_reducer
+else
+  require 'asciidoctor/reducer'
+end
+
+require 'asciidoctor/reducer/cli'
+
+exit Asciidoctor::Reducer::Cli.run

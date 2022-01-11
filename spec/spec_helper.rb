@@ -10,10 +10,16 @@ when 'true'
 end
 
 require 'asciidoctor/reducer'
+require 'fileutils'
 require 'pathname'
 require 'shellwords'
+require 'tempfile'
 
-RSpec.configure do
+RSpec.configure do |config|
+  config.after :suite do
+    FileUtils.rm_r output_dir, force: true, secure: true
+  end
+
   def fixtures_dir
     File.join __dir__, 'fixtures'
   end
@@ -24,6 +30,14 @@ RSpec.configure do
     else
       File.join fixtures_dir, path
     end
+  end
+
+  def output_dir
+    (FileUtils.mkpath (File.join __dir__, 'output'))[0]
+  end
+
+  def with_tmp_file ext = '.adoc', &block
+    Tempfile.create %W(asciidoctor-reducer- #{ext}), output_dir, &block
   end
 
   def with_memory_logger level = nil
