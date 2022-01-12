@@ -6,14 +6,4 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 
 == Unreleased
 
-=== Added
-
-* Initialize project.
-
-=== Changed
-
-* ...
-
-=== Fixed
-
-* ...
+Initial release.
