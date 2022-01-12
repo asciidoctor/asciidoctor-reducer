@@ -1,6 +1,5 @@
 = Asciidoctor Reducer
 Dan Allen <https://github.com/mojavelinux[@mojavelinux]>
-// settings:
 :idprefix:
 :idseparator: -
 ifndef::env-github[:icons: font]
@@ -11,12 +10,33 @@ ifdef::env-github[]
 :tip-caption: :bulb:
 :warning-caption: :warning:
 endif::[]
+:url-rvm: https://rvm.io
 
 Asciidoctor Reducer is a tool that reduces an AsciiDoc document with includes to a single document by expanding the includes reachable from the specified parent document.
 If the document does not contain any includes, the tool returns the original source.
 
-IMPORTANT: This project is still in prototype.
-As such, there is no release available.
+== Prerequisites
+
+To install and run Asciidoctor Reducer, you need Ruby 2.5 or better installed and the Asciidoctor gem.
+The instructions for installing the gems is covered in the next section.
+
+To check whether you have Ruby installed, and which version, run the following command:
+
+ $ ruby -v
+
+If Ruby is not installed, you can install it using {url-rvm}[RVM] (or, if you prefer, the package manager for your system).
+We generally recommend using RVM because it allows you to install gems without requiring elevated privileges or messing with system libraries.
+
+== Installation
+
+Asciidoctor Reducer is published to RubyGems.org as the gem named *asciidoctor-reducer*.
+
+You can install the latest version of the gem using the following command:
+
+ $ gem install asciidoctor-reducer
+
+Installing this gem makes the `asciidoctor-reducer` command available on your $PATH.
+You can also require the gem to use it as an Asciidoctor extension.
 
 == Usage
 
