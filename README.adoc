@@ -33,7 +33,7 @@ Asciidoctor Reducer is published to RubyGems.org as the gem named *asciidoctor-r
 
 You can install the latest version of the gem using the following command:
 
- $ gem install asciidoctor-reducer
+ $ gem install asciidoctor-reducer --pre
 
 Installing this gem makes the `asciidoctor-reducer` command available on your $PATH.
 You can also require the gem to use it as an Asciidoctor extension.
