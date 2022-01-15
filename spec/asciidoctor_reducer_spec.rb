@@ -490,6 +490,32 @@ describe 'Asciidoctor::Reducer' do
     (expect (blocks.map {|it| it.lineno })).to eql [1, 4, 6]
   end
 
+  it 'should use attribute defined in body when resolving include' do
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-attribute-reference-from-body.adoc'),
+      safe: :safe
+    expected_lines = <<~'EOS'.chomp.split ?\n
+    = Book Title
+    :doctype: book
+
+    Preamble.
+
+    :includesdir: chapters
+    == Chapter One
+
+    content
+
+    :includesdir: appendices
+    [appendix]
+    == Installation
+
+    content
+    EOS
+    (expect doc.source_lines).to eql expected_lines
+    blocks = doc.find_by {|it| it.context != :document }
+    (expect blocks).to have_size 7
+    (expect (blocks.map {|it| it.lineno })).to eql [1, 4, 4, 7, 9, 13, 15]
+  end
+
   it 'should use attribute passed to API when resolving include' do
     doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-attribute-reference-in-target.adoc'),
       safe: :safe, attributes: 'chaptersdir=chapters'

@@ -1,0 +1,10 @@
+= Book Title
+:doctype: book
+
+Preamble.
+
+:includesdir: chapters
+include::{includesdir}/ch1.adoc[]
+
+:includesdir: appendices
+include::{includesdir}/appx1.adoc[]
