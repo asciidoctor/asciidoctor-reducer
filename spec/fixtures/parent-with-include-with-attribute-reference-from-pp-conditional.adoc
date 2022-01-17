@@ -1,0 +1,4 @@
+= Book Title
+ifndef::chaptersdir[:chaptersdir: chapters]
+
+include::{chaptersdir}/ch1.adoc[]
