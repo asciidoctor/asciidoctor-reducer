@@ -1,0 +1,7 @@
+before include
+
+ifdef::no-such-attribute[]
+include::single-line-paragraph.adoc[]
+
+endif::[]
+after include
