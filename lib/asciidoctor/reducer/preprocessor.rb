@@ -6,7 +6,6 @@ module Asciidoctor::Reducer
   class Preprocessor < ::Asciidoctor::Extensions::Preprocessor
     def process doc, reader
       return if doc.options[:reduced]
-      doc.sourcemap = true
       # Q: is there a better place we can store the original logger?
       ::Asciidoctor::LoggerManager.instance_variable_set :@original_logger, ::Asciidoctor::LoggerManager.logger
       ::Asciidoctor::LoggerManager.logger = ::Asciidoctor::NullLogger.new
