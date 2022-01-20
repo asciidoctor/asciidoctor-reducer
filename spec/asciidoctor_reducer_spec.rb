@@ -19,7 +19,7 @@ describe 'Asciidoctor::Reducer' do
 
   it 'should load document with no includes' do
     source_file = fixture_file 'parent-with-no-includes.adoc'
-    doc = Asciidoctor.load_file source_file, safe: :safe
+    doc = Asciidoctor.load_file source_file, safe: :safe, sourcemap: true
     expected_lines = <<~'EOS'.chomp.split ?\n
     no includes to be found here
 
@@ -28,7 +28,6 @@ describe 'Asciidoctor::Reducer' do
     (expect doc.source_lines).to eql expected_lines
     (expect doc.blocks).to have_size 2
     (expect doc.options[:reduced]).to be_falsy
-    # NOTE for now, sourcemap is enabled implicitly
     (expect doc.sourcemap).to be true
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3]
     (expect doc.attr 'docname').to eql 'parent-with-no-includes'
@@ -36,9 +35,17 @@ describe 'Asciidoctor::Reducer' do
     (expect doc.attr 'docdir').to eql (File.dirname source_file)
   end
 
+  it 'should not enable sourcemap on document with no includes' do
+    source_file = fixture_file 'parent-with-no-includes.adoc'
+    doc = Asciidoctor.load_file source_file, safe: :safe
+    (expect doc.options[:reduced]).to be_falsy
+    (expect doc.sourcemap).to be_falsy
+    (expect doc.blocks[0].source_location).to be_nil
+  end
+
   it 'should resolve top-level include with no nested includes' do
     source_file = fixture_file 'parent-with-single-include.adoc'
-    doc = Asciidoctor.load_file source_file, safe: :safe
+    doc = Asciidoctor.load_file source_file, safe: :safe, sourcemap: true
     expected_lines = <<~'EOS'.chomp.split ?\n
     before include
 
@@ -59,9 +66,17 @@ describe 'Asciidoctor::Reducer' do
     (expect doc.attr 'docdir').to eql (File.dirname source_file)
   end
 
+  it 'should not enable sourcemap on reduced document' do
+    source_file = fixture_file 'parent-with-single-include.adoc'
+    doc = Asciidoctor.load_file source_file, safe: :safe
+    (expect doc.options[:reduced]).to be true
+    (expect doc.sourcemap).to be_falsy
+    (expect doc.blocks[0].source_location).to be_nil
+  end
+
   it 'should resolve top-level include with nested include' do
     source_file = fixture_file 'parent-with-single-include-with-include.adoc'
-    doc = Asciidoctor.load_file source_file, safe: :safe
+    doc = Asciidoctor.load_file source_file, safe: :safe, sourcemap: true
     expected_lines = <<~'EOS'.chomp.split ?\n
     before include
 
@@ -82,7 +97,7 @@ describe 'Asciidoctor::Reducer' do
   end
 
   it 'should resolve nested include relative to include file' do
-    doc = Asciidoctor.load_file (fixture_file 'parent-with-nested-include-in-subdir.adoc'), safe: :safe
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-nested-include-in-subdir.adoc'), safe: :safe, sourcemap: true
     expected_lines = <<~'EOS'.chomp.split ?\n
     before include
 
@@ -100,7 +115,8 @@ describe 'Asciidoctor::Reducer' do
   end
 
   it 'should resolve include with single line paragraph' do
-    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-single-line-paragraph.adoc'), safe: :safe
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-single-line-paragraph.adoc'), safe: :safe,
+      sourcemap: true
     expected_lines = <<~'EOS'.chomp.split ?\n
     before include
 
@@ -114,7 +130,7 @@ describe 'Asciidoctor::Reducer' do
   end
 
   it 'should leave escaped include escaped' do
-    doc = Asciidoctor.load_file (fixture_file 'parent-with-escaped-include.adoc'), safe: :safe
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-escaped-include.adoc'), safe: :safe, sourcemap: true
     expected_lines = <<~'EOS'.chomp.split ?\n
     before include
 
@@ -128,7 +144,7 @@ describe 'Asciidoctor::Reducer' do
   end
 
   it 'should resolve include at start of document' do
-    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-at-start.adoc'), safe: :safe
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-at-start.adoc'), safe: :safe, sourcemap: true
     expected_lines = <<~'EOS'.chomp.split ?\n
     single line paragraph
 
@@ -140,7 +156,7 @@ describe 'Asciidoctor::Reducer' do
   end
 
   it 'should resolve include at end of document' do
-    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-at-end.adoc'), safe: :safe
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-at-end.adoc'), safe: :safe, sourcemap: true
     expected_lines = <<~'EOS'.chomp.split ?\n
     before include
 
@@ -152,7 +168,8 @@ describe 'Asciidoctor::Reducer' do
   end
 
   it 'should resolve include with multiline paragraph' do
-    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-multiline-paragraph.adoc'), safe: :safe
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-multiline-paragraph.adoc'), safe: :safe,
+      sourcemap: true
     expected_lines = <<~'EOS'.chomp.split ?\n
     before include
 
@@ -168,7 +185,8 @@ describe 'Asciidoctor::Reducer' do
   end
 
   it 'should resolve include with multiple paragraphs' do
-    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-multiple-paragraphs.adoc'), safe: :safe
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-multiple-paragraphs.adoc'), safe: :safe,
+      sourcemap: true
     expected_lines = <<~'EOS'.chomp.split ?\n
     before include
 
@@ -185,7 +203,7 @@ describe 'Asciidoctor::Reducer' do
   end
 
   it 'should resolve adjacent includes' do
-    doc = Asciidoctor.load_file (fixture_file 'parent-with-adjacent-includes.adoc'), safe: :safe
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-adjacent-includes.adoc'), safe: :safe, sourcemap: true
     expected_lines = <<~'EOS'.chomp.split ?\n
     before includes
 
@@ -201,7 +219,7 @@ describe 'Asciidoctor::Reducer' do
 
   it 'should resolve include that follows include with nested include' do
     doc = Asciidoctor.load_file (fixture_file 'parent-with-include-following-include-with-nested-include.adoc'),
-      safe: :safe
+      safe: :safe, sourcemap: true
     expected_lines = <<~'EOS'.chomp.split ?\n
     before
 
@@ -227,7 +245,7 @@ describe 'Asciidoctor::Reducer' do
   end
 
   it 'should assign same line number to preamble and its paragraph' do
-    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-preamble.adoc'), safe: :safe
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-preamble.adoc'), safe: :safe, sourcemap: true
     expected_lines = <<~'EOS'.chomp.split ?\n
     = Document Title
 
@@ -246,7 +264,7 @@ describe 'Asciidoctor::Reducer' do
   it 'should skip top-level include that cannot be resolved' do
     doc = nil
     with_memory_logger do |logger|
-      doc = Asciidoctor.load_file (fixture_file 'parent-with-unresolved-include.adoc'), safe: :safe
+      doc = Asciidoctor.load_file (fixture_file 'parent-with-unresolved-include.adoc'), safe: :safe, sourcemap: true
       (expect logger).to be_empty
     end
     expected_lines = <<~'EOS'.chomp.split ?\n
@@ -265,7 +283,8 @@ describe 'Asciidoctor::Reducer' do
   it 'should skip optional top-level include that cannot be resolved' do
     doc = nil
     with_memory_logger do |logger|
-      doc = Asciidoctor.load_file (fixture_file 'parent-with-optional-unresolved-include.adoc'), safe: :safe
+      doc = Asciidoctor.load_file (fixture_file 'parent-with-optional-unresolved-include.adoc'), safe: :safe,
+        sourcemap: true
       (expect logger).to be_empty
     end
     expected_lines = <<~'EOS'.chomp.split ?\n
@@ -280,7 +299,7 @@ describe 'Asciidoctor::Reducer' do
   end
 
   it 'should skip empty include' do
-    doc = Asciidoctor.load_file (fixture_file 'parent-with-empty-include.adoc'), safe: :safe
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-empty-include.adoc'), safe: :safe, sourcemap: true
     expected_lines = <<~'EOS'.chomp.split ?\n
     before include
     after include
@@ -297,7 +316,7 @@ describe 'Asciidoctor::Reducer' do
 
   it 'should skip include that custom include processor handles but does not push' do
     doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-single-line-paragraph.adoc'), safe: :safe,
-      extensions: proc { include_processor { process { next } } }
+      sourcemap: true, extensions: proc { include_processor { process { next } } }
     expected_lines = <<~'EOS'.chomp.split ?\n
     before include
 
@@ -311,7 +330,7 @@ describe 'Asciidoctor::Reducer' do
 
   it 'should include lines pushed by custom include processor' do
     doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-single-line-paragraph.adoc'), safe: :safe,
-      extensions: proc {
+      sourcemap: true, extensions: proc {
         include_processor do
           process do |_, reader, target, attrs|
             reader.push_include ['pushed first', '', 'pushed last'], target, target, 1, attrs
@@ -334,7 +353,7 @@ describe 'Asciidoctor::Reducer' do
 
   it 'should not replace lines if the target line does not match the expected line' do
     doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-single-line-paragraph.adoc'), safe: :safe,
-      extensions: proc {
+      sourcemap: true, extensions: proc {
         tree_processor do
           prefer
           process do |interim_doc|
@@ -372,7 +391,7 @@ describe 'Asciidoctor::Reducer' do
   end
 
   it 'should resolve include with tag' do
-    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-tag.adoc'), safe: :safe
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-tag.adoc'), safe: :safe, sourcemap: true
     expected_lines = <<~'EOS'.chomp.split ?\n
     before include
 
@@ -388,7 +407,7 @@ describe 'Asciidoctor::Reducer' do
   end
 
   it 'should resolve include with tags' do
-    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-tags.adoc'), safe: :safe
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-tags.adoc'), safe: :safe, sourcemap: true
     expected_lines = <<~'EOS'.chomp.split ?\n
     before include
 
@@ -403,7 +422,7 @@ describe 'Asciidoctor::Reducer' do
   end
 
   it 'should resolve include with lines' do
-    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-lines.adoc'), safe: :safe
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-lines.adoc'), safe: :safe, sourcemap: true
     expected_lines = <<~'EOS'.chomp.split ?\n
     before include
 
@@ -422,7 +441,7 @@ describe 'Asciidoctor::Reducer' do
   end
 
   it 'should resolve include with leveloffset' do
-    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-leveloffset.adoc'), safe: :safe
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-leveloffset.adoc'), safe: :safe, sourcemap: true
     expected_lines = <<~'EOS'.chomp.split ?\n
     = Document Title
 
@@ -445,7 +464,7 @@ describe 'Asciidoctor::Reducer' do
   end
 
   it 'should resolve include between leveloffset attribute entries' do
-    doc = Asciidoctor.load_file (fixture_file 'parent-with-leveloffset-and-include.adoc'), safe: :safe
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-leveloffset-and-include.adoc'), safe: :safe, sourcemap: true
     expected_lines = <<~'EOS'.chomp.split ?\n
     = Document Title
 
@@ -466,7 +485,7 @@ describe 'Asciidoctor::Reducer' do
   end
 
   it 'should preserve attribute entries in the document header' do
-    doc = Asciidoctor.load_file (fixture_file 'parent-with-header-attributes.adoc'), safe: :safe
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-header-attributes.adoc'), safe: :safe, sourcemap: true
     expected_lines = <<~'EOS'.chomp.split ?\n
     = Document Title
     :sectnums:
@@ -489,7 +508,7 @@ describe 'Asciidoctor::Reducer' do
 
   it 'should use attribute defined in header when resolving include' do
     doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-attribute-reference-from-header.adoc'),
-      safe: :safe
+      safe: :safe, sourcemap: true
     expected_lines = <<~'EOS'.chomp.split ?\n
     = Book Title
     :chaptersdir: chapters
@@ -506,7 +525,7 @@ describe 'Asciidoctor::Reducer' do
 
   it 'should use attribute defined in body when resolving include' do
     doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-attribute-reference-from-body.adoc'),
-      safe: :safe
+      safe: :safe, sourcemap: true
     expected_lines = <<~'EOS'.chomp.split ?\n
     = Book Title
     :doctype: book
@@ -532,7 +551,7 @@ describe 'Asciidoctor::Reducer' do
 
   it 'should use attribute defined inside preprocessor conditional header when resolving include' do
     doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-attribute-reference-from-pp-conditional.adoc'),
-      safe: :safe
+      safe: :safe, sourcemap: true
     expected_lines = <<~'EOS'.chomp.split ?\n
     = Book Title
     ifndef::chaptersdir[:chaptersdir: chapters]
@@ -549,7 +568,7 @@ describe 'Asciidoctor::Reducer' do
 
   it 'should use attribute passed to API when resolving include' do
     doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-attribute-reference-in-target.adoc'),
-      safe: :safe, attributes: 'chaptersdir=chapters'
+      safe: :safe, sourcemap: true, attributes: 'chaptersdir=chapters'
     expected_lines = <<~'EOS'.chomp.split ?\n
     = Book Title
 
@@ -565,7 +584,7 @@ describe 'Asciidoctor::Reducer' do
 
   it 'should use attribute passed to API when resolving attribute value on include directive' do
     doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-attribute-reference-as-tag.adoc'),
-      safe: :safe, attributes: 'tag=body'
+      safe: :safe, sourcemap: true, attributes: 'tag=body'
     expected_lines = <<~'EOS'.chomp.split ?\n
     before include
 
@@ -581,7 +600,8 @@ describe 'Asciidoctor::Reducer' do
   end
 
   it 'should not resolve include inside false preprocessor conditional' do
-    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-inside-false-pp-conditional.adoc'), safe: :safe
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-inside-false-pp-conditional.adoc'), safe: :safe,
+      sourcemap: true
     expected_lines = <<~'EOS'.chomp.split ?\n
     before include
 
