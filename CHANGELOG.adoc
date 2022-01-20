@@ -9,6 +9,7 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 === Changed
 
 * Don't enable sourcemap automatically (#4)
+* Reserve zero index in include replacements for top-level document
 
 == 1.0.0.alpha.1 (2022-01-12) - @mojavelinux
 
