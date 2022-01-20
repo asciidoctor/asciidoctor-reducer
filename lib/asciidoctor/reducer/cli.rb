@@ -8,7 +8,7 @@ module Asciidoctor::Reducer
 
   class Cli
     def parse args
-      options = {}
+      options = { attributes: {} }
 
       opt_parser = ::OptionParser.new do |opts|
         opts.program_name = 'asciidoctor-reducer'
@@ -21,6 +21,13 @@ module Asciidoctor::Reducer
 
         opts.on '-o FILE', '--output=FILE', 'Set the output filename or stream' do |file|
           options[:output_file] = file
+        end
+
+        opts.on '-a KEY[=VALUE]', '--attribute=KEY[=VALUE]',
+          'Set an attribute in the AsciiDoc document header (accepts: key, key!, or key=value)' do |attr|
+          key, val = attr.split '=', 2
+          val ||= ''
+          options[:attributes][key] = val
         end
 
         opts.on '-h', '--help', 'Display this help text and exit' do
@@ -58,15 +65,16 @@ module Asciidoctor::Reducer
     def self.run args = ARGV
       code, options = new.parse (Array args)
       return code unless code == 0 && options
+      attributes = options.delete :attributes
       if (output_file = options.delete :output_file) == '-'
         to = $stdout
       else
         (to = ::Pathname.new output_file).dirname.mkpath
       end
       if (input_file = options.delete :input_file) == '-'
-        reduced = (Asciidoctor.load $stdin, safe: :safe).source + ?\n
+        reduced = (Asciidoctor.load $stdin, attributes: attributes, safe: :safe).source + ?\n
       else
-        reduced = (Asciidoctor.load_file input_file, safe: :safe, to_file: false).source + ?\n
+        reduced = (Asciidoctor.load_file input_file, attributes: attributes, safe: :safe, to_file: false).source + ?\n
       end
       Pathname === to ? (to.write reduced, encoding: ::Encoding::UTF_8) : (to.write reduced)
       0

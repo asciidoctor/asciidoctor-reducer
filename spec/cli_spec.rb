@@ -52,10 +52,23 @@ describe Asciidoctor::Reducer::Cli do
       end
     end
 
-    it 'should write to stdout when -o is -' do
+    it 'should write to stdout when -o option is -' do
       the_source_file = fixture_file 'parent-with-single-include.adoc'
       (expect subject.run [the_source_file, '-o', '-']).to eql 0
       (expect $stdout.string.chomp).to include 'just good old-fashioned paragraph text'
+    end
+
+    it 'should allow runtime attribute to be specified using -a option' do
+      the_source_file = fixture_file 'parent-with-include-with-attribute-reference-in-target.adoc'
+      expected = <<~'EOS'.chomp
+      = Book Title
+
+      == Chapter One
+
+      content
+      EOS
+      (expect subject.run [the_source_file, '-a', 'chaptersdir=chapters', '-a', 'doctitle=Untitled']).to eql 0
+      (expect $stdout.string.chomp).to eql expected
     end
   end
 
