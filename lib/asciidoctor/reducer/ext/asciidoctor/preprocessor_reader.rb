@@ -10,15 +10,11 @@ module Asciidoctor::Reducer
         result = super
         return result if @x_push_include_called
         parent_depth = (parents = @x_parents).length
-        depth_change = @include_stack.length - (parent_depth - 1)
-        parent_depth -= (parents.slice! parent_depth + depth_change, -depth_change).length if depth_change < 0
+        if (depth_change = @include_stack.length - (parent_depth - 1)) < 0
+          parent_depth -= (parents.slice! parent_depth + depth_change, -depth_change).length
+        end
         lines = ((line = @lines[-1].to_s).start_with? 'Unresolved directive in ') && (line.end_with? ']') ? [line] : []
-        @x_include_replacements << {
-          lines: lines,
-          into: parents[parent_depth - 1],
-          index: inc_lineno,
-          replace: @x_include_directive_line,
-        }
+        push_include_replacement lines, parent_depth, inc_lineno
         result
       end
 
@@ -29,34 +25,35 @@ module Asciidoctor::Reducer
         # Q: can we do this without resetting the lineno?
         lineno = 1 # rubocop:disable Lint/ShadowedArgument
         super
-        inc_depth = @include_stack.length
         parent_depth = (parents = @x_parents).length
         # push_include did not push to the stack
-        if inc_depth == prev_inc_depth
-          depth_change = inc_depth - (parent_depth - 1)
-          parent_depth -= (parents.slice! parent_depth + depth_change, -depth_change).length if depth_change < 0
-          @x_include_replacements << {
-            lines: [],
-            into: parents[parent_depth - 1],
-            index: inc_lineno,
-            replace: @x_include_directive_line,
-          }
+        if (inc_depth = @include_stack.length) == prev_inc_depth
+          if (depth_change = inc_depth - (parent_depth - 1)) < 0
+            parent_depth -= (parents.slice! parent_depth + depth_change, -depth_change).length
+          end
         else
-          depth_change = inc_depth - parent_depth
-          if depth_change > 0
+          if (depth_change = inc_depth - parent_depth) > 0
             parents << @x_include_replacements.length.pred
             parent_depth += 1
           elsif depth_change < 0
             parent_depth -= (parents.slice! parent_depth + depth_change, -depth_change).length
           end
-          @x_include_replacements << {
-            lines: @lines.reverse,
-            into: parents[parent_depth - 1],
-            index: inc_lineno,
-            replace: @x_include_directive_line,
-          }
+          lines = @lines.reverse
         end
+        push_include_replacement lines, parent_depth, inc_lineno
         self
+      end
+
+      private
+
+      def push_include_replacement lines, parent_depth, inc_lineno
+        @x_include_replacements << {
+          lines: lines || [],
+          into: @x_parents[parent_depth - 1],
+          index: inc_lineno,
+          replace: @x_include_directive_line,
+        }
+        nil
       end
     end
   end
