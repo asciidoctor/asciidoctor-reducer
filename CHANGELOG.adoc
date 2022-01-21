@@ -6,6 +6,10 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 
 == Unreleased
 
+=== Added
+
+* Add `-a` / `--attribute` option to CLI for setting an AsciiDoc document attribute at runtime (#6)
+
 === Changed
 
 * Don't enable sourcemap automatically (#4)
