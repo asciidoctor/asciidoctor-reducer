@@ -19,6 +19,7 @@ module Asciidoctor::Reducer
           index: inc_lineno,
           replace: @x_include_directive_line,
         }
+        result
       end
 
       def push_include data, file, path, lineno, attrs
