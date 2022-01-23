@@ -10,9 +10,17 @@ module Asciidoctor::Reducer
       ::Asciidoctor::LoggerManager.instance_variable_set :@original_logger, ::Asciidoctor::LoggerManager.logger
       ::Asciidoctor::LoggerManager.logger = ::Asciidoctor::NullLogger.new
       reader.singleton_class.prepend AsciidoctorExt::PreprocessorReader
-      reader.instance_variable_set :@x_include_replacements, [{}]
+      reader.instance_variable_set :@x_include_replacements, ([{ drop: [] }].extend Current)
       reader.instance_variable_set :@x_parents, [0]
       nil
+    end
+  end
+
+  module Current
+    attr_accessor :current
+
+    def self.extended obj
+      obj.current = obj[-1]
     end
   end
 end

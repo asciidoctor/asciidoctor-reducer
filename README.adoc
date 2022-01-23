@@ -12,8 +12,9 @@ ifdef::env-github[]
 endif::[]
 :url-rvm: https://rvm.io
 
-Asciidoctor Reducer is a tool that reduces an AsciiDoc document with includes to a single document by expanding the includes reachable from the specified parent document.
-If the document does not contain any includes, the tool returns the original source.
+Asciidoctor Reducer is a tool that reduces a composite AsciiDoc document containing includes to a single AsciiDoc document by expanding any includes reachable from the parent document.
+The tool also applies preprocessor conditionals (unless the option to preserve them is specified), leaving behind only the enabled lines.
+If the document does not contain any preprocessor directives, the tool returns the original source.
 
 == Prerequisites
 

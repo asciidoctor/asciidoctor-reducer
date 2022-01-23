@@ -7,8 +7,8 @@ end
 Gem::Specification.new do |s|
   s.name = 'asciidoctor-reducer'
   s.version = Asciidoctor::Reducer::VERSION
-  s.summary = 'Reduces an AsciiDoc document with includes to a single AsciiDoc document.'
-  s.description = 'A tool that reduces an AsciiDoc document with includes to a single AsciiDoc document by expanding the includes reachable from the specified parent document.'
+  s.summary = 'Reduces a composite AsciiDoc document containing includes and conditionals to a single AsciiDoc document.'
+  s.description = 'A tool that reduces a composite AsciiDoc document containing preprocessor directives (includes and conditionals) to a single AsciiDoc document by expanding the includes and applying the conditionals.'
   s.authors = ['Dan Allen']
   s.email = 'dan.j.allen@gmail.com'
   s.homepage = 'https://asciidoctor.org'

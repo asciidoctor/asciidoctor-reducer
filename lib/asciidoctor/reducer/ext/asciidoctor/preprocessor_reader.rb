@@ -3,6 +3,28 @@
 module Asciidoctor::Reducer
   module AsciidoctorExt
     module PreprocessorReader
+      def preprocess_conditional_directive keyword, target, delimiter, text
+        return super if (opts = @document.options)[:preserve_conditionals] || opts[:reduced]
+        skip_active = @skipping
+        depth = @conditional_stack.length
+        cond_lineno = @lineno - 1
+        result = super
+        return result if @skipping && skip_active
+        drop = @x_include_replacements.current[:drop]
+        if (depth_change = @conditional_stack.length - depth) < 0
+          if skip_active
+            drop.push(*(drop.pop..cond_lineno))
+          else
+            drop << cond_lineno
+          end
+        elsif depth_change > 0 || cond_lineno == @lineno - 1
+          drop << cond_lineno
+        else
+          drop << [cond_lineno, text]
+        end
+        result
+      end
+
       def preprocess_include_directive target, attrlist
         @x_include_directive_line = %(include::#{target}[#{attrlist}])
         @x_push_include_called = false
@@ -44,15 +66,22 @@ module Asciidoctor::Reducer
         self
       end
 
+      def pop_include
+        @x_include_replacements.current = @x_include_replacements[@x_include_replacements.current[:into] || 0]
+        super
+      end
+
       private
 
       def push_include_replacement lines, parent_depth, inc_lineno
         @x_include_replacements << {
           lines: lines || [],
+          drop: [],
           into: @x_parents[parent_depth - 1],
           index: inc_lineno,
           replace: @x_include_directive_line,
         }
+        @x_include_replacements.current = @x_include_replacements[-1] if lines
         nil
       end
     end
