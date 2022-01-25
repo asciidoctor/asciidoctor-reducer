@@ -8,7 +8,7 @@ module Asciidoctor::Reducer
 
   class Cli
     def parse args
-      options = { attributes: {} }
+      options = { attributes: {}, safe: :safe }
 
       opt_parser = ::OptionParser.new do |opts|
         opts.program_name = 'asciidoctor-reducer'
@@ -65,16 +65,15 @@ module Asciidoctor::Reducer
     def self.run args = ARGV
       code, options = new.parse (Array args)
       return code unless code == 0 && options
-      attributes = options.delete :attributes
       if (output_file = options.delete :output_file) == '-'
         to = $stdout
       else
         (to = ::Pathname.new output_file).dirname.mkpath
       end
       if (input_file = options.delete :input_file) == '-'
-        reduced = (Asciidoctor.load $stdin, attributes: attributes, safe: :safe).source + ?\n
+        reduced = (Asciidoctor.load $stdin, options).source + ?\n
       else
-        reduced = (Asciidoctor.load_file input_file, attributes: attributes, safe: :safe, to_file: false).source + ?\n
+        reduced = (Asciidoctor.load_file input_file, (options.merge to_file: false)).source + ?\n
       end
       Pathname === to ? (to.write reduced, encoding: ::Encoding::UTF_8) : (to.write reduced)
       0
