@@ -101,6 +101,22 @@ puts doc.source
 
 You can write this source to a file to save the reduced document.
 
+== How it Works
+
+Asciidoctor Reducer uses a collection of Asciidoctor extensions to rebuild the AsciiDoc source as a single document.
+
+It starts by using a preprocessor extension to enhance the PreprocessorReader class to be notified each time an include is entered (pushed) or exited (popped).
+When an include directive is encountered, the enhanced reader stores the resolved lines and location of the include directive, thus keeping track of where those lines should be inserted in the original source.
+This information is stored as a stack, where each successive entry contains lines to be inserted into a parent entry.
+The enhanced reader also stores the location of preprocessor conditionals and whether the lines they enclose should be kept or dropped.
+
+The reducer then uses a tree processor extension to fold the include stack into a single sequence of lines.
+It does so by working from the end of the stack and inserting the lines into the parent until the stack has been flattened.
+As it goes, it also removes lines that have been excluded by the preprocessor conditionals as well as the directive lines themselves.
+
+Finally, it loads the document again and returns it.
+The reduced source is available on the reconstructed document.
+
 == Copyright and License
 
 Copyright (C) 2021-present Dan Allen.
