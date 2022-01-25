@@ -12,6 +12,7 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 
 === Changed
 
+* Reduce preprocessor conditionals by default; add option (`--preserve-conditionals` / `:preserve_conditionals`) to preserve them (#8)
 * Don't enable sourcemap automatically (#4)
 * Reserve zero index in include replacements for top-level document
 

@@ -70,6 +70,24 @@ describe Asciidoctor::Reducer::Cli do
       (expect subject.run [the_source_file, '-a', 'chaptersdir=chapters', '-a', 'doctitle=Untitled']).to eql 0
       (expect $stdout.string.chomp).to eql expected
     end
+
+    it 'should reduce preprocessor conditionals by default' do
+      the_source_file = fixture_file 'parent-with-single-line-preprocessor-conditional.adoc'
+      expected = <<~'EOS'.chomp
+      text
+      EOS
+      (expect subject.run [the_source_file]).to eql 0
+      (expect $stdout.string.chomp).to eql expected
+    end
+
+    it 'should preserve preprocessor conditionals if --preserve-conditionals option is specified' do
+      the_source_file = fixture_file 'parent-with-single-line-preprocessor-conditional.adoc'
+      expected = <<~'EOS'.chomp
+      ifdef::asciidoctor-version[text]
+      EOS
+      (expect subject.run [the_source_file, '--preserve-conditionals']).to eql 0
+      (expect $stdout.string.chomp).to eql expected
+    end
   end
 
   context 'arguments' do

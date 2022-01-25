@@ -1,0 +1,4 @@
+primary content
+ifdef::flag[]
+conditional content
+endif::[]

@@ -30,6 +30,10 @@ module Asciidoctor::Reducer
           options[:attributes][key] = val
         end
 
+        opts.on '--preserve-conditionals', 'Keep preprocessor conditional directives in the reduced source' do
+          options[:preserve_conditionals] = true
+        end
+
         opts.on '-h', '--help', 'Display this help text and exit' do
           $stdout.write opts.help
           return 0

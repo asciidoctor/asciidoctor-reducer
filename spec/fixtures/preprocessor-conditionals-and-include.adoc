@@ -1,0 +1,9 @@
+ifdef::flag[]
+before nested include
+endif::[]
+
+include::no-includes.adoc[]
+
+ifdef::flag[]
+after nested include
+endif::[]
