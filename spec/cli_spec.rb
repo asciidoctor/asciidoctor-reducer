@@ -38,7 +38,7 @@ describe Asciidoctor::Reducer::Cli do
       (expect subject.run %w(-h)).to eql 0
       stdout = $stdout.string.chomp
       (expect stdout).to start_with 'Usage: asciidoctor-reducer'
-      (expect stdout).to include 'Reduces an AsciiDoc document'
+      (expect stdout).to include 'Reduces a composite AsciiDoc document'
       (expect stdout).to include '-h, --help'
     end
 

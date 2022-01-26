@@ -15,31 +15,31 @@ module Asciidoctor::Reducer
         opts.banner = <<~EOS
         Usage: #{opts.program_name} [OPTION]... FILE
 
-        Reduces an AsciiDoc document with includes to a single AsciiDoc document.
+        Reduces a composite AsciiDoc document containing includes and conditionals to a single AsciiDoc document.
 
         EOS
 
-        opts.on '-o FILE', '--output=FILE', 'Set the output filename or stream' do |file|
+        opts.on '-o FILE', '--output=FILE', 'set the output filename or stream' do |file|
           options[:output_file] = file
         end
 
         opts.on '-a KEY[=VALUE]', '--attribute=KEY[=VALUE]',
-          'Set an attribute in the AsciiDoc document header (accepts: key, key!, or key=value)' do |attr|
+          'set a document attribute in the AsciiDoc document: [key, key!, key=value]' do |attr|
           key, val = attr.split '=', 2
           val ||= ''
           options[:attributes][key] = val
         end
 
-        opts.on '--preserve-conditionals', 'Keep preprocessor conditional directives in the reduced source' do
+        opts.on '--preserve-conditionals', 'preserve preprocessor conditional directives in the reduced source' do
           options[:preserve_conditionals] = true
         end
 
-        opts.on '-h', '--help', 'Display this help text and exit' do
+        opts.on '-h', '--help', 'display this help text and exit' do
           $stdout.write opts.help
           return 0
         end
 
-        opts.on '-v', '--version', %(Display version information and exit) do
+        opts.on '-v', '--version', 'display the version information and exit' do
           $stdout.write %(#{opts.program_name} #{VERSION}\n)
           return 0
         end
