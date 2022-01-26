@@ -40,7 +40,7 @@ module Asciidoctor::Reducer
         end
 
         opts.on '-v', '--version', %(Display version information and exit) do
-          $stdout.write %(#{opts.program_name} #{::Asciidoctor::Reducer::VERSION}\n)
+          $stdout.write %(#{opts.program_name} #{VERSION}\n)
           return 0
         end
       end
@@ -75,11 +75,11 @@ module Asciidoctor::Reducer
         (to = ::Pathname.new output_file).dirname.mkpath
       end
       if (input_file = options.delete :input_file) == '-'
-        reduced = (Asciidoctor.load $stdin, options).source + ?\n
+        reduced = (::Asciidoctor.load $stdin, options).source + ?\n
       else
-        reduced = (Asciidoctor.load_file input_file, (options.merge to_file: false)).source + ?\n
+        reduced = (::Asciidoctor.load_file input_file, (options.merge to_file: false)).source + ?\n
       end
-      Pathname === to ? (to.write reduced, encoding: ::Encoding::UTF_8) : (to.write reduced)
+      ::Pathname === to ? (to.write reduced, encoding: ::Encoding::UTF_8) : (to.write reduced)
       0
     rescue ::IOError
       $stderr.write %(asciidoctor-reducer: #{$!.message}\n)
