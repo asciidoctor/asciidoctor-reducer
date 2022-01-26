@@ -98,6 +98,47 @@ describe Asciidoctor::Reducer::Cli do
       (expect subject.run [the_source_file, '--preserve-conditionals']).to eql 0
       (expect $stdout.string.chomp).to eql expected
     end
+
+    it 'should set level on logger to higher value specified by --log-level option' do
+      the_source_file = fixture_file 'parent-with-unresolved-include.adoc'
+      expected = <<~'EOS'.chomp
+      before include
+
+      Unresolved directive in parent-with-unresolved-include.adoc - include::no-such-file.adoc[]
+
+      after include
+      EOS
+      (expect subject.run [the_source_file, '--log-level', 'fatal']).to eql 0
+      (expect $stderr.string.chomp).to be_empty
+      (expect $stdout.string.chomp).to eql expected
+    end
+
+    it 'should set level on logger to lower value specified by --log-level option' do
+      the_source_file = fixture_file 'parent-with-optional-unresolved-include.adoc'
+      expected = <<~'EOS'.chomp
+      before include
+
+
+      after include
+      EOS
+      (expect subject.run [the_source_file, '--log-level', 'info']).to eql 0
+      (expect $stderr.string.chomp).to include 'optional include dropped'
+      (expect $stdout.string.chomp).to eql expected
+    end
+
+    it 'should suppress log messages when -q option is specified' do
+      the_source_file = fixture_file 'parent-with-unresolved-include.adoc'
+      expected = <<~'EOS'.chomp
+      before include
+
+      Unresolved directive in parent-with-unresolved-include.adoc - include::no-such-file.adoc[]
+
+      after include
+      EOS
+      (expect subject.run [the_source_file, '-q']).to eql 0
+      (expect $stderr.string.chomp).to be_empty
+      (expect $stdout.string.chomp).to eql expected
+    end
   end
 
   context 'arguments' do

@@ -22,8 +22,6 @@ module Asciidoctor::Reducer
         # WARNING: if include directives remain that can still be resolved, the sourcemap won't match the source lines
         doc = ::Asciidoctor.load inc_replacements[0][:lines].flatten, (doc.options.merge reduced: true)
       end
-      ::Asciidoctor::LoggerManager.logger = ::Asciidoctor::LoggerManager.instance_variable_get :@original_logger
-      ::Asciidoctor::LoggerManager.remove_instance_variable :@original_logger
       doc
     end
   end

@@ -34,6 +34,15 @@ module Asciidoctor::Reducer
           options[:preserve_conditionals] = true
         end
 
+        opts.on '--log-level LEVEL', %w(debug info warn error fatal),
+          'set the minimum level of messages to log: [debug, info, warn, error, fatal] (default: warn)' do |level|
+          (options[:logger] = ::Asciidoctor::Logger.new $stderr).level = level unless level == 'warn'
+        end
+
+        opts.on '-q', '--quiet', 'suppress all application log messages' do
+          options[:logger] = ::Asciidoctor::NullLogger.new
+        end
+
         opts.on '-h', '--help', 'display this help text and exit' do
           $stdout.write opts.help
           return 0
@@ -67,6 +76,7 @@ module Asciidoctor::Reducer
     end
 
     def self.run args = ARGV
+      old_logger = ::Asciidoctor::LoggerManager.logger
       code, options = new.parse (Array args)
       return code unless code == 0 && options
       if (output_file = options.delete :output_file) == '-'
@@ -84,6 +94,8 @@ module Asciidoctor::Reducer
     rescue ::IOError
       $stderr.write %(asciidoctor-reducer: #{$!.message}\n)
       1
+    ensure
+      ::Asciidoctor::LoggerManager.logger = old_logger
     end
   end
 end
