@@ -172,6 +172,8 @@ Metrics/PerceivedComplexity:
   Enabled: false
 Naming/AccessorMethodName:
   Enabled: true
+Naming/BlockForwarding:
+  Enabled: true
 Naming/ConstantName:
   Enabled: false # FIXME consider reenabling
 Naming/FileName:
@@ -204,6 +206,8 @@ RSpec/ExampleWording:
 RSpec/ExcessiveDocstringSpacing:
   Enabled: true
 RSpec/ExpectInHook:
+  Enabled: true
+RSpec/FactoryBot/SyntaxMethods:
   Enabled: true
 RSpec/FilePath:
   Enabled: false
@@ -288,6 +292,10 @@ Style/ExplicitBlockArgument:
   Enabled: false # reason: yield is fine
 Style/ExponentialNotation:
   Enabled: true
+Style/FileRead:
+  Enabled: true
+Style/FileWrite:
+  Enabled: true
 Style/FormatString:
   EnforcedStyle: sprintf
 Style/FormatStringToken:
@@ -327,6 +335,8 @@ Style/InPatternThen:
 Style/InfiniteLoop:
   Enabled: false # reason: loop is measurably slower than while true
 Style/KeywordParametersOrder:
+  Enabled: true
+Style/MapToHash:
   Enabled: true
 Style/MethodCallWithArgsParentheses:
   Enabled: true
