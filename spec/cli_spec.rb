@@ -71,6 +71,16 @@ describe Asciidoctor::Reducer::Cli do
       (expect $stdout.string.chomp).to eql expected
     end
 
+    it 'should set attribute value to empty string if only name is passed to -a option' do
+      the_source_file = fixture_file 'preprocessor-conditional.adoc'
+      expected = <<~'EOS'.chomp
+      primary content
+      conditional content
+      EOS
+      (expect subject.run [the_source_file, '-a', 'flag']).to eql 0
+      (expect $stdout.string.chomp).to eql expected
+    end
+
     it 'should reduce preprocessor conditionals by default' do
       the_source_file = fixture_file 'parent-with-single-line-preprocessor-conditional.adoc'
       expected = <<~'EOS'.chomp
