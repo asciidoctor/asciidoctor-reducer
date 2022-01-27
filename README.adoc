@@ -1,4 +1,4 @@
-= Asciidoctor Reducer
+= {project-name}
 Dan Allen <https://github.com/mojavelinux[@mojavelinux]>
 :idprefix:
 :idseparator: -
@@ -10,16 +10,19 @@ ifdef::env-github[]
 :tip-caption: :bulb:
 :warning-caption: :warning:
 endif::[]
+:project-name: Asciidoctor Reducer
+:project-handle: asciidoctor-reducer
 :url-rvm: https://rvm.io
+:url-repo: https://github.com/asciidoctor/{project-handle}
 
-Asciidoctor Reducer is a tool that reduces a composite AsciiDoc document containing includes to a single AsciiDoc document by expanding any includes reachable from the parent document.
+{project-name} is a tool that reduces a composite AsciiDoc document containing includes to a single AsciiDoc document by expanding any includes reachable from the parent document.
 The tool also applies preprocessor conditionals (unless the option to preserve them is specified), leaving behind only the enabled lines.
 If the document does not contain any preprocessor directives, the tool returns the original source.
 
 == Prerequisites
 
-To install and run Asciidoctor Reducer, you need Ruby 2.5 or better installed and the Asciidoctor gem.
-The instructions for installing the gems is covered in the next section.
+{project-name} is a Ruby program that you install using Ruby packaging.
+Therefore, to install and run {project-name}, you need Ruby 2.5 or better installed.
 
 To check whether you have Ruby installed, and which version, run the following command:
 
@@ -30,14 +33,30 @@ We generally recommend using RVM because it allows you to install gems without r
 
 == Installation
 
-Asciidoctor Reducer is published to RubyGems.org as the gem named *asciidoctor-reducer*.
+{project-name} is published to RubyGems.org as the gem named *{project-handle}*.
 
 You can install the latest version of the gem using the following command:
 
  $ gem install asciidoctor-reducer --pre
 
 Installing this gem makes the `asciidoctor-reducer` command available on your $PATH.
-You can also require the gem to use it as an Asciidoctor extension.
+You can also require the gem into the Ruby runtime to use it as an Asciidoctor extension.
+
+If you prefer to manage the application as a project-scoped dependency, you can declare the gem in the project's [.path]_Gemfile_:
+
+.Gemfile
+[,ruby]
+----
+source 'https://rubygems.org'
+
+gem 'asciidoctor-reducer'
+----
+
+You then install the gem using the `bundle` command:
+
+ $ bundle --path=.bundle/gems
+
+Installing the gem this way makes the `bundle exec asciidoctor-reducer` command available on your $PATH.
 
 == Usage
 
@@ -103,7 +122,7 @@ You can write this source to a file to save the reduced document.
 
 == How it Works
 
-Asciidoctor Reducer uses a collection of Asciidoctor extensions to rebuild the AsciiDoc source as a single document.
+{project-name} uses a collection of Asciidoctor extensions to rebuild the AsciiDoc source as a single document.
 
 It starts by using a preprocessor extension to enhance the PreprocessorReader class to be notified each time an include is entered (pushed) or exited (popped).
 When an include directive is encountered, the enhanced reader stores the resolved lines and location of the include directive, thus keeping track of where those lines should be inserted in the original source.
@@ -116,6 +135,97 @@ As it goes, it also removes lines that have been excluded by the preprocessor co
 
 Finally, it loads the document again and returns it.
 The reduced source is available on the reconstructed document.
+
+== Development
+
+Follow the instructions below to learn how to help develop the project or test-drive the development version.
+
+=== Retrieve the source code
+
+Copy the {url-repo}[GitHub repository URL] and pass it to the `git clone` command:
+
+[subs=attributes+]
+ $ git clone {url-repo}
+
+Next, switch to the project directory:
+
+[subs=attributes+]
+ $ cd {project-handle}
+
+=== Install the dependencies
+
+The dependencies needed to use {project-name} are defined in the [.path]_Gemfile_ at the root of the project.
+You'll use Bundler to install these dependencies.
+
+Use the `bundle` command to install the project dependencies under the project directory:
+
+ $ bundle --path=.bundle/gems
+
+You must invoke `bundle` from the project's root directory so it can locate the [.path]_Gemfile_.
+
+=== Run the tests
+
+The test suite is located in the [.path]_spec_ directory.
+The tests are based on RSpec.
+
+==== Run all tests
+
+You can run all of the tests using Rake:
+
+ $ bundle exec spec
+
+For more fine-grained control, you can also run the tests directly using RSpec:
+
+ $ bundle exec rspec
+
+To run all tests in a single spec, point RSpec at the spec file:
+
+ $ bundle exec rspec spec/asciidoctor_reducer_spec.rb
+
+==== Run specific tests
+
+If you only want to run a single test, or a group of tests, you can do so by tagging the test cases, then filtering the test run using that tag.
+
+Start by adding the `only` tag to one or more specifications:
+
+[source,ruby]
+----
+it 'should do something new', only: true do
+  expect(true).to be true
+end
+----
+
+Next, run RSpec with the `only` flag enabled:
+
+ $ bundle exec rspec -t only
+
+RSpec will only run the specifications that contain this flag.
+
+You can also filter tests by keyword.
+Let's assume we want to run all the tests that have `leveloffset` in the description.
+Run RSpec with the example filter:
+
+ $ bundle exec rspec -e leveloffset
+
+RSpec will only run the specifications that have a description containing the text `leveloffset`.
+
+=== Generate code coverage
+
+To generate a code coverage report when running tests using simplecov, set the `COVERAGE` environment variable as follows when running the tests:
+
+ $ COVERAGE=deep bundle exec rake
+
+You'll see a total coverage score, a detailed coverage report, and a link to HTML report in the output.
+The HTML report helps you understand which lines and branches were missed, if any.
+
+=== Run the development version
+
+When running the `asciidoctor-reducer` command from source, you must prefix the command with `bundle exec`:
+
+[subs=attributes+]
+ $ bundle exec asciidoctor-reducer sample.adoc
+
+To avoid having to do this, or make the `asciidoctor-reducer` command available from anywhere, you need to build the development gem and install it.
 
 == Copyright and License
 
