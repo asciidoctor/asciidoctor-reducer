@@ -690,12 +690,13 @@ describe 'Asciidoctor::Reducer' do
     ifdef::no-such-attribute[]
     include::single-line-paragraph.adoc[]
 
+    ifdef::backend[ignored]
     endif::[]
     after include
     EOS
     (expect doc.source_lines).to eql expected_lines
     (expect doc.blocks).to have_size 2
-    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 7]
+    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 8]
   end
 
   it 'should keep single line preprocessor conditional if :preserve_conditionals option is set and no includes' do

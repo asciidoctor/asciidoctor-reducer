@@ -3,5 +3,6 @@ before include
 ifdef::no-such-attribute[]
 include::single-line-paragraph.adoc[]
 
+ifdef::backend[ignored]
 endif::[]
 after include
