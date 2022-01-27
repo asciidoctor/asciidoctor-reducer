@@ -14,6 +14,9 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 
 * Reduce preprocessor conditionals by default; add option (`--preserve-conditionals` / `:preserve_conditionals`) to preserve them (#8)
 * Don't enable sourcemap automatically (#4)
+* Don't override logger by default; instead, rely on `:logger` API option to change logger
+* Add `--log-level` option to CLI to set severity level on logger (#9)
+* Add `-q` / `--quiet` option to CLI to suppress log messages (#9)
 * Reserve zero index in include replacements for top-level document
 
 === Fixed
