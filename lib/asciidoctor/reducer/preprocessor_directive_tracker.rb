@@ -2,6 +2,13 @@
 
 module Asciidoctor::Reducer
   module PreprocessorDirectiveTracker
+    attr_reader :x_include_replacements
+
+    def self.extended instance
+      instance.instance_variable_set :@x_include_replacements, ([{ drop: [] }].extend CurrentPointer)
+      instance.instance_variable_set :@x_parents, [0]
+    end
+
     def preprocess_conditional_directive keyword, target, delimiter, text
       return super if (opts = @document.options)[:preserve_conditionals] || opts[:reduced]
       skip_active = @skipping
@@ -34,8 +41,8 @@ module Asciidoctor::Reducer
       if (depth_change = @include_stack.length - (parent_depth - 1)) < 0
         parent_depth -= (parents.slice! parent_depth + depth_change, -depth_change).length
       end
-      lines = ((line = @lines[-1].to_s).start_with? 'Unresolved directive in ') && (line.end_with? ']') ? [line] : []
-      push_include_replacement lines, parent_depth, inc_lineno
+      inc_lines = ((line = lines[0].to_s).start_with? 'Unresolved directive in ') && (line.end_with? ']') ? [line] : []
+      push_include_replacement inc_lines, parent_depth, inc_lineno
       result
     end
 
@@ -59,9 +66,9 @@ module Asciidoctor::Reducer
         elsif depth_change < 0
           parent_depth -= (parents.slice! parent_depth + depth_change, -depth_change).length
         end
-        lines = @lines.reverse
+        inc_lines = lines
       end
-      push_include_replacement lines, parent_depth, inc_lineno
+      push_include_replacement inc_lines, parent_depth, inc_lineno
       self
     end
 
@@ -72,16 +79,24 @@ module Asciidoctor::Reducer
 
     private
 
-    def push_include_replacement lines, parent_depth, inc_lineno
+    def push_include_replacement inc_lines, parent_depth, inc_lineno
       @x_include_replacements << {
-        lines: lines || [],
+        lines: inc_lines || [],
         drop: [],
         into: @x_parents[parent_depth - 1],
         index: inc_lineno,
         replace: @x_include_directive_line,
       }
-      @x_include_replacements.current = @x_include_replacements[-1] if lines
+      @x_include_replacements.current = @x_include_replacements[-1] if inc_lines
       nil
+    end
+  end
+
+  module CurrentPointer
+    attr_accessor :current
+
+    def self.extended instance
+      instance.current = instance[-1]
     end
   end
 end

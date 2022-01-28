@@ -362,8 +362,7 @@ describe 'Asciidoctor::Reducer' do
           prefer
           process do |interim_doc|
             unless interim_doc.options[:reduced]
-              inc_replacements = interim_doc.reader.instance_variable_get :@x_include_replacements
-              inc_replacements[1][:replace] = 'include::not-a-match[]'
+              interim_doc.reader.x_include_replacements[1][:replace] = 'include::not-a-match[]'
             end
           end
         end
