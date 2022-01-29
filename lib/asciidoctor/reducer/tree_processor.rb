@@ -19,8 +19,13 @@ module Asciidoctor::Reducer
           end
           target_lines[index] = lines if target_lines
         end
-        # WARNING: if include directives remain that can still be resolved, the sourcemap won't match the source lines
-        doc = ::Asciidoctor.load inc_replacements[0][:lines].flatten, (doc.options.merge reduced: true)
+        source_lines = inc_replacements[0][:lines].flatten
+        if doc.sourcemap
+          # WARNING: if include directives remain that can still be resolved, the sourcemap won't match the source lines
+          doc = ::Asciidoctor.load source_lines, (doc.options.merge reduced: true)
+        else
+          doc.reader.source_lines = source_lines
+        end
       end
       doc
     end
