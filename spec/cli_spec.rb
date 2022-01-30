@@ -113,6 +113,19 @@ describe Asciidoctor::Reducer::Cli do
       (expect $stdout.string.chomp).to eql expected
     end
 
+    it 'should ignore --log-level option if value is warn' do
+      the_source_file = fixture_file 'parent-with-optional-unresolved-include.adoc'
+      expected = <<~'EOS'.chomp
+      before include
+
+
+      after include
+      EOS
+      (expect subject.run [the_source_file, '--log-level', 'warn']).to eql 0
+      (expect $stderr.string.chomp).to be_empty
+      (expect $stdout.string.chomp).to eql expected
+    end
+
     it 'should set level on logger to lower value specified by --log-level option' do
       the_source_file = fixture_file 'parent-with-optional-unresolved-include.adoc'
       expected = <<~'EOS'.chomp
