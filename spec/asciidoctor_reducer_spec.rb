@@ -69,9 +69,34 @@ describe 'Asciidoctor::Reducer' do
   it 'should not enable sourcemap on reduced document' do
     source_file = fixture_file 'parent-with-single-include.adoc'
     doc = Asciidoctor.load_file source_file, safe: :safe
-    (expect doc.options[:reduced]).to be true
+    (expect doc.options[:reduced]).to be_falsy
     (expect doc.sourcemap).to be_falsy
     (expect doc.blocks[0].source_location).to be_nil
+  end
+
+  it 'should not reload document with includes if sourcemap is not enabled' do
+    docs = []
+    result = Asciidoctor.load_file (fixture_file 'parent-with-single-include.adoc'), safe: :safe,
+      extensions: proc {
+        tree_processor do
+          prefer
+          process do |doc|
+            docs << doc
+          end
+        end
+      }
+    expected_lines = <<~'EOS'.chomp.split ?\n
+    before include
+
+    no includes here
+
+    just good old-fashioned paragraph text
+
+    after include
+    EOS
+    (expect docs).to have_size 1
+    (expect docs[0].object_id).to eql result.object_id
+    (expect result.source_lines).to eql expected_lines
   end
 
   it 'should resolve top-level include with nested include' do

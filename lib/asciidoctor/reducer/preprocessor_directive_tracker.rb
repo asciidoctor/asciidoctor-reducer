@@ -2,6 +2,7 @@
 
 module Asciidoctor::Reducer
   module PreprocessorDirectiveTracker
+    attr_writer :source_lines
     attr_reader :x_include_replacements
 
     def self.extended instance
