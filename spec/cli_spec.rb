@@ -75,7 +75,12 @@ describe Asciidoctor::Reducer::Cli do
     it 'should exit with status code 1 when value of -o option is a directory' do
       the_source_file = fixture_file 'parent-with-single-include.adoc'
       (expect subject.run [the_source_file, '-o', Dir.tmpdir]).to eql 1
-      (expect $stderr.string.chomp.downcase).to include 'is a directory'
+      message = $stderr.string.chomp.downcase
+      if message.include? 'permission'
+        (expect message).to include 'permission denied'
+      else
+        (expect message).to include 'is a directory'
+      end
     end
 
     it 'should allow runtime attribute to be specified using -a option' do
