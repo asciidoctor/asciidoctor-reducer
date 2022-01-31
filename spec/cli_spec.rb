@@ -72,6 +72,12 @@ describe Asciidoctor::Reducer::Cli do
       (expect $stdout.string.chomp).to include 'just good old-fashioned paragraph text'
     end
 
+    it 'should exit with status code 1 when value of -o option is a directory' do
+      the_source_file = fixture_file 'parent-with-single-include.adoc'
+      (expect subject.run [the_source_file, '-o', Dir.tmpdir]).to eql 1
+      (expect $stderr.string.chomp.downcase).to include 'is a directory'
+    end
+
     it 'should allow runtime attribute to be specified using -a option' do
       the_source_file = fixture_file 'parent-with-include-with-attribute-reference-in-target.adoc'
       expected = <<~'EOS'.chomp

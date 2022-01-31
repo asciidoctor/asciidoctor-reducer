@@ -91,7 +91,7 @@ module Asciidoctor::Reducer
       end
       ::Pathname === to ? (to.write reduced, encoding: ::Encoding::UTF_8) : (to.write reduced)
       0
-    rescue ::IOError
+    rescue
       $stderr.write %(asciidoctor-reducer: #{$!.message}\n)
       1
     ensure
