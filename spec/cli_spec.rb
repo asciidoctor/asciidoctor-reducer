@@ -17,11 +17,17 @@ describe Asciidoctor::Reducer::Cli do
     $stdin, $stdout, $stderr = @old_stdin, @old_stdout, @old_stderr # rubocop:disable RSpec/InstanceVariable,RSpec/ExpectOutput
   end
 
-  context 'packaging' do
+  context 'bin script' do
     it 'should install bin script named asciidoctor-reducer' do
       bin_script = (Pathname.new Gem.bindir) / 'asciidoctor-reducer'
       bin_script = Pathname.new Gem.bin_path 'asciidoctor-reducer', 'asciidoctor-reducer' unless bin_script.exist?
       (expect bin_script).to exist
+    end
+
+    it 'should read args from ARGV by default' do
+      out, _, res = run_command asciidoctor_reducer_bin, '-v'
+      (expect res.exitstatus).to be 0
+      (expect out.chomp).to eql %(asciidoctor-reducer #{Asciidoctor::Reducer::VERSION})
     end
   end
 

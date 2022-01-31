@@ -11,6 +11,7 @@ end
 
 require 'asciidoctor/reducer'
 require 'fileutils'
+require 'open3' unless defined? Open3
 require 'pathname'
 require 'shellwords'
 require 'tempfile'
@@ -18,6 +19,21 @@ require 'tempfile'
 RSpec.configure do |config|
   config.after :suite do
     FileUtils.rm_r output_dir, force: true, secure: true
+  end
+
+  def bin_script name, opts = {}
+    bin_path = Gem.bin_path (opts.fetch :gem, 'asciidoctor-reducer'), name
+    if (defined? DeepCover) && !(DeepCover.const_defined? :TAKEOVER_IS_ON)
+      [Gem.ruby, '-rdeep_cover', bin_path]
+    elsif Gem.win_platform?
+      [Gem.ruby, bin_path]
+    else
+      bin_path
+    end
+  end
+
+  def asciidoctor_reducer_bin
+    bin_script 'asciidoctor-reducer'
   end
 
   def fixtures_dir
@@ -34,6 +50,22 @@ RSpec.configure do |config|
 
   def output_dir
     (FileUtils.mkpath (File.join __dir__, 'output'))[0]
+  end
+
+  def run_command cmd, *args
+    Dir.chdir __dir__ do
+      if Array === cmd
+        args.unshift(*cmd)
+        cmd = args.shift
+      end
+      kw_args = Hash === args[-1] ? args.pop : {}
+      env_override = kw_args[:env] || {}
+      if (out = kw_args[:out])
+        Open3.pipeline_w([env_override, cmd, *args, out: out]) {} # rubocop:disable Lint/EmptyBlock
+      else
+        Open3.capture3 env_override, cmd, *args
+      end
+    end
   end
 
   def with_tmp_file ext = '.adoc', &block
