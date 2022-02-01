@@ -136,6 +136,14 @@ As it goes, it also removes lines that have been excluded by the preprocessor co
 Finally, it loads the document again and returns it.
 The reduced source is available on the reconstructed document (via `Document#source` or `Document#source_lines`).
 
+=== Impact on Extensions
+
+If the sourcemap is enabled, and the reducer finds lines to replace or filter, the reducer will load the document again using `Asciidoctor.load`.
+This step is necessary to synchronize the sourcemap with the reduced source.
+This call will cause extensions that run during the load phase to be invoked again.
+An extension can check for this secondary load by checking for the `:reduced` option in the `Document#options` hash.
+If this option is set (the value of which will be `true`), then Asciidoctor is loading the reduced document.
+
 == Development
 
 Follow the instructions below to learn how to help develop the project or test-drive the development version.
