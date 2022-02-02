@@ -79,7 +79,7 @@ To use the command, pass the AsciiDoc file as the sole argument:
  $ asciidoctor-reducer input.adoc
 
 By default, the command will output the reduced AsciiDoc document to the terminal (via stdout).
-To write the output to a file, specify an output file using the `-o` option.
+To write the output to a file, specify an output file using the `-o` option:
 
  $ asciidoctor-reducer -o output.adoc input.adoc
 
@@ -88,7 +88,7 @@ To use the command in this way, pass `-` as the first argument:
 
  $ cat input.adoc | asciidoctor-reducer -
 
-To write the output to a file, also specify the `-o` option:
+To write the output to a file instead of stdout, also specify an output file using the `-o` option:
 
  $ cat input.adoc | asciidoctor-reducer -o output.adoc -
 
