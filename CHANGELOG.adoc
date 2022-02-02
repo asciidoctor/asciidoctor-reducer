@@ -11,6 +11,7 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 * Rename PreprocessorReader ext module to PreprocessorReaderTracker
 * Encapsulate logic to enhance PreprocessorReader inside PreprocessorReaderTracker module
 * Only reload document if source lines have changed; otherwise, update source lines on reader directly
+* Change default safe mode for CLI to :unsafe
 
 == 1.0.0.alpha.2 (2022-01-27) - @mojavelinux
 

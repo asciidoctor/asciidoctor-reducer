@@ -207,4 +207,18 @@ describe Asciidoctor::Reducer::Cli do
       (expect $stdout.string.chomp).to include 'just good old-fashioned paragraph text'
     end
   end
+
+  context 'safe mode' do
+    it 'should permit file to be included in parent directory of docdir using relative path' do
+      the_source_file = fixture_file 'subdir/with-parent-include.adoc'
+      (expect subject.run [the_source_file]).to eql 0
+      (expect $stdout.string.chomp).to include 'just good old-fashioned paragraph text'
+    end
+
+    it 'should permit file to be included in parent directory of docdir using absolute path' do
+      the_source_file = fixture_file 'subdir/with-parent-include.adoc'
+      (expect subject.run [the_source_file, '-a', %(includedir=#{File.dirname File.dirname the_source_file})]).to eql 0
+      (expect $stdout.string.chomp).to include 'just good old-fashioned paragraph text'
+    end
+  end
 end

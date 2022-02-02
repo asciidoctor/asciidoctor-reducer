@@ -8,7 +8,7 @@ module Asciidoctor::Reducer
 
   class Cli
     def parse args
-      options = { attributes: {}, safe: :safe }
+      options = { attributes: {}, safe: :unsafe }
 
       opt_parser = ::OptionParser.new do |opts|
         opts.program_name = 'asciidoctor-reducer'
