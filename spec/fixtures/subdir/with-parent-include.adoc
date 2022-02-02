@@ -1,0 +1,7 @@
+ifndef::includedir[:includedir: ..]
+
+before include
+
+include::{includedir}/no-includes.adoc[]
+
+after include
