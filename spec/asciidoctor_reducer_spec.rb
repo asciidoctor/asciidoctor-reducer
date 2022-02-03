@@ -327,6 +327,32 @@ describe 'Asciidoctor::Reducer' do
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 4]
   end
 
+  it 'should skip nested include that cannot be resolved' do
+    doc = nil
+    with_memory_logger do |logger|
+      doc = Asciidoctor.load_file (fixture_file 'parent-with-nested-unresolved-include.adoc'), safe: :safe,
+        sourcemap: true
+      messages = logger.messages
+      (expect messages).to have_size 1
+      (expect messages[0][:message][:text]).to include 'include file not found'
+    end
+    expected_lines = <<~'EOS'.chomp.split ?\n
+    before top-level include
+
+    before include
+
+    Unresolved directive in parent-with-unresolved-include.adoc - include::no-such-file.adoc[]
+
+    after include
+
+    after top-level include
+    EOS
+    (expect doc.source_lines).to eql expected_lines
+    (expect doc.blocks).to have_size 5
+    (expect doc.blocks[2].source).to start_with 'Unresolved directive'
+    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9]
+  end
+
   it 'should skip empty include' do
     doc = Asciidoctor.load_file (fixture_file 'parent-with-empty-include.adoc'), safe: :safe, sourcemap: true
     expected_lines = <<~'EOS'.chomp.split ?\n
@@ -341,6 +367,26 @@ describe 'Asciidoctor::Reducer' do
     (expect doc.source_lines).to eql expected_lines
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 4, 7]
+  end
+
+  it 'should skip nested empty include' do
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-nested-empty-include.adoc'), safe: :safe, sourcemap: true
+    expected_lines = <<~'EOS'.chomp.split ?\n
+    before top-level include
+
+    before include
+    after include
+
+    before include
+
+
+    after include
+
+    after top-level include
+    EOS
+    (expect doc.source_lines).to eql expected_lines
+    (expect doc.blocks).to have_size 5
+    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 6, 9, 11]
   end
 
   it 'should skip include that custom include processor handles but does not push' do

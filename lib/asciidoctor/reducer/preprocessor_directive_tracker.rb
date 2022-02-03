@@ -39,7 +39,10 @@ module Asciidoctor::Reducer
       result = super
       return result if @x_push_include_called
       parent_depth = (parents = @x_parents).length
-      if (depth_change = @include_stack.length - (parent_depth - 1)) < 0
+      if (depth_change = @include_stack.length - (parent_depth - 1)) > 0
+        parents << @x_include_replacements.length.pred
+        parent_depth += 1
+      elsif depth_change < 0
         parent_depth -= (parents.slice! parent_depth + depth_change, -depth_change).length
       end
       inc_lines = ((line = lines[0].to_s).start_with? 'Unresolved directive in ') && (line.end_with? ']') ? [line] : []
@@ -57,17 +60,16 @@ module Asciidoctor::Reducer
       parent_depth = (parents = @x_parents).length
       # push_include did not push to the stack
       if (inc_depth = @include_stack.length) == prev_inc_depth
-        if (depth_change = inc_depth - (parent_depth - 1)) < 0
-          parent_depth -= (parents.slice! parent_depth + depth_change, -depth_change).length
-        end
+        depth_change = inc_depth - (parent_depth - 1)
       else
-        if (depth_change = inc_depth - parent_depth) > 0
-          parents << @x_include_replacements.length.pred
-          parent_depth += 1
-        elsif depth_change < 0
-          parent_depth -= (parents.slice! parent_depth + depth_change, -depth_change).length
-        end
+        depth_change = inc_depth - parent_depth
         inc_lines = lines
+      end
+      if depth_change > 0
+        parents << @x_include_replacements.length.pred
+        parent_depth += 1
+      elsif depth_change < 0
+        parent_depth -= (parents.slice! parent_depth + depth_change, -depth_change).length
       end
       push_include_replacement inc_lines, parent_depth, inc_lineno
       self
