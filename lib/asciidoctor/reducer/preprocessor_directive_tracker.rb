@@ -55,7 +55,7 @@ module Asciidoctor::Reducer
       prev_inc_depth = @include_stack.length
       # Q: can we do this without resetting the lineno?
       lineno = 1 # rubocop:disable Lint/ShadowedArgument
-      super
+      result = super
       parent_depth = (parents = @x_parents).length
       # push_include did not push to the stack
       if (inc_depth = @include_stack.length) == prev_inc_depth
@@ -71,7 +71,7 @@ module Asciidoctor::Reducer
         parent_depth -= (parents.slice! parent_depth + depth_change, -depth_change).length
       end
       push_include_replacement inc_lines, parent_depth, inc_lineno
-      self
+      result
     end
 
     def pop_include
