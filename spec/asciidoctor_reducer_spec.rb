@@ -423,6 +423,12 @@ describe 'Asciidoctor::Reducer' do
     (expect doc.blocks).to have_size 1
   end
 
+  it 'should not crash if reduced document is empty' do
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-only-empty-include.adoc'), safe: :safe
+    (expect doc.source_lines).to be_empty
+    (expect doc.blocks).to be_empty
+  end
+
   it 'should skip include that custom include processor handles but does not push' do
     doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-single-line-paragraph.adoc'), safe: :safe,
       sourcemap: true, extensions: proc { include_processor { process { next } } }
