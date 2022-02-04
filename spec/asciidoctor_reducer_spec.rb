@@ -694,6 +694,24 @@ describe 'Asciidoctor::Reducer' do
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
   end
 
+  it 'should skip include when attribute in target cannot be resolved and attribute-missing=drop-line' do
+    doc = nil
+    with_memory_logger do |logger|
+      doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-attribute-reference-in-target.adoc'),
+        attributes: { 'attribute-missing' => 'drop-line' }, safe: :safe, sourcemap: true
+      messages = logger.messages
+      (expect messages).to have_size 2
+      (expect messages[1][:severity]).to eql :INFO
+      (expect messages[1][:message][:text]).to include 'include dropped'
+    end
+    expected_lines = <<~'EOS'.chomp.split ?\n
+    = Book Title
+
+    EOS
+    (expect doc.source_lines).to eql expected_lines
+    (expect doc.lineno).to eql 1
+  end
+
   it 'should drop lines containing preprocessor directive when condition resolves to true' do
     doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-pp-conditional.adoc'), safe: :safe,
       attributes: { 'flag' => '' }, sourcemap: true
