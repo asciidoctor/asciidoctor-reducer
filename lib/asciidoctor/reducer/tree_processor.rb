@@ -20,7 +20,6 @@ module Asciidoctor::Reducer
         end
         source_lines = inc_replacements[0][:lines].flatten
         if doc.sourcemap
-          # WARNING: if include directives remain that can still be resolved, the sourcemap won't match the source lines
           doc = ::Asciidoctor.load source_lines, (doc.options.merge reduced: true)
         else
           source_lines.pop while (last = source_lines[-1]) && last.empty?
