@@ -410,6 +410,19 @@ describe 'Asciidoctor::Reducer' do
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 6, 9, 11]
   end
 
+  it 'should remove trailing empty lines when sourcemap is enabled' do
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-empty-trailing-include.adoc'), safe: :safe, sourcemap: true
+    (expect doc.source_lines).to eql ['before include']
+    (expect doc.blocks).to have_size 1
+    (expect doc.blocks[0].lineno).to eql 1
+  end
+
+  it 'should remove trailing empty lines when sourcemap is not enabled' do
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-empty-trailing-include.adoc'), safe: :safe
+    (expect doc.source_lines).to eql ['before include']
+    (expect doc.blocks).to have_size 1
+  end
+
   it 'should skip include that custom include processor handles but does not push' do
     doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-single-line-paragraph.adoc'), safe: :safe,
       sourcemap: true, extensions: proc { include_processor { process { next } } }
@@ -704,11 +717,7 @@ describe 'Asciidoctor::Reducer' do
       (expect messages[1][:severity]).to eql :INFO
       (expect messages[1][:message][:text]).to include 'include dropped'
     end
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    = Book Title
-
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+    (expect doc.source_lines).to eql ['= Book Title']
     (expect doc.lineno).to eql 1
   end
 
