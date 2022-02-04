@@ -286,7 +286,7 @@ describe 'Asciidoctor::Reducer' do
     (expect (blocks.map {|it| it.lineno })).to eql [1, 3, 3, 5, 7]
   end
 
-  it 'should skip top-level include that cannot be resolved' do
+  it 'should flag top-level include that cannot be resolved as an unresolved directive' do
     doc = nil
     with_memory_logger do |logger|
       doc = Asciidoctor.load_file (fixture_file 'parent-with-unresolved-include.adoc'), safe: :safe, sourcemap: true
@@ -327,7 +327,7 @@ describe 'Asciidoctor::Reducer' do
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 4]
   end
 
-  it 'should skip nested include that cannot be resolved' do
+  it 'should flag nested include that cannot be resolved as an unresolved directive' do
     doc = nil
     with_memory_logger do |logger|
       doc = Asciidoctor.load_file (fixture_file 'parent-with-nested-unresolved-include.adoc'), safe: :safe,
@@ -353,7 +353,7 @@ describe 'Asciidoctor::Reducer' do
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9]
   end
 
-  it 'should skip include with with warning if target is empty' do
+  it 'should flag include as an unresolved directive if target is empty' do
     doc = nil
     with_memory_logger do |logger|
       doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-empty-target.adoc'), safe: :safe,
