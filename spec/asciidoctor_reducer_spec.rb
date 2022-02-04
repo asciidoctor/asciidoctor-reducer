@@ -353,6 +353,27 @@ describe 'Asciidoctor::Reducer' do
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9]
   end
 
+  it 'should skip include with with warning if target is empty' do
+    doc = nil
+    with_memory_logger do |logger|
+      doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-empty-target.adoc'), safe: :safe,
+        sourcemap: true
+      messages = logger.messages
+      (expect messages).to have_size 1
+      (expect messages[0][:message][:text]).to include 'resolved target is blank'
+    end
+    expected_lines = <<~'EOS'.chomp.split ?\n
+    before include
+
+    Unresolved directive in parent-with-include-with-empty-target.adoc - include::{empty}[]
+
+    after include
+    EOS
+    (expect doc.source_lines).to eql expected_lines
+    (expect doc.blocks).to have_size 3
+    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
+  end
+
   it 'should skip empty include' do
     doc = Asciidoctor.load_file (fixture_file 'parent-with-empty-include.adoc'), safe: :safe, sourcemap: true
     expected_lines = <<~'EOS'.chomp.split ?\n
