@@ -53,8 +53,6 @@ module Asciidoctor::Reducer
       @x_push_include_called = true
       inc_lineno = @lineno - 2 # we're below the include line, which is 1-based
       prev_inc_depth = @include_stack.length
-      # Q: can we do this without resetting the lineno?
-      lineno = 1 # rubocop:disable Lint/ShadowedArgument
       result = super
       parent_depth = (parents = @x_parents).length
       # push_include did not push to the stack
