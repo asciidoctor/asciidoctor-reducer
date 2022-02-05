@@ -10,6 +10,7 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 
 * Removing trailing empty lines after reducing when sourcemap is not enabled
 * Remove unnecessary override of lineno in preprocess_include_directive override
+* Simplify how include replacement target is tracked
 
 == 1.0.0.alpha.4 (2022-02-03) - @mojavelinux
 
