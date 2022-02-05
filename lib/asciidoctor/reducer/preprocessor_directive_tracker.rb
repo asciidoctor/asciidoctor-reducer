@@ -83,11 +83,11 @@ module Asciidoctor::Reducer
 
     def push_include_replacement inc_lines, parent_depth, inc_lineno
       @x_include_replacements << {
+        into: @x_parents[parent_depth - 1],
+        lineno: inc_lineno,
+        line: @x_include_directive_line,
         lines: inc_lines || [],
         drop: [],
-        into: @x_parents[parent_depth - 1],
-        index: inc_lineno,
-        replace: @x_include_directive_line,
       }
       @x_include_replacements.current = @x_include_replacements[-1] if inc_lines
       nil

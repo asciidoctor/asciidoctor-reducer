@@ -10,7 +10,7 @@ module Asciidoctor::Reducer
           if (into = it[:into])
             target_lines = inc_replacements[into][:lines]
             # adds extra bit of assurance that we're replacing the correct line
-            next unless target_lines[(index = it[:index])] == it[:replace]
+            next unless target_lines[(index = it[:lineno])] == it[:line]
           end
           lines = it[:lines]
           unless (drop = it[:drop]).empty?
