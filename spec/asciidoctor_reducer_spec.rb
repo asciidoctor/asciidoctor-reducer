@@ -863,4 +863,15 @@ describe 'Asciidoctor::Reducer' do
       (expect Asciidoctor::LoggerManager.logger).to be silent_logger
     end
   end
+
+  it 'should suppress log messages when reloading document' do
+    with_memory_logger do |logger|
+      Asciidoctor.load_file (fixture_file 'parent-with-include-and-warning.adoc'), safe: :safe, sourcemap: true
+      messages = logger.messages
+      (expect messages).to have_size 1
+      (expect messages[0][:severity]).to eql :WARN
+      (expect messages[0][:message][:text]).to include 'unterminated'
+      (expect Asciidoctor::LoggerManager.logger).to be logger
+    end
+  end
 end

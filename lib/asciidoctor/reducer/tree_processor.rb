@@ -20,7 +20,9 @@ module Asciidoctor::Reducer
         end
         source_lines = inc_replacements[0][:lines].flatten
         if doc.sourcemap
-          doc = ::Asciidoctor.load source_lines, (doc.options.merge reduced: true)
+          logger = ::Asciidoctor::LoggerManager.logger
+          doc = ::Asciidoctor.load source_lines, (doc.options.merge logger: false, reduced: true)
+          ::Asciidoctor::LoggerManager.logger = logger
         else
           source_lines.pop while (last = source_lines[-1]) && last.empty?
           doc.reader.source_lines = source_lines
