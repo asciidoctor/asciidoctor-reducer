@@ -796,6 +796,23 @@ describe 'Asciidoctor::Reducer' do
     (expect (blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9, 11]
   end
 
+  it 'should resolve include inside true preprocessor conditional' do
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-inside-true-pp-conditional.adoc'), safe: :safe,
+      sourcemap: true
+    expected_lines = <<~'EOS'.chomp.split ?\n
+    :flag:
+
+    before include
+
+    single line paragraph
+
+    after include
+    EOS
+    (expect doc.source_lines).to eql expected_lines
+    (expect doc.blocks).to have_size 3
+    (expect (doc.blocks.map {|it| it.lineno })).to eql [3, 5, 7]
+  end
+
   it 'should not resolve include inside false preprocessor conditional' do
     doc = Asciidoctor.load_file (fixture_file 'parent-with-include-inside-false-pp-conditional.adoc'), safe: :safe,
       sourcemap: true
