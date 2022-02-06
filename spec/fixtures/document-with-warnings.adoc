@@ -1,7 +1,7 @@
 = Document Title
 :attribute-missing: warn
 
-{no-such-attribute}
+image::{no-such-attribute}.png[]
 
 |===
 cell
