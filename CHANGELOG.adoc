@@ -13,6 +13,10 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 * Simplify how include replacement target is tracked
 * Classify extensions in group named `:reducer`
 
+=== Fixed
+
+* Suppress log messages when reloading document (#14)
+
 == 1.0.0.alpha.4 (2022-02-03) - @mojavelinux
 
 === Fixed
