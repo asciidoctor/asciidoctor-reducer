@@ -38,9 +38,14 @@ module Asciidoctor::Reducer
           options[:preserve_conditionals] = true
         end
 
-        opts.on '--log-level LEVEL', LOG_LEVELS.keys,
-          %(set the minimum level of messages to log: [#{LOG_LEVELS.keys.join ', '}] (default: warn)) do |level|
-          options[:log_level] = LOG_LEVELS[level]
+        opts.on '--log-level LEVEL', %w(debug info warn error fatal),
+          'set the minimum level of messages to log: [debug, info, warn, error, fatal] (default: warn)' do |level|
+          options[:log_level] = level
+        end
+
+        opts.on '-S', '--safe-mode SAFE_MODE', ['unsafe', 'safe', 'server'],
+          'set supported safe mode level: [unsafe, safe, server] (default: unsafe)' do |name|
+          options[:safe] = ::Asciidoctor::SafeMode.value_for_name name
         end
 
         opts.on '-q', '--quiet', 'suppress all application log messages' do
