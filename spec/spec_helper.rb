@@ -9,11 +9,12 @@ when 'true'
   require 'simplecov'
 end
 
-require 'asciidoctor/reducer'
+require 'asciidoctor/reducer/api'
+require 'asciidoctor/reducer/cli'
 require 'fileutils'
 require 'open3' unless defined? Open3
-require 'pathname'
 require 'shellwords'
+require 'stringio'
 require 'tempfile'
 
 RSpec.configure do |config|
@@ -52,6 +53,12 @@ RSpec.configure do |config|
     (FileUtils.mkpath (File.join __dir__, 'output'))[0]
   end
 
+  def reduce_file input_file, opts = {}
+    opts[:safe] = :safe
+    opts[:sourcemap] == false ? (opts.delete :sourcemap) : (opts[:sourcemap] = true)
+    Asciidoctor::Reducer.reduce_file input_file, opts
+  end
+
   def run_command cmd, *args
     Dir.chdir __dir__ do
       if Array === cmd
@@ -69,7 +76,7 @@ RSpec.configure do |config|
   end
 
   def with_tmp_file ext = '.adoc', &block
-    Tempfile.create %W(asciidoctor-reducer- #{ext}), output_dir, encoding: 'UTF-8', &block
+    Tempfile.create %W(asciidoctor-reducer- #{ext}), output_dir, encoding: 'UTF-8', newline: :universal, &block
   end
 
   def with_memory_logger level = nil

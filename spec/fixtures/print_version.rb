@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'asciidoctor'
-require 'asciidoctor/reducer'
+require 'asciidoctor/reducer/api'
 
 puts Asciidoctor::Reducer::VERSION
-puts Asciidoctor::Extensions.groups[:reducer] && 'loaded'
+puts (defined? Asciidoctor::Reducer.reduce_file) && 'loaded'

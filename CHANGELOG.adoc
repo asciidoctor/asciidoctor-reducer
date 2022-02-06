@@ -6,13 +6,21 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 
 == Unreleased
 
+=== Added
+
+* Add asciidoctor/reducer/api to require main API (#3)
+* Add `Asciidoctor::Reducer.reduce` and `Asciidoctor::Reducer.reduce_file` API methods (#3)
+* Add asciidoctor/reducer/extensions to require extensions API (#3)
+* Add `Asciidoctor::Reducer::Extensions` API (#3)
+
 === Changed
 
-* make `CurrentPosition` module private to the `PreprocessorDirectiveTracker` module
+* Scope extensions to single call instead of registering them globally (#3)
+* Make `CurrentPosition` module private to the `PreprocessorDirectiveTracker` module
 
 === Fixed
 
-* Require asciidoctor/reducer/version if necessary when `Asciidoctor::Reducer::VERSION` is accessed
+* Require asciidoctor/reducer/version automatically when `Asciidoctor::Reducer::VERSION` is accessed
 
 == 1.0.0.alpha.6 (2022-02-10) - @mojavelinux
 
