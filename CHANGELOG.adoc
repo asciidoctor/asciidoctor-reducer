@@ -6,6 +6,10 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 
 == Unreleased
 
+=== Added
+
+* Add `-S` / `--safe-mode` option to CLI to set safe mode (#13)
+
 === Changed
 
 * Update CLI to always use a new logger instance

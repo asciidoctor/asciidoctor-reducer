@@ -220,5 +220,12 @@ describe Asciidoctor::Reducer::Cli do
       (expect subject.run [the_source_file, '-a', %(includedir=#{File.dirname File.dirname the_source_file})]).to eql 0
       (expect $stdout.string.chomp).to include 'just good old-fashioned paragraph text'
     end
+
+    it 'should not permit file to be included in parent directory of docdir when safe mode is safe' do
+      the_source_file = fixture_file 'subdir/with-parent-include.adoc'
+      (expect subject.run [the_source_file, '-S', 'safe']).to eql 0
+      (expect $stdout.string.chomp).to include 'Unresolved directive'
+      (expect $stderr.string.chomp).to include 'illegal reference to ancestor of jail'
+    end
   end
 end
