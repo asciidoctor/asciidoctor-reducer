@@ -4,6 +4,13 @@
 This document provides a high-level view of the changes to the Asciidoctor Reducer by release.
 For a detailed view of what has changed, refer to the {url-repo}/commits/main[commit history] on GitHub.
 
+== Unreleased
+
+=== Changed
+
+* Update CLI to always use a new logger instance
+* Defer initializing logger until run method is called
+
 == 1.0.0.alpha.5 (2022-02-06) - @mojavelinux
 
 === Changed

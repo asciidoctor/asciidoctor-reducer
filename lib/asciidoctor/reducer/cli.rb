@@ -7,8 +7,12 @@ module Asciidoctor::Reducer
   autoload :VERSION, (::File.join __dir__, 'version.rb')
 
   class Cli
+    LOG_LEVELS = (::Logger::Severity.constants false).each_with_object({}) do |level, accum|
+      accum[level.to_s.downcase] = (::Logger::Severity.const_get level) unless level == :UNKNOWN
+    end
+
     def parse args
-      options = { attributes: {}, safe: :unsafe }
+      options = { attributes: {}, log_level: LOG_LEVELS['warn'], safe: :unsafe }
 
       opt_parser = ::OptionParser.new do |opts|
         opts.program_name = 'asciidoctor-reducer'
@@ -34,13 +38,13 @@ module Asciidoctor::Reducer
           options[:preserve_conditionals] = true
         end
 
-        opts.on '--log-level LEVEL', %w(debug info warn error fatal),
-          'set the minimum level of messages to log: [debug, info, warn, error, fatal] (default: warn)' do |level|
-          (options[:logger] = ::Asciidoctor::Logger.new $stderr).level = level unless level == 'warn'
+        opts.on '--log-level LEVEL', LOG_LEVELS.keys,
+          %(set the minimum level of messages to log: [#{LOG_LEVELS.keys.join ', '}] (default: warn)) do |level|
+          options[:log_level] = LOG_LEVELS[level]
         end
 
         opts.on '-q', '--quiet', 'suppress all application log messages' do
-          options[:logger] = ::Asciidoctor::NullLogger.new
+          options[:log_level] = nil
         end
 
         opts.on '-h', '--help', 'display this help text and exit' do
@@ -76,9 +80,14 @@ module Asciidoctor::Reducer
     end
 
     def self.run args = ARGV
-      old_logger = ::Asciidoctor::LoggerManager.logger
       code, options = new.parse (Array args)
       return code unless code == 0 && options
+      old_logger = ::Asciidoctor::LoggerManager.logger
+      if (log_level = options.delete :log_level)
+        (options[:logger] = ::Asciidoctor::Logger.new $stderr).level = log_level
+      else
+        options[:logger] = nil
+      end
       if (output_file = options.delete :output_file) == '-'
         to = $stdout
       else
@@ -95,7 +104,7 @@ module Asciidoctor::Reducer
       $stderr.write %(asciidoctor-reducer: #{$!.message}\n)
       1
     ensure
-      ::Asciidoctor::LoggerManager.logger = old_logger
+      ::Asciidoctor::LoggerManager.logger = old_logger if old_logger
     end
   end
 end
