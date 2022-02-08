@@ -113,7 +113,7 @@ module Asciidoctor::Reducer
       if (input_file = options.delete :input_file) == '-'
         reduced = (::Asciidoctor.load $stdin, options).source + ?\n
       else
-        reduced = (::Asciidoctor.load_file input_file, (options.merge to_file: false)).source + ?\n
+        reduced = (::Asciidoctor.load_file input_file, options).source + ?\n
       end
       ::Pathname === to ? (to.write reduced, encoding: ::Encoding::UTF_8) : (to.write reduced)
       0
