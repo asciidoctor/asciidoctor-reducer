@@ -177,6 +177,42 @@ describe Asciidoctor::Reducer::Cli do
       (expect $stderr.string.chomp).to be_empty
       (expect $stdout.string.chomp).to eql expected
     end
+
+    it 'should require library specified by -r option' do
+      the_source_file = fixture_file 'parent-with-single-include.adoc'
+      with_tmp_file '.rb' do |the_ext_file|
+        the_ext_file.write %(puts 'extension required'\n)
+        the_ext_file.flush
+        (expect subject.run [the_source_file, '-r', the_ext_file.path]).to eql 0
+      end
+      stdout_lines = $stdout.string.chomp.lines
+      (expect stdout_lines[0]).to include 'extension required'
+      (expect stdout_lines[1..-1].join).to include 'just good old-fashioned paragraph text'
+    end
+
+    it 'should require libraries specified by -r option' do
+      the_source_file = fixture_file 'parent-with-single-include.adoc'
+      with_tmp_file '.rb' do |a_ext_file|
+        with_tmp_file '.rb' do |b_ext_file|
+          a_ext_file.write %(puts 'extension required'\n)
+          b_ext_file.write %(puts 'another extension required'\n)
+          a_ext_file.flush
+          b_ext_file.flush
+          (expect subject.run [the_source_file, '-r', ([a_ext_file.path, b_ext_file.path].join ',')]).to eql 0
+        end
+      end
+      stdout_lines = $stdout.string.chomp.lines
+      (expect stdout_lines[0]).to include 'extension required'
+      (expect stdout_lines[1]).to include 'another extension required'
+      (expect stdout_lines[2..-1].join).to include 'just good old-fashioned paragraph text'
+    end
+
+    it 'should show error message if library specified by -r cannot be required' do
+      expected = %(asciidoctor-reducer: 'no-such-library' could not be required)
+      the_source_file = fixture_file 'parent-with-single-include.adoc'
+      (expect subject.run [the_source_file, '-r', 'no-such-library']).to eql 1
+      (expect $stderr.string.chomp).to start_with expected
+    end
   end
 
   context 'arguments' do
