@@ -9,6 +9,7 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 === Added
 
 * Add `-S` / `--safe-mode` option to CLI to set safe mode (#13)
+* Add `-r` / `--require` option to CLI to specify additional libraries to require before running (#17)
 
 === Changed
 

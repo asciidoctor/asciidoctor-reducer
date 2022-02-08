@@ -48,6 +48,10 @@ module Asciidoctor::Reducer
           options[:safe] = ::Asciidoctor::SafeMode.value_for_name name
         end
 
+        opts.on '-rLIBRARY', '--require LIBRARY', 'require the specified library or libraries before running' do |path|
+          (options[:requires] ||= []).concat path.split ','
+        end
+
         opts.on '-q', '--quiet', 'suppress all application log messages' do
           options[:log_level] = nil
         end
@@ -70,13 +74,21 @@ module Asciidoctor::Reducer
         $stdout.write opt_parser.help
         1
       elsif args.size == 1
+        if (requires = options.delete :requires)
+          requires.uniq.each do |path|
+            require path
+          rescue ::LoadError
+            $stderr.write %(#{opt_parser.program_name}: '#{path}' could not be required (reason: #{$!.message})\n)
+            return 1
+          end
+        end
         options[:input_file] = args[0]
         options[:output_file] = '-' unless options[:output_file]
         [0, options]
       else
         opt_parser.warn %(extra arguments detected (unparsed arguments: #{(args.drop 1).join ' '}))
         $stdout.write opt_parser.help
-        [1, options]
+        1
       end
     rescue ::OptionParser::InvalidOption
       $stderr.write %(#{opt_parser.program_name}: #{$!.message}\n)
