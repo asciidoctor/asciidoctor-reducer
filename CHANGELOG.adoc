@@ -8,12 +8,12 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 
 === Added
 
-* Add `-S` / `--safe-mode` option to CLI to set safe mode (#13)
-* Add `-r` / `--require` option to CLI to specify additional libraries to require before running (#17)
+* Add `-S`, `--safe-mode` option to CLI to set safe mode (#13)
+* Add `-r`, `--require` option to CLI to specify additional libraries to require before running (#17)
 
 === Changed
 
-* Sort CLI options in help text, except for the `-h` / `--help` option
+* Sort CLI options in help text, except for the `-h`, `--help` option
 * Update CLI to always use a new logger instance
 * Defer initializing logger until run method is called
 
@@ -49,15 +49,15 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 
 === Added
 
-* Add `-a` / `--attribute` option to CLI for setting an AsciiDoc document attribute at runtime (#6)
+* Add `-a`, `--attribute` option to CLI for setting an AsciiDoc document attribute at runtime (#6)
 
 === Changed
 
-* Reduce preprocessor conditionals by default; add option (`--preserve-conditionals` / `:preserve_conditionals`) to preserve them (#8)
+* Reduce preprocessor conditionals by default; add option (`--preserve-conditionals`, `:preserve_conditionals`) to preserve them (#8)
 * Don't enable sourcemap automatically (#4)
 * Don't override logger by default; instead, rely on `:logger` API option to change logger
 * Add `--log-level` option to CLI to set severity level on logger (#9)
-* Add `-q` / `--quiet` option to CLI to suppress log messages (#9)
+* Add `-q`, `--quiet` option to CLI to suppress log messages (#9)
 * Reserve zero index in include replacements for top-level document
 
 === Fixed
