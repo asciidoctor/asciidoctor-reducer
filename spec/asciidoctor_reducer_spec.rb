@@ -17,6 +17,13 @@ describe 'Asciidoctor::Reducer' do
     (expect require 'asciidoctor-reducer').not_to be_nil
   end
 
+  it 'should require extensions under group named reducer' do
+    (expect Asciidoctor::Extensions.groups).to have_key :reducer
+    reg = Asciidoctor::Extensions::Registry.new.activate nil
+    (expect reg.preprocessors).to have_size 1
+    (expect reg.treeprocessors).to have_size 1
+  end
+
   it 'should load document with no includes' do
     source_file = fixture_file 'parent-with-no-includes.adoc'
     doc = Asciidoctor.load_file source_file, safe: :safe, sourcemap: true
