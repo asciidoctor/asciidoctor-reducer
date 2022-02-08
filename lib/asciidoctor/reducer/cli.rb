@@ -23,10 +23,6 @@ module Asciidoctor::Reducer
 
         EOS
 
-        opts.on '-o FILE', '--output=FILE', 'set the output filename or stream' do |file|
-          options[:output_file] = file
-        end
-
         opts.on '-a KEY[=VALUE]', '--attribute=KEY[=VALUE]',
           'set a document attribute in the AsciiDoc document: [key, key!, key=value]' do |attr|
           key, val = attr.split '=', 2
@@ -34,13 +30,25 @@ module Asciidoctor::Reducer
           options[:attributes][key] = val
         end
 
+        opts.on '--log-level LEVEL', %w(debug info warn error fatal),
+          'set the minimum level of messages to log: [debug, info, warn, error, fatal] (default: warn)' do |level|
+          options[:log_level] = level
+        end
+
+        opts.on '-o FILE', '--output=FILE', 'set the output filename or stream' do |file|
+          options[:output_file] = file
+        end
+
         opts.on '--preserve-conditionals', 'preserve preprocessor conditional directives in the reduced source' do
           options[:preserve_conditionals] = true
         end
 
-        opts.on '--log-level LEVEL', %w(debug info warn error fatal),
-          'set the minimum level of messages to log: [debug, info, warn, error, fatal] (default: warn)' do |level|
-          options[:log_level] = level
+        opts.on '-q', '--quiet', 'suppress all application log messages' do
+          options[:log_level] = nil
+        end
+
+        opts.on '-rLIBRARY', '--require LIBRARY', 'require the specified library or libraries before running' do |path|
+          (options[:requires] ||= []).concat path.split ','
         end
 
         opts.on '-S', '--safe-mode SAFE_MODE', ['unsafe', 'safe', 'server'],
@@ -48,21 +56,13 @@ module Asciidoctor::Reducer
           options[:safe] = ::Asciidoctor::SafeMode.value_for_name name
         end
 
-        opts.on '-rLIBRARY', '--require LIBRARY', 'require the specified library or libraries before running' do |path|
-          (options[:requires] ||= []).concat path.split ','
-        end
-
-        opts.on '-q', '--quiet', 'suppress all application log messages' do
-          options[:log_level] = nil
+        opts.on '-v', '--version', 'display the version information and exit' do
+          $stdout.write %(#{opts.program_name} #{VERSION}\n)
+          return 0
         end
 
         opts.on '-h', '--help', 'display this help text and exit' do
           $stdout.write opts.help
-          return 0
-        end
-
-        opts.on '-v', '--version', 'display the version information and exit' do
-          $stdout.write %(#{opts.program_name} #{VERSION}\n)
           return 0
         end
       end

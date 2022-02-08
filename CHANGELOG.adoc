@@ -13,6 +13,7 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 
 === Changed
 
+* Sort CLI options in help text, except for the `-h` / `--help` option
 * Update CLI to always use a new logger instance
 * Defer initializing logger until run method is called
 
