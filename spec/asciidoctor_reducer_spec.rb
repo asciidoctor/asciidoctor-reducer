@@ -19,7 +19,8 @@ describe 'Asciidoctor::Reducer' do
 
   it 'should require extensions under group named reducer' do
     (expect Asciidoctor::Extensions.groups).to have_key :reducer
-    reg = Asciidoctor::Extensions::Registry.new.activate nil
+    doc = Asciidoctor.load []
+    reg = Asciidoctor::Extensions::Registry.new.activate doc
     (expect reg.preprocessors).to have_size 1
     (expect reg.treeprocessors).to have_size 1
   end

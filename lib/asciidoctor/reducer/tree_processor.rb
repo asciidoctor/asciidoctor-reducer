@@ -3,7 +3,6 @@
 module Asciidoctor::Reducer
   class TreeProcessor < ::Asciidoctor::Extensions::TreeProcessor
     def process doc
-      return if doc.options[:reduced]
       unless (inc_replacements = doc.reader.x_include_replacements).length == 1 && inc_replacements[0][:drop].empty?
         inc_replacements[0][:lines] = doc.source_lines.dup
         inc_replacements.reverse_each do |it|

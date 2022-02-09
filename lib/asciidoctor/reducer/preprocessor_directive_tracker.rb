@@ -12,7 +12,7 @@ module Asciidoctor::Reducer
     end
 
     def preprocess_conditional_directive keyword, target, delimiter, text
-      return super if (opts = @document.options)[:preserve_conditionals] || opts[:reduced]
+      return super if @document.options[:preserve_conditionals]
       skip_active = @skipping
       depth = @conditional_stack.length
       cond_lineno = @lineno - 1
