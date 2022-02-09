@@ -39,7 +39,7 @@ module Asciidoctor::Reducer
       inc_lineno = @lineno - 1 # we're currently on the include line, which is 1-based
       result = super
       unless @x_include_pushed
-        inc_lines = ((line = lines[0].to_s).start_with? 'Unresolved directive in ') && (line.end_with? ']') ? [line] : []
+        inc_lines = (l = peek_line true) && (l.start_with? 'Unresolved directive in ') && (l.end_with? ']') ? [l] : []
         push_include_replacement inc_lineno, inc_lines
       end
       @x_include_directive_line = @x_include_pushed = nil
