@@ -17,6 +17,10 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 * Update CLI to always use a new logger instance
 * Defer initializing logger until run method is called
 
+=== Fixed
+
+* Don't activate reducer extensions on reduced document
+
 == 1.0.0.alpha.5 (2022-02-06) - @mojavelinux
 
 === Changed
