@@ -233,7 +233,7 @@ When running the `asciidoctor-reducer` command from source, you must prefix the 
 [subs=attributes+]
  $ bundle exec asciidoctor-reducer sample.adoc
 
-To avoid having to do this, or make the `asciidoctor-reducer` command available from anywhere, you need to build the development gem and install it.
+To avoid having to do this, or to make the `asciidoctor-reducer` command available from anywhere, you need to build the development gem and install it.
 
 == Copyright and License
 
