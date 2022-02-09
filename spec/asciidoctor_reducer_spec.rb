@@ -89,6 +89,7 @@ describe 'Asciidoctor::Reducer' do
           prefer
           process do |doc|
             docs << doc
+            nil
           end
         end
       }
@@ -482,6 +483,7 @@ describe 'Asciidoctor::Reducer' do
             unless interim_doc.options[:reduced]
               interim_doc.reader.x_include_replacements[1][:line] = 'include::not-a-match[]'
             end
+            nil
           end
         end
       }
@@ -504,7 +506,8 @@ describe 'Asciidoctor::Reducer' do
         tree_processor do
           prefer
           process do |interim_doc|
-            interim_doc.options[:reduced] ? interim_doc : (captured_interim_doc = interim_doc)
+            captured_interim_doc = interim_doc unless interim_doc.options[:reduced]
+            nil
           end
         end
       }
