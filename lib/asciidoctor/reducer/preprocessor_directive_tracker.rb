@@ -38,12 +38,10 @@ module Asciidoctor::Reducer
       @x_include_pushed = false
       inc_lineno = @lineno - 1 # we're currently on the include line, which is 1-based
       result = super
-      if @x_include_pushed
-        @x_include_directive_line = @x_include_pushed = nil
-        return result
+      unless @x_include_pushed
+        inc_lines = ((line = lines[0].to_s).start_with? 'Unresolved directive in ') && (line.end_with? ']') ? [line] : []
+        push_include_replacement inc_lineno, inc_lines
       end
-      inc_lines = ((line = lines[0].to_s).start_with? 'Unresolved directive in ') && (line.end_with? ']') ? [line] : []
-      push_include_replacement inc_lineno, inc_lines
       @x_include_directive_line = @x_include_pushed = nil
       result
     end
@@ -53,8 +51,7 @@ module Asciidoctor::Reducer
       inc_lineno = @lineno - 2 # we're below the include line, which is 1-based
       prev_inc_depth = @include_stack.length
       result = super
-      inc_lines = lines if @include_stack.length > prev_inc_depth
-      push_include_replacement inc_lineno, inc_lines
+      push_include_replacement inc_lineno, (@include_stack.length > prev_inc_depth ? lines : nil)
       result
     end
 
