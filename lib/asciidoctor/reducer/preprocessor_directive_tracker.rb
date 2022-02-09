@@ -39,8 +39,8 @@ module Asciidoctor::Reducer
       inc_lineno = @lineno - 1 # we're currently on the include line, which is 1-based
       result = super
       unless @x_include_pushed
-        inc_lines = (l = peek_line true) && (l.start_with? 'Unresolved directive in ') && (l.end_with? ']') ? [l] : []
-        push_include_replacement inc_lineno, inc_lines
+        unresolved = (l = peek_line true) && (l.start_with? 'Unresolved directive in ') && (l.end_with? ']') || nil
+        push_include_replacement inc_lineno, (unresolved ? [l] : []), unresolved
       end
       @x_include_directive_line = @x_include_pushed = nil
       result
@@ -51,7 +51,7 @@ module Asciidoctor::Reducer
       inc_lineno = @lineno - 2 # we're below the include line, which is 1-based
       prev_inc_depth = @include_stack.length
       result = super
-      push_include_replacement inc_lineno, (@include_stack.length > prev_inc_depth ? lines : nil)
+      push_include_replacement inc_lineno, (@include_stack.length > prev_inc_depth ? lines : [])
       result
     end
 
@@ -62,15 +62,15 @@ module Asciidoctor::Reducer
 
     private
 
-    def push_include_replacement inc_lineno, inc_lines
+    def push_include_replacement inc_lineno, inc_lines, unresolved = false
       @x_include_replacements << {
         into: @x_include_replacements.pos,
         lineno: inc_lineno,
         line: @x_include_directive_line,
-        lines: inc_lines || [],
+        lines: inc_lines,
         drop: [],
       }
-      @x_include_replacements.pos = @x_include_replacements.length - 1 if inc_lines
+      @x_include_replacements.pos = @x_include_replacements.length - 1 unless unresolved || inc_lines.empty?
       nil
     end
   end
