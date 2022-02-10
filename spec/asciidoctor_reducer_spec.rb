@@ -316,6 +316,60 @@ describe 'Asciidoctor::Reducer' do
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
 
+  it 'should resolve include after unresolved include' do
+    doc = nil
+    with_memory_logger do |logger|
+      doc = Asciidoctor.load_file (fixture_file 'parent-with-include-after-unresolved-include.adoc'), safe: :safe,
+        sourcemap: true
+      messages = logger.messages
+      (expect messages).to have_size 1
+      (expect messages[0][:message][:text]).to include 'include file not found'
+    end
+    expected_lines = <<~'EOS'.chomp.split ?\n
+    :optional:
+
+    before includes
+
+    Unresolved directive in parent-with-include-after-unresolved-include.adoc - include::no-such-file.adoc[{optional}]
+
+    between includes
+
+    single line paragraph
+
+    after includes
+    EOS
+    (expect doc.source_lines).to eql expected_lines
+    (expect doc.blocks).to have_size 5
+    (expect doc.blocks[1].source).to start_with 'Unresolved directive'
+    (expect (doc.blocks.map {|it| it.lineno })).to eql [3, 5, 7, 9, 11]
+  end
+
+  it 'should resolve include after unresolved optional include' do
+    doc = nil
+    with_memory_logger do |logger|
+      doc = Asciidoctor.load_file (fixture_file 'parent-with-include-after-unresolved-include.adoc'), safe: :safe,
+        attributes: { 'optional' => 'opts=optional' }, sourcemap: true
+      messages = logger.messages
+      (expect messages).to have_size 1
+      (expect messages[0][:message][:text]).to include 'include file not found'
+    end
+    expected_lines = <<~'EOS'.chomp.split ?\n
+    :optional:
+
+    before includes
+
+
+    between includes
+
+    single line paragraph
+
+    after includes
+    EOS
+    (expect doc.source_lines).to eql expected_lines
+    (expect doc.blocks).to have_size 4
+    (expect (doc.blocks.map {|it| it.lineno })).to eql [3, 6, 8, 10]
+  end
+
   it 'should skip optional top-level include that cannot be resolved' do
     doc = nil
     with_memory_logger do |logger|
