@@ -72,6 +72,7 @@ describe 'Asciidoctor::Reducer' do
     (expect doc.attr 'docname').to eql 'parent-with-single-include'
     (expect doc.attr 'docfile').to eql source_file
     (expect doc.attr 'docdir').to eql (File.dirname source_file)
+    (expect doc.catalog[:includes]['no-includes']).to be true
   end
 
   it 'should not enable sourcemap on reduced document' do
@@ -106,6 +107,7 @@ describe 'Asciidoctor::Reducer' do
     (expect docs).to have_size 1
     (expect docs[0].object_id).to eql result.object_id
     (expect result.source_lines).to eql expected_lines
+    (expect result.catalog[:includes]['no-includes']).to be true
   end
 
   it 'should not register extensions in a custom extension registry twice when reloading document' do
