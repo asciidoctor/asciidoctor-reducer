@@ -4,7 +4,7 @@
 This document provides a high-level view of the changes to the Asciidoctor Reducer by release.
 For a detailed view of what has changed, refer to the {url-repo}/commits/main[commit history] on GitHub.
 
-== Unreleased
+== 1.0.0.alpha.6 (2022-02-10) - @mojavelinux
 
 === Added
 
@@ -94,3 +94,7 @@ Initial release.
 === Details
 
 {url-repo}/releases/tag/v1.0.0.alpha.5[git tag]
+
+=== Details
+
+{url-repo}/releases/tag/v1.0.0.alpha.6[git tag]
