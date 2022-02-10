@@ -108,6 +108,33 @@ describe 'Asciidoctor::Reducer' do
     (expect result.source_lines).to eql expected_lines
   end
 
+  it 'should not register extensions in a custom extension registry twice when reloading document' do
+    calls = []
+    ext_reg = Asciidoctor::Extensions.create do
+      preprocessor do
+        prefer
+        process do |doc|
+          calls << (doc.options[:reduced] == true)
+          nil
+        end
+      end
+    end
+    result = Asciidoctor.load_file (fixture_file 'parent-with-single-include.adoc'), safe: :safe, sourcemap: true,
+      extension_registry: ext_reg
+    expected_lines = <<~'EOS'.chomp.split ?\n
+    before include
+
+    no includes here
+
+    just good old-fashioned paragraph text
+
+    after include
+    EOS
+    (expect result.source_lines).to eql expected_lines
+    (expect calls).to have_size 2
+    (expect calls).to eql [false, true]
+  end
+
   it 'should resolve top-level include with nested include' do
     source_file = fixture_file 'parent-with-single-include-with-include.adoc'
     doc = Asciidoctor.load_file source_file, safe: :safe, sourcemap: true

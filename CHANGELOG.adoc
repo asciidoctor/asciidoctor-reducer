@@ -21,6 +21,7 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 
 * Replace include directives that follow an unresolved include (#19)
 * Don't activate reducer extensions on reduced document
+* Prevent custom extension registry from activating extensions twice during reload (#21)
 
 == 1.0.0.alpha.5 (2022-02-06) - @mojavelinux
 
