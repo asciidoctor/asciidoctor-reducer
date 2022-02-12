@@ -8,9 +8,10 @@ describe 'Asciidoctor::Reducer' do
   end
 
   it 'should be able to require library from Ruby process' do
+    # NOTE asciidoctor/reducer/version will already be required by Bundler
     script_file = fixture_file 'print_version.rb'
-    output = %x(#{ruby} #{Shellwords.escape script_file}).chomp
-    (expect output).to eql Asciidoctor::Reducer::VERSION
+    output = %x(#{ruby} #{Shellwords.escape script_file}).lines.map(&:chomp)
+    (expect output).to eql [Asciidoctor::Reducer::VERSION, 'loaded']
   end
 
   it 'should be able to require library using the alias asciidoctor-reducer' do
