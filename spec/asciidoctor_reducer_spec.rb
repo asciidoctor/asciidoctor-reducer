@@ -471,15 +471,28 @@ describe 'Asciidoctor::Reducer' do
     expected_lines = <<~'EOS'.chomp.split ?\n
     before include
     after include
-
-    before include
-
-
-    after include
     EOS
     (expect doc.source_lines).to eql expected_lines
-    (expect doc.blocks).to have_size 3
-    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 4, 7]
+    (expect doc.blocks).to have_size 1
+    (expect (doc.blocks.map {|it| it.lineno })).to eql [1]
+  end
+
+  it 'should resolve include after empty include' do
+    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-after-empty-include.adoc'), safe: :safe,
+      sourcemap: true
+    expected_lines = <<~'EOS'.chomp.split ?\n
+    before includes
+
+
+    between includes
+
+    single line paragraph
+
+    after includes
+    EOS
+    (expect doc.source_lines).to eql expected_lines
+    (expect doc.blocks).to have_size 4
+    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 4, 6, 8]
   end
 
   it 'should skip nested empty include' do
@@ -490,16 +503,11 @@ describe 'Asciidoctor::Reducer' do
     before include
     after include
 
-    before include
-
-
-    after include
-
     after top-level include
     EOS
     (expect doc.source_lines).to eql expected_lines
-    (expect doc.blocks).to have_size 5
-    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 6, 9, 11]
+    (expect doc.blocks).to have_size 3
+    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 6]
   end
 
   it 'should remove trailing empty lines when sourcemap is enabled' do
