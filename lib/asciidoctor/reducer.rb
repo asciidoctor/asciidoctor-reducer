@@ -2,6 +2,7 @@
 
 require 'asciidoctor'
 require_relative 'reducer/extensions'
+require_relative 'reducer/version'
 
 Asciidoctor::Extensions.register :reducer do
   next if document.options[:reduced]
