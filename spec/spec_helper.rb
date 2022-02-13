@@ -69,7 +69,7 @@ RSpec.configure do |config|
   end
 
   def with_tmp_file ext = '.adoc', &block
-    Tempfile.create %W(asciidoctor-reducer- #{ext}), output_dir, encoding: 'utf8', &block
+    Tempfile.create %W(asciidoctor-reducer- #{ext}), output_dir, encoding: 'utf-8', &block
   end
 
   def with_memory_logger level = nil
