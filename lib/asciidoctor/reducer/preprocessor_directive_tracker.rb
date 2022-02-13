@@ -86,4 +86,6 @@ module Asciidoctor::Reducer
       self[@pos]
     end
   end
+
+  private_constant :CurrentPosition
 end
