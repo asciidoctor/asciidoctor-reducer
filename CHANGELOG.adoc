@@ -8,7 +8,7 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 
 === Fixed
 
-* Require asciidoctor/reducer/version when asciidoctor/reducer is required
+* Require asciidoctor/reducer/version if necessary when `Asciidoctor::Reducer::VERSION` is accessed
 
 == 1.0.0.alpha.6 (2022-02-10) - @mojavelinux
 

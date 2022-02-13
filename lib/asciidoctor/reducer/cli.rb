@@ -4,8 +4,6 @@ autoload :OptionParser, 'optparse'
 autoload :Pathname, 'pathname'
 
 module Asciidoctor::Reducer
-  autoload :VERSION, (::File.join __dir__, 'version.rb')
-
   class Cli
     LOG_LEVELS = (::Logger::Severity.constants false).each_with_object({}) do |level, accum|
       accum[level.to_s.downcase] = (::Logger::Severity.const_get level) unless level == :UNKNOWN
