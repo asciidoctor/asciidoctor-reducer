@@ -3,6 +3,10 @@
 require_relative 'spec_helper'
 
 describe Asciidoctor::Reducer do
+  it 'should provide VERSION constant' do
+    (expect Asciidoctor::Reducer::VERSION).to match %r/^\d+\.\d+\.\d+(\.\S+)?$/
+  end
+
   describe '.reduce' do
     subject { described_class.method :reduce }
 

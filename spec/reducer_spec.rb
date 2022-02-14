@@ -2,11 +2,7 @@
 
 require_relative 'spec_helper'
 
-describe 'Asciidoctor::Reducer' do
-  it 'should provide VERSION constant' do
-    (expect Asciidoctor::Reducer::VERSION).to match %r/^\d+\.\d+\.\d+(\.\S+)?$/
-  end
-
+describe Asciidoctor::Reducer do
   it 'should be able to require library from Ruby process' do
     # NOTE asciidoctor/reducer/version will already be required by Bundler
     script_file = fixture_file 'print_version.rb'
