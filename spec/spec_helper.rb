@@ -54,7 +54,6 @@ RSpec.configure do |config|
   end
 
   def reduce_file input_file, opts = {}
-    opts[:safe] = :safe
     opts[:sourcemap] == false ? (opts.delete :sourcemap) : (opts[:sourcemap] = true)
     Asciidoctor::Reducer.reduce_file input_file, opts
   end

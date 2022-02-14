@@ -24,7 +24,7 @@ describe Asciidoctor::Reducer do
 
       after include
       EOS
-      doc = File.open(source_file, mode: 'r:UTF-8') {|f| subject.call f, safe: :safe }
+      doc = File.open(source_file, mode: 'r:UTF-8') {|f| subject.call f }
       (expect doc.source_lines).to eql expected_lines
       (expect doc.attr 'docname').to eql 'parent-with-single-include'
       (expect doc.attr 'docfile').to eql source_file
@@ -54,7 +54,7 @@ describe Asciidoctor::Reducer do
       after include
       EOS
       with_tmp_file do |the_output_file|
-        subject.reduce_file the_source_file, safe: :safe, to: the_output_file.path
+        subject.reduce_file the_source_file, to: the_output_file.path
         output_contents = the_output_file.read
         (expect output_contents).to eql (expected + ?\n)
       end
@@ -71,7 +71,7 @@ describe Asciidoctor::Reducer do
       EOS
       with_tmp_file do |the_output_file|
         the_output_pathname = ::Pathname.new the_output_file.path
-        subject.reduce_file the_source_file, safe: :safe, to: the_output_pathname
+        subject.reduce_file the_source_file, to: the_output_pathname
         output_contents = the_output_file.read
         (expect output_contents).to eql (expected + ?\n)
       end
@@ -86,7 +86,7 @@ describe Asciidoctor::Reducer do
 
       after include
       EOS
-      result = subject.reduce_file the_source_file, safe: :safe, to: String
+      result = subject.reduce_file the_source_file, to: String
       (expect result).to eql expected
     end
 
@@ -100,7 +100,7 @@ describe Asciidoctor::Reducer do
       after include
       EOS
       to = StringIO.new
-      subject.reduce_file the_source_file, safe: :safe, to: to
+      subject.reduce_file the_source_file, to: to
       (expect to.string).to eql (expected + ?\n)
     end
 
@@ -113,7 +113,7 @@ describe Asciidoctor::Reducer do
 
       after include
       EOS
-      result = subject.reduce_file the_source_file, safe: :safe, to: '/dev/null'
+      result = subject.reduce_file the_source_file, to: '/dev/null'
       (expect result.source).to eql expected
     end
 
@@ -126,7 +126,7 @@ describe Asciidoctor::Reducer do
 
       after include
       EOS
-      result = subject.reduce_file the_source_file, safe: :safe, to: nil
+      result = subject.reduce_file the_source_file, to: nil
       (expect result.source).to eql expected
     end
   end
@@ -135,7 +135,7 @@ describe Asciidoctor::Reducer do
     it 'should not register extension for call if extension is registered globally' do
       Asciidoctor::Reducer::Extensions.register
       calls = 0
-      result = subject.reduce_file (fixture_file 'parent-with-single-include.adoc'), safe: :safe, sourcemap: true,
+      result = subject.reduce_file (fixture_file 'parent-with-single-include.adoc'), sourcemap: true,
         extensions: proc {
           tree_processor do
             prefer
