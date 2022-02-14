@@ -525,7 +525,7 @@ describe 'Asciidoctor::Reducer' do
   it 'should skip include that custom include processor handles but does not push' do
     Asciidoctor::Reducer::Extensions.register
     doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-single-line-paragraph.adoc'),
-      safe: :safe, sourcemap: true, extensions: proc { include_processor { process { next } } }
+      safe: :server, sourcemap: true, extensions: proc { include_processor { process { next } } }
     expected_lines = <<~'EOS'.chomp.split ?\n
     before include
 

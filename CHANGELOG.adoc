@@ -16,6 +16,7 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 === Changed
 
 * Scope extensions to single call instead of registering them globally (#3)
+* Use `:safe` as the default safe mode when using the API
 * Make `CurrentPosition` module private to the `PreprocessorDirectiveTracker` module
 
 === Fixed
