@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require_relative 'spec_helper'
-require 'asciidoctor/reducer/cli'
 
 describe Asciidoctor::Reducer::Cli do
   # NOTE override subject to return class object; RSpec returns instance of class by default
@@ -63,6 +62,15 @@ describe Asciidoctor::Reducer::Cli do
         output_contents = the_output_file.read.chomp
         (expect output_contents).not_to include 'include::'
         (expect output_contents).to include 'just good old-fashioned paragraph text'
+      end
+    end
+
+    it 'should create empty file specified by -o option if output is empty' do
+      the_source_file = fixture_file 'parent-with-only-empty-include.adoc'
+      with_tmp_file do |the_output_file|
+        (expect subject.run ['-o', the_output_file.path, the_source_file]).to eql 0
+        output_contents = the_output_file.read
+        (expect output_contents).to be_empty
       end
     end
 

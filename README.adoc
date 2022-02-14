@@ -60,7 +60,7 @@ Installing the gem this way makes the `bundle exec asciidoctor-reducer` command 
 
 == Usage
 
-=== As command
+=== Command
 
 You can run this tool using the provided command (i.e., CLI), named `asciidoctor-reducer`.
 To learn how to use the command, and to verify it's available, run the command with the `-h` option:
@@ -96,21 +96,21 @@ To write the output to a file instead of stdout, also specify an output file usi
 
 Note that top-level include files in the input AsciiDoc document are resolved relative to current working directory.
 
-=== As extension
+=== API
 
-You can use this tool as an Asciidoctor extension when using the Asciidoctor API.
-To do so, require it before calling the `Asciidoctor.load` method.
-
-[,ruby]
-----
-require 'asciidoctor/reducer'
-----
-
-Next, load a parent document that contains includes.
+You can also use this tool from a Ruby application using the provided API.
+To begin, require the API for this library.
 
 [,ruby]
 ----
-doc = Asciidoctor.load_file 'sample.adoc', safe: :safe
+require 'asciidoctor/reducer/api'
+----
+
+Next, reduce a parent document that contains includes.
+
+[,ruby]
+----
+doc = Asciidoctor::Reducer.reduce_file 'sample.adoc', safe: :safe
 ----
 
 Finally, you can retrieve the reduced source from the returned document.
@@ -120,7 +120,55 @@ Finally, you can retrieve the reduced source from the returned document.
 puts doc.source
 ----
 
-You can write this source to a file to save the reduced document.
+The benefit of this approach is that you can access the reduced source and the parsed document that corresponds to it.
+
+If you don't need the parsed document, you can retrieve the reduced source directly by passing the `String` type to the `:to` option:
+
+[,ruby]
+----
+puts Asciidoctor::Reducer.reduce_file 'sample.adoc', safe: :safe, to: String
+----
+
+You can write the reduced source directly to a file by passing a file path to the `:to` option:
+
+[,ruby]
+----
+Asciidoctor::Reducer.reduce_file 'sample.adoc', safe: :safe, to: 'sample-reduced.adoc'
+----
+
+== Extension
+
+Instead of using the API for this library, you can use the load API provided by Asciidoctor.
+If you want to register the extension globally, require the library as follows:
+
+[,ruby]
+----
+require 'asciidoctor/reducer'
+----
+
+When you use the Asciidoctor load API, the document will automatically be reduced.
+
+[,ruby]
+----
+puts (Asciidoctor.load_file 'sample.adoc', safe: :safe).source
+----
+
+If you want to keep the extension scoped to the call, require the library as follows:
+
+[,ruby]
+----
+require 'asciidoctor/reducer/extensions'
+----
+
+Next, use the extensions API to prepare an extension registry and pass it to the Asciidoctor load API:
+
+[,ruby]
+----
+puts (Asciidoctor.load_file 'sample.adoc', safe: :safe, extension_registry: Asciidoctor::Reducer.prepare_registry).source
+----
+
+Working with the extension directly is intended for low-level operations.
+Most of the time, you should use the API provided by this library.
 
 == How it Works
 

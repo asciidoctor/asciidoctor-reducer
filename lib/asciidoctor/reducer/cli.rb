@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'api'
 autoload :OptionParser, 'optparse'
-autoload :Pathname, 'pathname'
 
 module Asciidoctor::Reducer
   class Cli
@@ -103,17 +103,9 @@ module Asciidoctor::Reducer
       else
         options[:logger] = nil
       end
-      if (output_file = options.delete :output_file) == '-'
-        to = $stdout
-      else
-        (to = ::Pathname.new output_file).dirname.mkpath
-      end
-      if (input_file = options.delete :input_file) == '-'
-        reduced = (::Asciidoctor.load $stdin, options).source + ?\n
-      else
-        reduced = (::Asciidoctor.load_file input_file, options).source + ?\n
-      end
-      ::Pathname === to ? (to.write reduced, encoding: ::Encoding::UTF_8) : (to.write reduced)
+      options[:to] = (output_file = options.delete :output_file) == '-' ? $stdout : (::Pathname.new output_file)
+      input = (input_file = options.delete :input_file) == '-' ? $stdin : (::Pathname.new input_file)
+      ::Asciidoctor::Reducer.reduce input, options
       0
     rescue
       $stderr.write %(asciidoctor-reducer: #{$!.message}\n)
