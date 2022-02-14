@@ -21,10 +21,10 @@ If the document does not contain any preprocessor directives, the tool returns t
 
 == Prerequisites
 
-{project-name} is a Ruby program that you install using Ruby packaging.
+{project-name} is a Ruby application that you install using Ruby packaging.
 To install and run {project-name}, you need Ruby 2.5 or better.
 
-Run the following command to check whether you have Ruby installed and to check which version:
+Run the following command to check which version of Ruby you have installed, if any:
 
  $ ruby -v
 
@@ -40,7 +40,9 @@ You can install the latest version of the gem using the following command:
  $ gem install asciidoctor-reducer --pre
 
 Installing this gem makes the `asciidoctor-reducer` command available on your $PATH.
-You can also require the gem into the Ruby runtime to use it as an Asciidoctor extension.
+You can also require the gem into the Ruby runtime to use it as a library or Asciidoctor extension.
+
+=== Project-scoped
 
 If you prefer to manage the application as a project-scoped dependency, you can declare the gem in the project's [.path]_Gemfile_:
 
@@ -74,7 +76,7 @@ asciidoctor-reducer [OPTION]... FILE
 ....
 
 The argument `FILE` is the AsciiDoc file you want to reduce.
-The options, represented by `[OPTION]...`, are optional, as the name suggestions.
+The options, represented by `+[OPTION]...+`, are optional, as the name suggestions.
 
 Thus, to use the command, pass the AsciiDoc file as the sole argument:
 
@@ -90,11 +92,9 @@ To use the command in this way, pass `-` as the first argument:
 
  $ cat input.adoc | asciidoctor-reducer -
 
-To write the output to a file instead of stdout, also specify an output file using the `-o` option:
+To write the output to a file in this case, specify an output file using the `-o` option:
 
  $ cat input.adoc | asciidoctor-reducer -o output.adoc -
-
-Note that top-level include files in the input AsciiDoc document are resolved relative to current working directory.
 
 === API
 
@@ -174,6 +174,7 @@ Most of the time, you should use the API provided by this library.
 == How it Works
 
 {project-name} uses a collection of Asciidoctor extensions to rebuild the AsciiDoc source as a single document.
+Top-level include files in the input AsciiDoc document are resolved relative to current working directory.
 
 It starts by using a preprocessor extension to enhance the PreprocessorReader class to be notified each time an include is entered (pushed) or exited (popped).
 When an include directive is encountered, the enhanced reader stores the resolved lines and location of the include directive, thus keeping track of where those lines should be inserted in the original source.
@@ -239,7 +240,7 @@ For more fine-grained control, you can also run the tests directly using RSpec:
 
 To run all tests in a single spec, point RSpec at the spec file:
 
- $ bundle exec rspec spec/asciidoctor_reducer_spec.rb
+ $ bundle exec rspec spec/reducer_spec.rb
 
 ==== Run specific tests
 
