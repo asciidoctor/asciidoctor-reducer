@@ -107,10 +107,11 @@ require 'asciidoctor/reducer/api'
 ----
 
 Next, reduce a parent document that contains includes.
+This works without having to specify the safe mode since the default safe mode when using the API is `:safe`.
 
 [,ruby]
 ----
-doc = Asciidoctor::Reducer.reduce_file 'sample.adoc', safe: :safe
+doc = Asciidoctor::Reducer.reduce_file 'sample.adoc'
 ----
 
 Finally, you can retrieve the reduced source from the returned document.
@@ -126,14 +127,14 @@ If you don't need the parsed document, you can retrieve the reduced source direc
 
 [,ruby]
 ----
-puts Asciidoctor::Reducer.reduce_file 'sample.adoc', safe: :safe, to: String
+puts Asciidoctor::Reducer.reduce_file 'sample.adoc', to: String
 ----
 
 You can write the reduced source directly to a file by passing a file path to the `:to` option:
 
 [,ruby]
 ----
-Asciidoctor::Reducer.reduce_file 'sample.adoc', safe: :safe, to: 'sample-reduced.adoc'
+Asciidoctor::Reducer.reduce_file 'sample.adoc', to: 'sample-reduced.adoc'
 ----
 
 == Extension
