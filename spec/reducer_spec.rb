@@ -456,6 +456,55 @@ describe Asciidoctor::Reducer do
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
 
+  it 'should replace includes with links if safe mode is secure' do
+    doc = reduce_file (fixture_file 'parent-with-nonadjacent-includes.adoc'), safe: :secure
+    expected_lines = <<~'EOS'.chomp.split ?\n
+    before includes
+
+    link:single-line-paragraph.adoc[role=include]
+
+    link:multiline-paragraph.adoc[role=include]
+
+    after includes
+    EOS
+    (expect doc.source_lines).to eql expected_lines
+    (expect doc.blocks).to have_size 4
+    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
+  end
+
+  it 'should not process link macro following include skipped by include processor when safe mode is not secure' do
+    doc = reduce_file (fixture_file 'parent-with-link-macro-after-include.adoc'), extensions: proc {
+      include_processor { process { next } }
+    }
+    expected_lines = <<~'EOS'.chomp.split ?\n
+    before includes
+
+    link:foobar.adoc[]
+
+    after includes
+    EOS
+    (expect doc.source_lines).to eql expected_lines
+    (expect doc.blocks).to have_size 3
+    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
+  end
+
+  it 'should not process link macro following include skipped by include processor when safe mode is secure' do
+    doc = reduce_file (fixture_file 'parent-with-link-macro-after-include.adoc'), safe: :secure,
+      extensions: proc {
+        include_processor { process { next } }
+      }
+    expected_lines = <<~'EOS'.chomp.split ?\n
+    before includes
+
+    link:foobar.adoc[]
+
+    after includes
+    EOS
+    (expect doc.source_lines).to eql expected_lines
+    (expect doc.blocks).to have_size 3
+    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
+  end
+
   it 'should skip empty include' do
     doc = reduce_file fixture_file 'parent-with-empty-include.adoc'
     expected_lines = <<~'EOS'.chomp.split ?\n
@@ -543,6 +592,29 @@ describe Asciidoctor::Reducer do
         end
       end
     }
+    expected_lines = <<~'EOS'.chomp.split ?\n
+    before include
+
+    pushed first
+
+    pushed last
+
+    after include
+    EOS
+    (expect doc.source_lines).to eql expected_lines
+    (expect doc.blocks).to have_size 4
+    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
+  end
+
+  it 'should include lines pushed by custom include processor when safe mode is secure' do
+    doc = reduce_file (fixture_file 'parent-with-include-with-single-line-paragraph.adoc'), safe: :secure,
+      extensions: proc {
+        include_processor do
+          process do |_, reader, target, attrs|
+            reader.push_include ['pushed first', '', 'pushed last'], target, target, 1, attrs
+          end
+        end
+      }
     expected_lines = <<~'EOS'.chomp.split ?\n
     before include
 

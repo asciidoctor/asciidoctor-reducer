@@ -39,8 +39,13 @@ module Asciidoctor::Reducer
       inc_lineno = @lineno - 1 # we're currently on the include line, which is 1-based
       result = super
       unless @x_include_pushed
-        unresolved = (l = peek_line true) && (l.start_with? 'Unresolved directive in ') && (l.end_with? ']') || nil
-        push_include_replacement inc_lineno, (unresolved ? [l] : []), unresolved
+        if (ln = peek_line true) && (ln.end_with? ']') && !(unresolved = ln.start_with? 'Unresolved directive in ')
+          if @document.safe >= ::Asciidoctor::SafeMode::SECURE && inc_lineno == @lineno - 1 && (ln.start_with? 'link:')
+            ln = (ln.slice 0, (ln.length - 1)) + 'role=include]'
+            unresolved = true
+          end
+        end
+        push_include_replacement inc_lineno, (unresolved ? [ln] : []), unresolved
       end
       @x_include_directive_line = @x_include_pushed = nil
       result
