@@ -49,8 +49,8 @@ module Asciidoctor::Reducer
           (options[:requires] ||= []).concat path.split ','
         end
 
-        opts.on '-S', '--safe-mode SAFE_MODE', ['unsafe', 'safe', 'server'],
-          'set supported safe mode level: [unsafe, safe, server] (default: unsafe)' do |name|
+        opts.on '-S', '--safe-mode SAFE_MODE', ['unsafe', 'safe', 'server', 'secure'],
+          'set safe mode level: [unsafe, safe, server, secure] (default: unsafe)' do |name|
           options[:safe] = ::Asciidoctor::SafeMode.value_for_name name
         end
 
