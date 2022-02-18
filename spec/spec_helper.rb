@@ -49,6 +49,10 @@ RSpec.configure do |config|
     end
   end
 
+  def jruby?
+    RUBY_ENGINE == 'jruby'
+  end
+
   def output_dir
     (FileUtils.mkpath (File.join __dir__, 'output'))[0]
   end
@@ -72,6 +76,10 @@ RSpec.configure do |config|
         Open3.capture3 env_override, cmd, *args
       end
     end
+  end
+
+  def windows?
+    Gem.win_platform?
   end
 
   def with_tmp_file ext = '.adoc', &block
