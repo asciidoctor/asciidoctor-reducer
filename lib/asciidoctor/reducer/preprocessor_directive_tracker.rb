@@ -68,14 +68,14 @@ module Asciidoctor::Reducer
     private
 
     def push_include_replacement inc_lineno, inc_lines, unresolved = false
-      @x_include_replacements << {
-        into: @x_include_replacements.pos,
+      (inc_replacements = @x_include_replacements) << {
+        into: inc_replacements.pos,
         lineno: inc_lineno,
         line: @x_include_directive_line,
         lines: inc_lines,
         drop: [],
       }
-      @x_include_replacements.pos = @x_include_replacements.length - 1 unless unresolved || inc_lines.empty?
+      inc_replacements.pos = inc_replacements.length - 1 unless unresolved || inc_lines.empty?
       nil
     end
   end
