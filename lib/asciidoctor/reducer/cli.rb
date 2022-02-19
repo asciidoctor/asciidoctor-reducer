@@ -107,6 +107,9 @@ module Asciidoctor::Reducer
       input = (input_file = options.delete :input_file) == '-' ? $stdin : (::Pathname.new input_file)
       ::Asciidoctor::Reducer.reduce input, options
       0
+    rescue ::SignalException
+      $stderr.puts if ::Interrupt === $!
+      $!.signo
     rescue
       $stderr.write %(asciidoctor-reducer: #{$!.message}\n)
       1

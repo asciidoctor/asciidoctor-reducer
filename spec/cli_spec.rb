@@ -30,6 +30,41 @@ describe Asciidoctor::Reducer::Cli do
     end
   end
 
+  context 'signals', unless: windows? do
+    it 'should handle HUP signal gracefully' do
+      the_source_file = fixture_file 'parent-with-single-include.adoc'
+      the_ext_file = fixture_file 'signal.rb'
+      out, err, res = run_command asciidoctor_reducer_bin, '-r', the_ext_file, the_source_file, '-a', 'signal=HUP'
+      (expect res.exitstatus).to (be 1).or (be 129)
+      (expect out).to be_empty
+      (expect err).to be_empty
+    end
+
+    it 'should handle INT signal gracefully and append line feed' do
+      the_source_file = fixture_file 'parent-with-single-include.adoc'
+      the_ext_file = fixture_file 'signal.rb'
+      out, err, res = run_command asciidoctor_reducer_bin, '-r', the_ext_file, the_source_file, '-a', 'signal=INT'
+      (expect res.exitstatus).to (be 2).or (be 130)
+      (expect out).to be_empty
+      if jruby?
+        (expect err).to be_empty
+      else
+        (expect err).to eql $/
+      end
+    end
+
+    it 'should handle KILL signal gracefully' do
+      the_source_file = fixture_file 'parent-with-single-include.adoc'
+      the_ext_file = fixture_file 'signal.rb'
+      out, err, res = run_command asciidoctor_reducer_bin, '-r', the_ext_file, the_source_file, '-a', 'signal=KILL'
+      (expect res.exitstatus).to be_nil
+      (expect res.success?).to be_falsey
+      (expect res.termsig).to be 9
+      (expect out).to be_empty
+      (expect err).to be_empty
+    end
+  end
+
   context 'options' do
     it 'should display error message and return non-zero exit status when invalid option is specified' do
       (expect subject.run %w(--invalid)).to eql 1
@@ -245,7 +280,7 @@ describe Asciidoctor::Reducer::Cli do
     end
 
     it 'should read from stdin when argument is -' do
-      $stdin.puts %(include::#{fixture_file 'no-includes.adoc'}[])
+      $stdin.write %(include::#{fixture_file 'no-includes.adoc'}[])
       $stdin.rewind
       (expect subject.run %w(-)).to eql 0
       (expect $stdout.string.chomp).to include 'just good old-fashioned paragraph text'
