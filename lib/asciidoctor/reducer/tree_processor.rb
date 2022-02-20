@@ -13,7 +13,7 @@ module Asciidoctor::Reducer
           end
           lines = it[:lines]
           unless (drop = it[:drop]).empty?
-            drop.reverse_each {|idx| ::Array === idx ? (lines[idx[0]] = idx[1]) : (lines.delete_at idx) }
+            drop.reverse_each {|it| ::Array === it ? (lines[it[0]] = it[1]) : (lines.delete_at it) }
           end
           target_lines[idx] = lines if target_lines
         end
