@@ -13,7 +13,9 @@ module Asciidoctor::Reducer
           end
           lines = it[:lines]
           unless (drop = it[:drop]).empty?
-            drop.reverse_each {|it| ::Array === it ? (lines[it[0] - 1] = it[1]) : (lines.delete_at it - 1) }
+            drop.reverse_each do |drop_it|
+              ::Array === drop_it ? (lines[drop_it[0] - 1] = drop_it[1]) : (lines.delete_at drop_it - 1)
+            end
           end
           target_lines[idx] = lines if target_lines
         end
