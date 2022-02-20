@@ -9,11 +9,11 @@ module Asciidoctor::Reducer
           if (into = it[:into])
             target_lines = inc_replacements[into][:lines]
             # adds extra bit of assurance that we're replacing the correct line
-            next unless target_lines[(idx = it[:lineno])] == it[:line]
+            next unless target_lines[(idx = it[:lineno] - 1)] == it[:line]
           end
           lines = it[:lines]
           unless (drop = it[:drop]).empty?
-            drop.reverse_each {|it| ::Array === it ? (lines[it[0]] = it[1]) : (lines.delete_at it) }
+            drop.reverse_each {|it| ::Array === it ? (lines[it[0] - 1] = it[1]) : (lines.delete_at it - 1) }
           end
           target_lines[idx] = lines if target_lines
         end

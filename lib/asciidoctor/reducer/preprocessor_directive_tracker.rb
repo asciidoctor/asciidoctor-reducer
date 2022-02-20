@@ -15,7 +15,7 @@ module Asciidoctor::Reducer
       return super if @document.options[:preserve_conditionals]
       skip_active = @skipping
       depth = @conditional_stack.length
-      cond_lineno = @lineno - 1
+      cond_lineno = @lineno
       result = super
       return result if @skipping && skip_active
       drop = @x_include_replacements.current[:drop]
@@ -25,7 +25,7 @@ module Asciidoctor::Reducer
         else
           drop << cond_lineno
         end
-      elsif depth_change > 0 || cond_lineno == @lineno - 1
+      elsif depth_change > 0 || cond_lineno == @lineno
         drop << cond_lineno
       else
         drop << [cond_lineno, text]
@@ -36,11 +36,11 @@ module Asciidoctor::Reducer
     def preprocess_include_directive target, attrlist
       @x_include_directive_line = %(include::#{target}[#{attrlist}])
       @x_include_pushed = false
-      inc_lineno = @lineno - 1 # we're currently on the include line, which is 1-based
+      inc_lineno = @lineno # we're currently on the include line, which is 1-based
       result = super
       unless @x_include_pushed
         if (ln = peek_line true) && (ln.end_with? ']') && !(unresolved = ln.start_with? 'Unresolved directive in ')
-          if @document.safe >= ::Asciidoctor::SafeMode::SECURE && inc_lineno == @lineno - 1 && (ln.start_with? 'link:')
+          if @document.safe >= ::Asciidoctor::SafeMode::SECURE && inc_lineno == @lineno && (ln.start_with? 'link:')
             ln = (ln.slice 0, (ln.length - 1)) + 'role=include]'
             unresolved = true
           end
@@ -53,7 +53,7 @@ module Asciidoctor::Reducer
 
     def push_include data, file, path, lineno, attrs
       @x_include_pushed = true
-      inc_lineno = @lineno - 2 # we're below the include line, which is 1-based
+      inc_lineno = @lineno - 1 # we're below the include line, which is 1-based
       prev_inc_depth = @include_stack.length
       result = super
       push_include_replacement inc_lineno, (@include_stack.length > prev_inc_depth ? lines : [])

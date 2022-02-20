@@ -13,6 +13,7 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 === Changed
 
 * Replace include directive with link macro if safe mode is secure (#31)
+* Track line numbers in include replacements using 1-based index
 
 === Fixed
 
