@@ -307,4 +307,46 @@ describe Asciidoctor::Reducer::Cli do
       (expect $stderr.string.chomp).to include 'illegal reference to ancestor of jail'
     end
   end
+
+  context 'error' do
+    it 'should suggest --trace option if application ends in error' do
+      the_source_file = fixture_file 'parent-with-single-include.adoc'
+      ext_source = <<~'EOS'
+      Asciidoctor::Extensions.register do
+        tree_processor do
+        end
+      end
+      EOS
+      with_tmp_file '.rb' do |the_ext_file|
+        the_ext_file.write ext_source
+        the_ext_file.flush
+        (expect subject.run [the_source_file, '-r', the_ext_file.path]).to eql 1
+      end
+      stderr_lines = $stderr.string.chomp.lines
+      (expect stderr_lines[0]).to include 'asciidoctor-reducer: FAILED: '
+      (expect stderr_lines[0]).to include 'No block specified to process tree processor extension'
+      (expect stderr_lines[-1]).to include 'Use --trace to show backtrace'
+    ensure
+      Asciidoctor::Extensions.unregister_all
+    end
+
+    it 'should show backtrace of error if --trace option is specifed' do
+      the_source_file = fixture_file 'parent-with-single-include.adoc'
+      ext_source = <<~'EOS'
+      Asciidoctor::Extensions.register do
+        tree_processor do
+        end
+      end
+      EOS
+      with_tmp_file '.rb' do |the_ext_file|
+        the_ext_file.write ext_source
+        the_ext_file.flush
+        expect do
+          subject.run [the_source_file, '-r', the_ext_file.path, '--trace']
+        end.to raise_exception ArgumentError, %r/No block specified to process tree processor extension/
+      end
+    ensure
+      Asciidoctor::Extensions.unregister_all
+    end
+  end
 end
