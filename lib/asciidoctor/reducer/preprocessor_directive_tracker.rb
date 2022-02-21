@@ -41,7 +41,7 @@ module Asciidoctor::Reducer
       unless @x_include_pushed
         if (ln = peek_line true) && (ln.end_with? ']') && !(unresolved = ln.start_with? 'Unresolved directive in ')
           if @document.safe >= ::Asciidoctor::SafeMode::SECURE && inc_lineno == @lineno && (ln.start_with? 'link:')
-            ln = (ln.slice 0, (ln.length - 1)) + 'role=include]'
+            ln = %(#{ln.slice 0, (ln.length - 1)}role=include])
             unresolved = true
           end
         end
