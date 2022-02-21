@@ -38,6 +38,10 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 
 * Require asciidoctor/reducer/version automatically when `Asciidoctor::Reducer::VERSION` is accessed
 
+=== Details
+
+{url-repo}/releases/tag/v1.0.0.alpha.7[git tag]
+
 == 1.0.0.alpha.6 (2022-02-10) - @mojavelinux
 
 === Added
@@ -58,6 +62,10 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 * Prevent custom extension registry from activating extensions twice during reload (#21)
 * Retain includes table in document catalog when reloading document (#23)
 
+=== Details
+
+{url-repo}/releases/tag/v1.0.0.alpha.6[git tag]
+
 == 1.0.0.alpha.5 (2022-02-06) - @mojavelinux
 
 === Changed
@@ -71,11 +79,19 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 
 * Suppress log messages when reloading document (#14)
 
+=== Details
+
+{url-repo}/releases/tag/v1.0.0.alpha.5[git tag]
+
 == 1.0.0.alpha.4 (2022-02-03) - @mojavelinux
 
 === Fixed
 
 * Fix replacement of nested empty and unresolved includes
+
+=== Details
+
+{url-repo}/releases/tag/v1.0.0.alpha.4[git tag]
 
 == 1.0.0.alpha.3 (2022-02-02) - @mojavelinux
 
@@ -85,6 +101,10 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 * Encapsulate logic to enhance PreprocessorReader inside PreprocessorReaderTracker module
 * Only reload document if source lines have changed; otherwise, update source lines on reader directly
 * Change default safe mode for CLI to :unsafe
+
+=== Details
+
+{url-repo}/releases/tag/v1.0.0.alpha.3[git tag]
 
 == 1.0.0.alpha.2 (2022-01-27) - @mojavelinux
 
@@ -105,6 +125,10 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 
 * Preserve return value when overridding `preprocess_include_directive` method
 
+=== Details
+
+{url-repo}/releases/tag/v1.0.0.alpha.2[git tag]
+
 == 1.0.0.alpha.1 (2022-01-12) - @mojavelinux
 
 Initial release.
@@ -112,27 +136,3 @@ Initial release.
 === Details
 
 {url-repo}/releases/tag/v1.0.0.alpha.1[git tag]
-
-=== Details
-
-{url-repo}/releases/tag/v1.0.0.alpha.2[git tag]
-
-=== Details
-
-{url-repo}/releases/tag/v1.0.0.alpha.3[git tag]
-
-=== Details
-
-{url-repo}/releases/tag/v1.0.0.alpha.4[git tag]
-
-=== Details
-
-{url-repo}/releases/tag/v1.0.0.alpha.5[git tag]
-
-=== Details
-
-{url-repo}/releases/tag/v1.0.0.alpha.6[git tag]
-
-=== Details
-
-{url-repo}/releases/tag/v1.0.0.alpha.7[git tag]
