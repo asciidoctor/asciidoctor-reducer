@@ -14,12 +14,12 @@ module Asciidoctor::Reducer
     def preprocess_conditional_directive keyword, target, delimiter, text
       return super if @document.options[:preserve_conditionals]
       skip_active = @skipping
-      depth = @conditional_stack.length
+      depth = @conditional_stack.size
       cond_lineno = @lineno
       result = super
       return result if @skipping && skip_active
       drop = @x_include_replacements.current[:drop]
-      if (depth_change = @conditional_stack.length - depth) < 0
+      if (depth_change = @conditional_stack.size - depth) < 0
         if skip_active
           drop.push(*(drop.pop..cond_lineno))
         else
@@ -54,9 +54,9 @@ module Asciidoctor::Reducer
     def push_include data, file, path, lineno, attrs
       @x_include_pushed = true
       inc_lineno = @lineno - 1 # we're below the include line, which is 1-based
-      prev_inc_depth = @include_stack.length
+      prev_inc_depth = @include_stack.size
       result = super
-      push_include_replacement inc_lineno, (@include_stack.length > prev_inc_depth ? lines : [])
+      push_include_replacement inc_lineno, (@include_stack.size > prev_inc_depth ? lines : [])
       result
     end
 
@@ -75,7 +75,7 @@ module Asciidoctor::Reducer
         lines: lines,
         drop: [],
       }
-      inc_replacements.pos = inc_replacements.length - 1 unless unresolved || lines.empty?
+      inc_replacements.pos = inc_replacements.size - 1 unless unresolved || lines.empty?
       nil
     end
   end
@@ -84,7 +84,7 @@ module Asciidoctor::Reducer
     attr_accessor :pos
 
     def self.extended instance
-      instance.pos = instance.length - 1
+      instance.pos = instance.size - 1
     end
 
     def current
