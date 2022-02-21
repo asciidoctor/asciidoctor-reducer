@@ -54,6 +54,10 @@ module Asciidoctor::Reducer
           options[:safe] = ::Asciidoctor::SafeMode.value_for_name name
         end
 
+        opts.on '--trace', 'trace the cause of application errors (default: false)' do
+          options[:trace] = true
+        end
+
         opts.on '-v', '--version', 'display the version information and exit' do
           $stdout.write %(#{opts.program_name} #{VERSION}\n)
           return 0
@@ -97,6 +101,7 @@ module Asciidoctor::Reducer
     def self.run args = ARGV
       code, options = new.parse (Array args)
       return code unless code == 0 && options
+      trace = options.delete :trace
       old_logger = ::Asciidoctor::LoggerManager.logger
       if (log_level = options.delete :log_level)
         (options[:logger] = ::Asciidoctor::Logger.new $stderr).level = log_level
@@ -111,7 +116,9 @@ module Asciidoctor::Reducer
       $stderr.puts if ::Interrupt === $!
       $!.signo
     rescue
-      $stderr.write %(asciidoctor-reducer: #{$!.message}\n)
+      raise $! if trace
+      $stderr.write %(asciidoctor-reducer: #{$!.message.delete_prefix 'asciidoctor: '}\n)
+      $stderr.write %(  Use --trace to show backtrace\n)
       1
     ensure
       ::Asciidoctor::LoggerManager.logger = old_logger if old_logger

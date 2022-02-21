@@ -9,6 +9,7 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 === Added
 
 * Add secure mode as value of `-S` CLI option (#31)
+* Add `--trace` option to CLI to trace cause of application errors (#29)
 
 === Changed
 
