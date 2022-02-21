@@ -3,7 +3,7 @@
 module Asciidoctor::Reducer
   class TreeProcessor < ::Asciidoctor::Extensions::TreeProcessor
     def process doc
-      if (inc_replacements = doc.reader.x_include_replacements).size > 1 || !inc_replacements[0][:drop].empty?
+      if (inc_replacements = doc.reader.x_include_replacements).size > 1 || !(inc_replacements[0][:drop] || []).empty?
         inc_replacements[0][:lines] = doc.source_lines.dup
         inc_replacements.reverse_each do |it|
           if (into = it[:into])
@@ -12,7 +12,7 @@ module Asciidoctor::Reducer
             next unless target_lines[(idx = it[:lineno] - 1)] == it[:line]
           end
           lines = it[:lines]
-          unless (drop = it[:drop]).empty?
+          unless (drop = it[:drop] || []).empty?
             drop.reverse_each do |drop_it|
               ::Array === drop_it ? (lines[drop_it[0] - 1] = drop_it[1]) : (lines.delete_at drop_it - 1)
             end

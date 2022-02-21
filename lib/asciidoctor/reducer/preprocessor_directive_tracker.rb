@@ -6,7 +6,7 @@ module Asciidoctor::Reducer
     attr_reader :x_include_replacements
 
     def self.extended instance
-      instance.instance_variable_set :@x_include_replacements, ([{ drop: [] }].extend CurrentPosition)
+      instance.instance_variable_set :@x_include_replacements, ([{}].extend CurrentPosition)
       instance.instance_variable_set :@x_include_directive_line, nil
       instance.instance_variable_set :@x_include_pushed, nil
     end
@@ -18,7 +18,7 @@ module Asciidoctor::Reducer
       cond_lineno = @lineno
       result = super
       return result if @skipping && skip_active
-      drop = @x_include_replacements.current[:drop]
+      drop = @x_include_replacements.current[:drop] ||= []
       if (depth_change = @conditional_stack.size - depth) < 0
         if skip_active
           drop.push(*(drop.pop..cond_lineno))
@@ -72,7 +72,6 @@ module Asciidoctor::Reducer
         lineno: lineno,
         line: @x_include_directive_line,
         lines: lines,
-        drop: [],
       }
       inc_replacements.pos = inc_replacements.size - 1 unless unresolved || lines.empty?
       nil
