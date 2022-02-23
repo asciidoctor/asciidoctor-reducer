@@ -59,12 +59,12 @@ module Asciidoctor::Reducer
         end
 
         opts.on '-v', '--version', 'display the version information and exit' do
-          $stdout.puts %(#{opts.program_name} #{VERSION})
+          print_version opts
           return 0
         end
 
         opts.on '-h', '--help', 'display this help text and exit' do
-          $stdout.puts opts.help.chomp
+          print_help opts
           return 0
         end
       end
@@ -73,7 +73,7 @@ module Asciidoctor::Reducer
 
       if args.empty?
         opt_parser.warn 'Please specify an AsciiDoc file to reduce.'
-        $stdout.puts opt_parser.help.chomp
+        print_help opt_parser
         1
       elsif args.size == 1
         if (requires = options.delete :requires)
@@ -89,12 +89,12 @@ module Asciidoctor::Reducer
         [0, options]
       else
         opt_parser.warn %(extra arguments detected (unparsed arguments: #{(args.drop 1).join ' '}))
-        $stdout.puts opt_parser.help.chomp
+        print_help opt_parser
         1
       end
     rescue ::OptionParser::InvalidOption
       $stderr.puts %(#{opt_parser.program_name}: #{$!.message})
-      $stdout.puts opt_parser.help.chomp
+      print_help opt_parser
       1
     end
 
@@ -122,6 +122,16 @@ module Asciidoctor::Reducer
       1
     ensure
       ::Asciidoctor::LoggerManager.logger = old_logger if old_logger
+    end
+
+    private
+
+    def print_help opt_parser
+      $stdout.puts opt_parser.help.chomp
+    end
+
+    def print_version opt_parser
+      $stdout.puts %(#{opt_parser.program_name} #{VERSION})
     end
   end
 end

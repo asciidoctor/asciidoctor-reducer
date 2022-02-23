@@ -426,7 +426,7 @@ Style/SoleNestedConditional:
 Style/SpecialGlobalVars:
   EnforcedStyle: use_perl_names
 Style/StderrPuts:
-  Enabled: true
+  Enabled: false
 Style/StringChars:
   Enabled: true
 Style/StringConcatenation:
