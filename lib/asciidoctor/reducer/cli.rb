@@ -59,12 +59,12 @@ module Asciidoctor::Reducer
         end
 
         opts.on '-v', '--version', 'display the version information and exit' do
-          $stdout.write %(#{opts.program_name} #{VERSION}\n)
+          $stdout.puts %(#{opts.program_name} #{VERSION})
           return 0
         end
 
         opts.on '-h', '--help', 'display this help text and exit' do
-          $stdout.write opts.help
+          $stdout.puts opts.help.chomp
           return 0
         end
       end
@@ -73,14 +73,14 @@ module Asciidoctor::Reducer
 
       if args.empty?
         opt_parser.warn 'Please specify an AsciiDoc file to reduce.'
-        $stdout.write opt_parser.help
+        $stdout.puts opt_parser.help.chomp
         1
       elsif args.size == 1
         if (requires = options.delete :requires)
           requires.uniq.each do |path|
             require path
           rescue ::LoadError
-            $stderr.write %(#{opt_parser.program_name}: '#{path}' could not be required (reason: #{$!.message})\n)
+            $stderr.puts %(#{opt_parser.program_name}: '#{path}' could not be required (reason: #{$!.message}))
             return 1
           end
         end
@@ -89,12 +89,12 @@ module Asciidoctor::Reducer
         [0, options]
       else
         opt_parser.warn %(extra arguments detected (unparsed arguments: #{(args.drop 1).join ' '}))
-        $stdout.write opt_parser.help
+        $stdout.puts opt_parser.help.chomp
         1
       end
     rescue ::OptionParser::InvalidOption
-      $stderr.write %(#{opt_parser.program_name}: #{$!.message}\n)
-      $stdout.write opt_parser.help
+      $stderr.puts %(#{opt_parser.program_name}: #{$!.message})
+      $stdout.puts opt_parser.help.chomp
       1
     end
 
@@ -117,8 +117,8 @@ module Asciidoctor::Reducer
       $!.signo
     rescue
       raise $! if trace
-      $stderr.write %(asciidoctor-reducer: #{$!.message.delete_prefix 'asciidoctor: '}\n)
-      $stderr.write %(  Use --trace to show backtrace\n)
+      $stderr.puts %(asciidoctor-reducer: #{$!.message.delete_prefix 'asciidoctor: '})
+      $stderr.puts '  Use --trace to show backtrace'
       1
     ensure
       ::Asciidoctor::LoggerManager.logger = old_logger if old_logger
