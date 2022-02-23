@@ -28,6 +28,8 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 * Add `Asciidoctor::Reducer.reduce` and `Asciidoctor::Reducer.reduce_file` API methods (#3)
 * Add asciidoctor/reducer/extensions to require extensions API (#3)
 * Add `Asciidoctor::Reducer::Extensions` API (#3)
+* Add `Asciidoctor::Reducer::IncludeMapper` auxiliary extension, required by `asciidoctor/reducer/include_mapper/extension` (#26)
+* Register `Asciidoctor::Reducer::IncludeMapper` extension when `asciidoctor/reducer/include_mapper` is required (#26)
 
 === Changed
 
