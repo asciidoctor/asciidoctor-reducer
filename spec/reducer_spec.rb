@@ -189,7 +189,7 @@ describe Asciidoctor::Reducer do
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
 
-  it 'should leave escaped include escaped' do
+  it 'should skip escaped include' do
     doc = reduce_file fixture_file 'parent-with-escaped-include.adoc'
     expected_lines = <<~'EOS'.chomp.split ?\n
     before include
