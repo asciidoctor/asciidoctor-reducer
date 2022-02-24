@@ -1,0 +1,5 @@
+before include
+
+include::https://example.org/intro.adoc[]
+
+after include
