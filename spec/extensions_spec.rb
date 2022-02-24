@@ -10,7 +10,7 @@ describe Asciidoctor::Reducer::Extensions do
       group = subject.call
       (expect group).to be_kind_of Proc
       doc = Asciidoctor.load []
-      reg = (Asciidoctor::Extensions.create :reducer, &group).activate doc
+      reg = (Asciidoctor::Extensions.create described_class.key, &group).activate doc
       (expect reg.preprocessors).to have_size 1
       (expect reg.treeprocessors).to have_size 1
     end
@@ -23,7 +23,7 @@ describe Asciidoctor::Reducer::Extensions do
       registry = subject.call
       (expect registry).not_to be_nil
       (expect registry.groups.keys).to have_size 1
-      (expect registry.groups[:reducer]).not_to be_nil
+      (expect registry.groups[described_class.key]).not_to be_nil
     end
   end
 
@@ -32,7 +32,7 @@ describe Asciidoctor::Reducer::Extensions do
 
     it 'should require extensions globally under group named reducer' do
       subject.call
-      (expect Asciidoctor::Extensions.groups).to have_key :reducer
+      (expect Asciidoctor::Extensions.groups).to have_key described_class.key
       doc = Asciidoctor.load []
       reg = Asciidoctor::Extensions::Registry.new.activate doc
       (expect reg.preprocessors).to have_size 1

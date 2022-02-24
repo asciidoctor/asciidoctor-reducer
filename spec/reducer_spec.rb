@@ -12,7 +12,7 @@ describe Asciidoctor::Reducer do
 
   it 'should register extensions globally when asciidoctor/reducer is required' do
     (expect require 'asciidoctor/reducer').not_to be_nil
-    (expect Asciidoctor::Extensions.groups).to have_key :reducer
+    (expect Asciidoctor::Extensions.groups).to have_key Asciidoctor::Reducer::Extensions.key
   ensure
     Asciidoctor::Reducer::Extensions.unregister
   end
@@ -20,7 +20,7 @@ describe Asciidoctor::Reducer do
   it 'should be able to require library using the alias asciidoctor-reducer' do
     $".delete ::File.expand_path 'lib/asciidoctor/reducer.rb', (::File.dirname __dir__)
     (expect require 'asciidoctor-reducer').not_to be_nil
-    (expect Asciidoctor::Extensions.groups).to have_key :reducer
+    (expect Asciidoctor::Extensions.groups).to have_key Asciidoctor::Reducer::Extensions.key
   ensure
     Asciidoctor::Reducer::Extensions.unregister
   end
