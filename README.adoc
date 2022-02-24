@@ -196,6 +196,69 @@ This call will cause extensions that run during the load phase to be invoked aga
 An extension can check for this secondary load by checking for the `:reduced` option in the `Document#options` hash.
 If this option is set (the value of which will be `true`), then Asciidoctor is loading the reduced document.
 
+== Include Mapper (Experimental)
+
+One of the challenges of reducing a document is that interdocument xrefs that rely on the includes being registered in the document catalog no longer work.
+That's because when the reduced document is converted, it has no includes and thus all interdocument xrefs are colocated in the same source file.
+To work around this shortcoming, {project-name} provides a utility extension named the include mapper that will carry over the includes in the document catalog to the reduced document so they can be imported during conversion.
+
+CAUTION: The include mapper is experimental and thus subject to change.
+
+To use the include mapper when using the CLI to reduce the document, require it using the `-r` option as follows:
+
+ $ asciidoctor-reducer -r asciidoctor/reducer/include_mapper -o input-reduced.adoc input.adoc
+
+To use the include mapper when converting the reduced document, again require it using the `-r` option as follows:
+
+ $ asciidoctor -r asciidoctor/reducer/include_mapper input-reduced.adoc
+
+To use the include mapper when using the API, first require the extension:
+
+[,ruby]
+----
+require 'asciidocotor/reducer/include_mapper/extension'
+----
+
+You then need to register the extension when reducing the document:
+
+[,ruby]
+----
+Asciidoctor::Reducer.reduce_file 'sample.adoc', to: 'sample-reduced.adoc', extensions: proc {
+  next if document.options[:reduced]
+  tree_processor Asciidoctor::Reducer::IncludeMapper
+}
+----
+
+Then register it again when converting the reduced document:
+
+[,ruby]
+----
+Asciidoctor.convert_file 'sample-reduced.adoc', safe: :safe, extensions: proc {
+  tree_processor Asciidoctor::Reducer::IncludeMapper
+}
+----
+
+You can also register the extension globally:
+
+[,ruby]
+----
+require 'asciidocotor/reducer/include_mapper'
+----
+
+In this case, you don't have to pass it to the API explicitly.
+
+=== How it Works
+
+The include mapper works by adding a magic comment to the bottom of the reduced file.
+Here's an example of that comment:
+
+[,asciidoc]
+----
+//# includes=chapters/chapter-a,chapters/chapter-b
+----
+
+When a document that contains the magic comment is converted, the include mapper reads the comma-separated paths in the value and loads them into the includes table of the document catalog.
+
 == Development
 
 Follow the instructions below to learn how to help develop the project or test-drive the development version.
