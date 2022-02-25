@@ -7,22 +7,22 @@ describe Asciidoctor::Reducer do
     # NOTE asciidoctor/reducer/version will already be required by Bundler
     script_file = fixture_file 'print_version.rb'
     output = %x(#{ruby} #{Shellwords.escape script_file}).lines.map(&:chomp)
-    (expect output).to eql [Asciidoctor::Reducer::VERSION, 'loaded']
+    (expect output).to eql [described_class::VERSION, 'loaded']
   end
 
   it 'should register extensions globally when asciidoctor/reducer is required' do
     (expect require 'asciidoctor/reducer').not_to be_nil
-    (expect Asciidoctor::Extensions.groups).to have_key Asciidoctor::Reducer::Extensions.key
+    (expect Asciidoctor::Extensions.groups).to have_key described_class::Extensions.key
   ensure
-    Asciidoctor::Reducer::Extensions.unregister
+    described_class::Extensions.unregister
   end
 
   it 'should be able to require library using the alias asciidoctor-reducer' do
     $".delete ::File.expand_path 'lib/asciidoctor/reducer.rb', (::File.dirname __dir__)
     (expect require 'asciidoctor-reducer').not_to be_nil
-    (expect Asciidoctor::Extensions.groups).to have_key Asciidoctor::Reducer::Extensions.key
+    (expect Asciidoctor::Extensions.groups).to have_key described_class::Extensions.key
   ensure
-    Asciidoctor::Reducer::Extensions.unregister
+    described_class::Extensions.unregister
   end
 
   it 'should load document with no includes' do
@@ -630,7 +630,7 @@ describe Asciidoctor::Reducer do
   end
 
   it 'should skip include that custom include processor handles but does not push' do
-    Asciidoctor::Reducer::Extensions.register
+    described_class::Extensions.register
     doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-single-line-paragraph.adoc'),
       safe: :server, sourcemap: true, extensions: proc { include_processor { process { next } } }
     expected_lines = <<~'EOS'.chomp.split ?\n
@@ -643,7 +643,7 @@ describe Asciidoctor::Reducer do
     (expect doc.blocks).to have_size 2
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 4]
   ensure
-    Asciidoctor::Reducer::Extensions.unregister
+    described_class::Extensions.unregister
   end
 
   it 'should include lines pushed by custom include processor' do

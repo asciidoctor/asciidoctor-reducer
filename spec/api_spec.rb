@@ -4,7 +4,7 @@ require_relative 'spec_helper'
 
 describe Asciidoctor::Reducer do
   it 'should provide VERSION constant' do
-    (expect Asciidoctor::Reducer::VERSION).to match %r/^\d+\.\d+\.\d+(\.\S+)?$/
+    (expect described_class::VERSION).to match %r/^\d+\.\d+\.\d+(\.\S+)?$/
   end
 
   describe '.reduce' do
@@ -137,7 +137,7 @@ describe Asciidoctor::Reducer do
 
   describe 'extension registry' do
     it 'should not register extension for call if extension is registered globally' do
-      Asciidoctor::Reducer::Extensions.register
+      described_class::Extensions.register
       calls = 0
       result = subject.reduce_file (fixture_file 'parent-with-single-include.adoc'), sourcemap: true,
         extensions: proc {
@@ -161,7 +161,7 @@ describe Asciidoctor::Reducer do
       (expect calls).to eql 2
       (expect result.source_lines).to eql expected_lines
     ensure
-      Asciidoctor::Reducer::Extensions.unregister
+      described_class::Extensions.unregister
     end
   end
 end
