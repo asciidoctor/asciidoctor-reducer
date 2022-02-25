@@ -8,7 +8,7 @@ module Asciidoctor::Reducer
       cond_lineno = @lineno
       result = super
       return result if @skipping && skip_active
-      drop = @x_include_replacements.current[:drop] ||= []
+      drop = @include_replacements.current[:drop] ||= []
       if (depth_change = @conditional_stack.size - depth) < 0
         if skip_active
           drop.push(*(drop.pop..cond_lineno))

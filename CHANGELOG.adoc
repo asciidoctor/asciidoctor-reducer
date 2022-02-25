@@ -12,6 +12,10 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 * Register `Asciidoctor::Reducer::IncludeMapper` extension when `asciidoctor/reducer/include_mapper` is required (#26)
 * Add `Asciidoctor::Reducer::Extensions.key` method that returns key for registering extension group
 
+=== Changed
+
+* Rename x_include_replacements attr on reader to include_replacements since it's public
+
 === Fixed
 
 * Replace remote include with link if `allow-uri-read` attribute is not set
