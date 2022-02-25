@@ -456,6 +456,24 @@ describe Asciidoctor::Reducer do
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
 
+  it 'should reduce includes when safe mode is server' do
+    source_file = fixture_file 'parent-with-include-with-single-line-paragraph.adoc'
+    doc = reduce_file source_file, safe: :server
+    expected_lines = <<~'EOS'.chomp.split ?\n
+    before include
+
+    single line paragraph
+
+    after include
+    EOS
+    (expect doc.attr 'docname').to eql 'parent-with-include-with-single-line-paragraph'
+    (expect doc.attr 'docfile').to eql (File.basename source_file)
+    (expect doc.attr 'docdir').to be_empty
+    (expect doc.source_lines).to eql expected_lines
+    (expect doc.blocks).to have_size 3
+    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
+  end
+
   it 'should replace includes with links if safe mode is secure' do
     doc = reduce_file (fixture_file 'parent-with-nonadjacent-includes.adoc'), safe: :secure
     expected_lines = <<~'EOS'.chomp.split ?\n
@@ -632,7 +650,7 @@ describe Asciidoctor::Reducer do
   it 'should skip include that custom include processor handles but does not push' do
     described_class::Extensions.register
     doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-single-line-paragraph.adoc'),
-      safe: :server, sourcemap: true, extensions: proc { include_processor { process { next } } }
+      safe: :secure, sourcemap: true, extensions: proc { include_processor { process { next } } }
     expected_lines = <<~'EOS'.chomp.split ?\n
     before include
 
