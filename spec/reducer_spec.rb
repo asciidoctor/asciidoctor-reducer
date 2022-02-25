@@ -486,6 +486,54 @@ describe Asciidoctor::Reducer do
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
 
+  it 'should reduce remote include if allow-uri-read is set' do
+    doc = with_local_webserver do |base_url|
+      described_class.reduce <<~EOS, attributes: { 'allow-uri-read' => '' }
+      before include
+
+      include::#{base_url}/no-includes.adoc[]
+
+      after include
+      EOS
+    end
+    expected_lines = <<~'EOS'.chomp.split ?\n
+    before include
+
+    no includes here
+
+    just good old-fashioned paragraph text
+
+    after include
+    EOS
+    (expect doc.source_lines).to eql expected_lines
+  end
+
+  it 'should reduce remote include with include if allow-uri-read is set' do
+    doc = with_local_webserver do |base_url|
+      described_class.reduce <<~EOS, attributes: { 'allow-uri-read' => '' }
+      before include
+
+      include::#{base_url}/include-with-include.adoc[]
+
+      after include
+      EOS
+    end
+    expected_lines = <<~'EOS'.chomp.split ?\n
+    before include
+
+    before nested include
+
+    no includes here
+
+    just good old-fashioned paragraph text
+
+    after nested include
+
+    after include
+    EOS
+    (expect doc.source_lines).to eql expected_lines
+  end
+
   it 'should not process link macro following include skipped by include processor when safe mode is not secure' do
     doc = reduce_file (fixture_file 'parent-with-link-macro-after-include.adoc'), extensions: proc {
       include_processor { process { next } }
