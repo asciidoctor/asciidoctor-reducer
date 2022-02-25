@@ -108,6 +108,30 @@ describe Asciidoctor::Reducer do
       (expect to.string).to eql (expected + ?\n)
     end
 
+    it 'should reduce input and send to write method if :to option value responds to write' do
+      the_source_file = fixture_file 'parent-with-include-with-single-line-paragraph.adoc'
+      expected = <<~'EOS'.chomp
+      before include
+
+      single line paragraph
+
+      after include
+      EOS
+      to = (Class.new do
+        attr_reader :string
+
+        def initialize
+          @string = nil
+        end
+
+        def write string
+          @string = string
+        end
+      end).new
+      subject.reduce_file the_source_file, to: to
+      (expect to.string).to eql (expected + ?\n)
+    end
+
     it 'should reduce input but not write if :to option is /dev/null' do
       the_source_file = fixture_file 'parent-with-include-with-single-line-paragraph.adoc'
       expected = <<~'EOS'.chomp
