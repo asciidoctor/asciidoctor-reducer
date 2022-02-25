@@ -38,7 +38,7 @@ module Asciidoctor::Reducer
     end
 
     def pop_include
-      @x_include_replacements.pos = @x_include_replacements.current[:into] unless @x_include_pushed
+      @x_include_replacements.up unless @x_include_pushed
       super
     end
 
@@ -46,25 +46,33 @@ module Asciidoctor::Reducer
 
     def push_include_replacement lineno, lines, unresolved = false
       (inc_replacements = @x_include_replacements) << {
-        into: inc_replacements.pos,
+        into: inc_replacements.pointer,
         lineno: lineno,
         line: @x_include_directive_line,
         lines: lines,
       }
-      inc_replacements.pos = inc_replacements.size - 1 unless unresolved || lines.empty?
+      inc_replacements.to_end unless unresolved || lines.empty?
       nil
     end
   end
 
   module CurrentPosition
-    attr_accessor :pos
+    attr_reader :pointer
 
     def self.extended instance
-      instance.pos = instance.size - 1
+      instance.to_end
     end
 
     def current
-      self[@pos]
+      self[@pointer]
+    end
+
+    def to_end
+      @pointer = size - 1
+    end
+
+    def up
+      @pointer = current[:into]
     end
   end
 
