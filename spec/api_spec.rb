@@ -187,5 +187,95 @@ describe Asciidoctor::Reducer do
     ensure
       described_class::Extensions.unregister
     end
+
+    it 'should not register extension for call with custom extension registry if extension is registered globally' do
+      described_class::Extensions.register
+      calls = []
+      ext_reg = Asciidoctor::Extensions.create do
+        tree_processor do
+          prefer
+          process do |doc|
+            calls << (doc.options[:reduced] == true)
+            nil
+          end
+        end
+      end
+      result = subject.reduce_file (fixture_file 'parent-with-single-include.adoc'), extension_registry: ext_reg,
+        sourcemap: true
+      expected_lines = <<~'EOS'.chomp.split ?\n
+      before include
+
+      no includes here
+
+      just good old-fashioned paragraph text
+
+      after include
+      EOS
+      (expect result.source_lines).to eql expected_lines
+      (expect ext_reg.groups[:reducer]).to be_nil
+      (expect calls).to have_size 2
+      (expect calls).to eql [false, true]
+    ensure
+      described_class::Extensions.unregister
+    end
+
+    it 'should not register extension for call to load API if extension is registered globally' do
+      described_class::Extensions.register
+      calls = []
+      ext_reg = Asciidoctor::Extensions.create do
+        tree_processor do
+          prefer
+          process do |doc|
+            calls << (doc.options[:reduced] == true)
+            nil
+          end
+        end
+      end
+      result = Asciidoctor.load_file (fixture_file 'parent-with-single-include.adoc'), extension_registry: ext_reg,
+        sourcemap: true, safe: :safe
+      expected_lines = <<~'EOS'.chomp.split ?\n
+      before include
+
+      no includes here
+
+      just good old-fashioned paragraph text
+
+      after include
+      EOS
+      (expect result.source_lines).to eql expected_lines
+      (expect ext_reg.groups[:reducer]).to be_nil
+      (expect calls).to have_size 2
+      (expect calls).to eql [false, true]
+    ensure
+      described_class::Extensions.unregister
+    end
+
+    it 'should not register extensions in a custom extension registry twice when reloading document' do
+      calls = []
+      ext_reg = Asciidoctor::Extensions.create do
+        preprocessor do
+          prefer
+          process do |doc|
+            calls << (doc.options[:reduced] == true)
+            nil
+          end
+        end
+      end
+      result = subject.reduce_file (fixture_file 'parent-with-single-include.adoc'), extension_registry: ext_reg,
+        sourcemap: true
+      expected_lines = <<~'EOS'.chomp.split ?\n
+      before include
+
+      no includes here
+
+      just good old-fashioned paragraph text
+
+      after include
+      EOS
+      (expect result.source_lines).to eql expected_lines
+      (expect ext_reg.groups[:reducer]).not_to be_nil
+      (expect calls).to have_size 2
+      (expect calls).to eql [false, true]
+    end
   end
 end
