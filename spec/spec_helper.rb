@@ -11,16 +11,25 @@ end
 
 require 'asciidoctor/reducer/api'
 require 'asciidoctor/reducer/cli'
-require 'fileutils'
 require 'open3' unless defined? Open3
 require 'shellwords'
 require 'socket'
 require 'stringio'
 require 'tempfile'
 
+unless (Pathname.instance_method :rmtree).arity > 0
+  autoload :FileUtils, 'fileutils'
+  Pathname.prepend (Module.new do
+    def rmtree **kwargs
+      FileUtils.rm_rf @path, **kwargs
+      nil
+    end
+  end)
+end
+
 RSpec.configure do |config|
   config.after :suite do
-    FileUtils.rm_r output_dir, force: true, secure: true
+    (Pathname.new output_dir).rmtree secure: true
   end
 
   def bin_script name, opts = {}
@@ -55,7 +64,7 @@ RSpec.configure do |config|
   end
 
   def output_dir
-    (FileUtils.mkpath (File.join __dir__, 'output'))[0]
+    (p = (Pathname.new __dir__) / 'output').mkpath || p.to_s
   end
 
   def reduce_file input_file, opts = {}

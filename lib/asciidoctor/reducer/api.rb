@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'pathname'
+autoload :Pathname, 'pathname'
 require_relative 'extensions'
 
 module Asciidoctor::Reducer
