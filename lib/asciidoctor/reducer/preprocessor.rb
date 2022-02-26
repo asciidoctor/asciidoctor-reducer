@@ -6,8 +6,8 @@ require_relative 'conditional_directive_tracker'
 module Asciidoctor::Reducer
   class Preprocessor < ::Asciidoctor::Extensions::Preprocessor
     def process doc, reader
-      reader.extend IncludeDirectiveTracker
-      reader.extend ConditionalDirectiveTracker unless doc.options[:preserve_conditionals]
+      doc.options[:preserve_conditionals] ?
+        (reader.extend IncludeDirectiveTracker) : (reader.extend ConditionalDirectiveTracker, IncludeDirectiveTracker)
     end
   end
 end
