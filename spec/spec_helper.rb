@@ -162,3 +162,12 @@ RSpec::Matchers.define :have_size do |expected|
     %(expected #{RSpec::Support::ObjectFormatter.format actual} to have size #{expected}, but was #{actual.size})
   end
 end
+
+RSpec::Matchers.define :have_source do |expected|
+  match {|actual| actual.source == expected }
+  failure_message do |actual|
+    message = %(expected #{actual} to have source #{expected.inspect})
+    differ = RSpec::Expectations.differ
+    (RSpec::Matchers::ExpectedsForMultipleDiffs.from expected).message_with_diff message, differ, actual.source
+  end
+end

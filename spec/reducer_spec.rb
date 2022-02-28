@@ -133,7 +133,7 @@ describe Asciidoctor::Reducer do
 
   it 'should resolve nested include relative to include file' do
     doc = reduce_file fixture_file 'parent-with-nested-include-in-subdir.adoc'
-    expected_lines = <<~'EOS'.chomp.split ?\n
+    expected_source = <<~'EOS'.chomp
     before include
 
     before relative include
@@ -144,21 +144,21 @@ describe Asciidoctor::Reducer do
 
     after include
     EOS
-    (expect doc.source_lines).to eql expected_lines
+    (expect doc).to have_source expected_source
     (expect doc.blocks).to have_size 5
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9]
   end
 
   it 'should resolve include with single line paragraph' do
     doc = reduce_file fixture_file 'parent-with-include-with-single-line-paragraph.adoc'
-    expected_lines = <<~'EOS'.chomp.split ?\n
+    expected_source = <<~EOS.chomp
     before include
 
     single line paragraph
 
     after include
     EOS
-    (expect doc.source_lines).to eql expected_lines
+    (expect doc).to have_source expected_source
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
