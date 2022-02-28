@@ -16,6 +16,14 @@ describe Asciidoctor::Reducer::Extensions do
     end
   end
 
+  describe '.key' do
+    subject { described_class.method :key }
+
+    it 'should return key for extension group' do
+      (expect subject.call).to eql :reducer
+    end
+  end
+
   describe '.prepare_registry' do
     subject { described_class.method :prepare_registry }
 
