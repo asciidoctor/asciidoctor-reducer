@@ -14,6 +14,16 @@ describe Asciidoctor::Reducer::IncludeMapper do
     (expect doc.source_lines[-1]).to eql 'not a one'
   end
 
+  it 'should not add include mapping comment if document only has partial includes' do
+    ext_class = described_class
+    source_file = fixture_file 'parent-with-include-with-tag.adoc'
+    doc = reduce_file source_file, extensions: proc {
+      next if document.options[:reduced]
+      tree_processor ext_class
+    }
+    (expect doc.source_lines[-1]).to eql 'after include'
+  end
+
   it 'should add include mapping comment to bottom of reduced file' do
     ext_class = described_class
     source_file = fixture_file 'parent-with-single-include-with-include.adoc'
@@ -22,6 +32,16 @@ describe Asciidoctor::Reducer::IncludeMapper do
       tree_processor ext_class
     }
     (expect doc.source_lines[-1]).to eql '//# includes=include-with-include,no-includes'
+  end
+
+  it 'should only add entries to include mapping comment that are included fully' do
+    ext_class = described_class
+    source_file = fixture_file 'parent-with-includes-with-and-without-tag.adoc'
+    doc = reduce_file source_file, extensions: proc {
+      next if document.options[:reduced]
+      tree_processor ext_class
+    }
+    (expect doc.source_lines[-1]).to eql '//# includes=single-line-paragraph'
   end
 
   it 'should load includes from mapping comment' do

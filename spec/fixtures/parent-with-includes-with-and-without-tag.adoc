@@ -1,0 +1,7 @@
+beginning
+
+include::single-line-paragraph.adoc[]
+
+include::include-with-tag.adoc[tag=body]
+
+end
