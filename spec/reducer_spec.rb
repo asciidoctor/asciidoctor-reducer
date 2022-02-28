@@ -26,109 +26,178 @@ describe Asciidoctor::Reducer do
   end
 
   it 'should load document with no includes' do
-    source_file = fixture_file 'parent-with-no-includes.adoc'
-    doc = reduce_file source_file
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    no includes to be found here
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      no includes to be found here
 
-    not a one
-    EOS
-    (expect doc.source_lines).to eql expected_lines
-    (expect doc.blocks).to have_size 2
+      not a single one
+      EOS
+
+      expected_source input_source
+    end
     (expect doc.options[:reduced]).to be_falsy
+    (expect doc).to have_source scenario.expected_source
+    (expect doc.blocks).to have_size 2
     (expect doc.sourcemap).to be true
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3]
-    (expect doc.attr 'docname').to eql (File.basename source_file, '.adoc')
-    (expect doc.attr 'docfile').to eql source_file
-    (expect doc.attr 'docdir').to eql (File.dirname source_file)
+    input_file = scenario.input_file
+    (expect doc.attr 'docname').to eql (File.basename input_file, '.adoc')
+    (expect doc.attr 'docfile').to eql input_file
+    (expect doc.attr 'docdir').to eql (File.dirname input_file)
   end
 
   it 'should not enable sourcemap on document with no includes' do
-    source_file = fixture_file 'parent-with-no-includes.adoc'
-    doc = reduce_file source_file, sourcemap: false
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      no includes to be found here
+
+      not a single one
+      EOS
+
+      reduce_options sourcemap: false
+
+      expected_source input_source
+    end
     (expect doc.options[:reduced]).to be_falsy
+    (expect doc).to have_source scenario.expected_source
     (expect doc.sourcemap).to be_falsy
     (expect doc.blocks[0].source_location).to be_nil
   end
 
   it 'should resolve top-level include with no nested includes' do
-    source_file = fixture_file 'parent-with-single-include.adoc'
-    doc = reduce_file source_file
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    before include
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      before include
 
-    no includes here
+      include::no-includes.adoc[]
 
-    just good old-fashioned paragraph text
+      after include
+      EOS
 
-    after include
-    EOS
+      expected_source <<~'EOS'
+      before include
+
+      no includes here
+
+      just good old-fashioned paragraph text
+
+      after include
+      EOS
+    end
     (expect doc.options[:reduced]).to be true
-    (expect doc.source_lines).to eql expected_lines
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 4
     (expect doc.sourcemap).to be true
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
-    (expect (doc.blocks.map {|it| it.file }).uniq).to eql [source_file]
-    (expect doc.attr 'docname').to eql (File.basename source_file, '.adoc')
-    (expect doc.attr 'docfile').to eql source_file
-    (expect doc.attr 'docdir').to eql (File.dirname source_file)
+    input_file = scenario.input_file
+    (expect (doc.blocks.map {|it| it.file }).uniq).to eql [input_file]
+    (expect doc.attr 'docname').to eql (File.basename input_file, '.adoc')
+    (expect doc.attr 'docfile').to eql input_file
+    (expect doc.attr 'docdir').to eql (File.dirname input_file)
     (expect doc.catalog[:includes]['no-includes']).to be true
   end
 
   it 'should not enable sourcemap on reduced document' do
-    source_file = fixture_file 'parent-with-single-include.adoc'
-    doc = reduce_file source_file, sourcemap: false
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      before include
+
+      include::no-includes.adoc[]
+
+      after include
+      EOS
+
+      reduce_options sourcemap: false
+
+      expected_source <<~'EOS'
+      before include
+
+      no includes here
+
+      just good old-fashioned paragraph text
+
+      after include
+      EOS
+    end
     (expect doc.options[:reduced]).to be_falsy
+    (expect doc).to have_source scenario.expected_source
     (expect doc.sourcemap).to be_falsy
     (expect doc.blocks[0].source_location).to be_nil
   end
 
   it 'should not reload document with includes if sourcemap is not enabled' do
     docs = []
-    result = reduce_file (fixture_file 'parent-with-single-include.adoc'), sourcemap: false, extensions: proc {
-      tree_processor do
-        prefer
-        process do |doc|
-          docs << doc
-          nil
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      before include
+
+      include::no-includes.adoc[]
+
+      after include
+      EOS
+
+      reduce_options sourcemap: false, extensions: proc {
+        tree_processor do
+          prefer
+          process do |doc|
+            docs << doc
+            nil
+          end
         end
-      end
-    }
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    before include
+      }
 
-    no includes here
+      expected_source <<~'EOS'
+      before include
 
-    just good old-fashioned paragraph text
+      no includes here
 
-    after include
-    EOS
+      just good old-fashioned paragraph text
+
+      after include
+      EOS
+    end
     (expect docs).to have_size 1
-    (expect docs[0].object_id).to eql result.object_id
-    (expect result.source_lines).to eql expected_lines
-    (expect result.catalog[:includes]['no-includes']).to be true
+    (expect docs[0].object_id).to eql doc.object_id
+    (expect doc).to have_source scenario.expected_source
+    (expect doc.catalog[:includes]['no-includes']).to be true
   end
 
   it 'should resolve top-level include with nested include' do
-    source_file = fixture_file 'parent-with-single-include-with-include.adoc'
-    doc = reduce_file source_file
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    before include
+    scenario, doc = create_scenario do
+      include_file = create_include_file <<~'EOS'
+      before nested include
 
-    before nested include
+      include::no-includes.adoc[]
 
-    no includes here
+      after nested include
+      EOS
 
-    just good old-fashioned paragraph text
+      input_source <<~EOS
+      before include
 
-    after nested include
+      include::#{include_file}[]
 
-    after include
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      after include
+      EOS
+
+      expected_source <<~'EOS'
+      before include
+
+      before nested include
+
+      no includes here
+
+      just good old-fashioned paragraph text
+
+      after nested include
+
+      after include
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 6
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9, 11]
-    (expect (doc.blocks.map {|it| it.file }).uniq).to eql [source_file]
+    (expect (doc.blocks.map {|it| it.file }).uniq).to eql [scenario.input_file]
   end
 
   it 'should resolve nested include relative to include file' do
@@ -709,16 +778,24 @@ describe Asciidoctor::Reducer do
 
   it 'should not rebuild document if no includes are found' do
     captured_interim_doc = nil
-    doc = reduce_file (fixture_file 'parent-with-no-includes.adoc'), extensions: proc {
-      tree_processor do
-        prefer
-        process do |interim_doc|
-          captured_interim_doc = interim_doc unless interim_doc.options[:reduced]
-          nil
+    scenario = create_scenario do
+      input_source <<~'EOS'
+      no includes to be found
+
+      not a single one
+      EOS
+
+      reduce_options extensions: proc {
+        tree_processor do
+          prefer
+          process do |interim_doc|
+            captured_interim_doc = interim_doc unless interim_doc.options[:reduced]
+            nil
+          end
         end
-      end
-    }
-    expect(captured_interim_doc).to be doc
+      }
+    end
+    expect(captured_interim_doc).to be scenario.doc
   end
 
   it 'should resolve include with tag' do
