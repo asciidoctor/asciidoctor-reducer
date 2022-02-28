@@ -38,7 +38,7 @@ describe Asciidoctor::Reducer do
     (expect doc.options[:reduced]).to be_falsy
     (expect doc.sourcemap).to be true
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3]
-    (expect doc.attr 'docname').to eql 'parent-with-no-includes'
+    (expect doc.attr 'docname').to eql (File.basename source_file, '.adoc')
     (expect doc.attr 'docfile').to eql source_file
     (expect doc.attr 'docdir').to eql (File.dirname source_file)
   end
@@ -69,7 +69,7 @@ describe Asciidoctor::Reducer do
     (expect doc.sourcemap).to be true
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
     (expect (doc.blocks.map {|it| it.file }).uniq).to eql [source_file]
-    (expect doc.attr 'docname').to eql 'parent-with-single-include'
+    (expect doc.attr 'docname').to eql (File.basename source_file, '.adoc')
     (expect doc.attr 'docfile').to eql source_file
     (expect doc.attr 'docdir').to eql (File.dirname source_file)
     (expect doc.catalog[:includes]['no-includes']).to be true
@@ -440,7 +440,7 @@ describe Asciidoctor::Reducer do
 
     after include
     EOS
-    (expect doc.attr 'docname').to eql 'parent-with-include-with-single-line-paragraph'
+    (expect doc.attr 'docname').to eql (File.basename source_file, '.adoc')
     (expect doc.attr 'docfile').to eql (File.basename source_file)
     (expect doc.attr 'docdir').to be_empty
     (expect doc.source_lines).to eql expected_lines

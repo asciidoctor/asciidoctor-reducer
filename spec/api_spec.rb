@@ -30,7 +30,7 @@ describe Asciidoctor::Reducer do
       EOS
       doc = File.open(source_file, mode: 'r:UTF-8') {|f| subject.call f }
       (expect doc.source_lines).to eql expected_lines
-      (expect doc.attr 'docname').to eql 'parent-with-single-include'
+      (expect doc.attr 'docname').to eql (File.basename source_file, '.adoc')
       (expect doc.attr 'docfile').to eql source_file
       (expect doc.attr 'docdir').to eql (File.dirname source_file)
     end
