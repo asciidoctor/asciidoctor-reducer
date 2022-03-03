@@ -27,6 +27,65 @@ unless (Pathname.instance_method :rmtree).arity > 0
   end)
 end
 
+class ScenarioBuilder
+  attr_reader :doc
+  attr_reader :input_file
+
+  UNDEFINED = ::Object.new
+
+  def initialize
+    @files = []
+    @expected_source = @input_file = @input_source = nil
+    @reduce_options = []
+  end
+
+  def create_file filename, contents
+    if ::Array === filename
+      file = ::Tempfile.create filename, fixtures_dir, encoding: 'UTF-8', newline: :universal
+      file.write contents
+      file.close
+      filename = file.path
+    else
+      filename = fixture_file filename
+      ::File.write filename, contents, encoding: 'UTF-8', newline: :universal
+    end
+    @files << filename
+    filename
+  end
+
+  def create_include_file source
+    create_file %w(include- .adoc), source
+  end
+
+  def create_input_file source
+    create_file %w(main- .adoc), source
+  end
+
+  def expected_source source = UNDEFINED
+    source == UNDEFINED ? @expected_source : (@expected_source = source.chomp)
+  end
+
+  def input_source source = UNDEFINED
+    source == UNDEFINED ? @input_source : (@input_source = source.chomp)
+  end
+
+  def reduce_options *args
+    @reduce_options = args
+  end
+
+  def run &block
+    instance_exec(&block)
+    @doc = reduce_file (@input_file = create_input_file @input_source), *@reduce_options if @input_source
+    self
+  ensure
+    @files.each {|it| File.unlink it }
+  end
+
+  def to_ary
+    [self, @doc]
+  end
+end
+
 RSpec.configure do |config|
   config.after :suite do
     (Pathname.new output_dir).rmtree secure: true
@@ -45,6 +104,10 @@ RSpec.configure do |config|
 
   def asciidoctor_reducer_bin
     bin_script 'asciidoctor-reducer'
+  end
+
+  def create_scenario &block
+    ScenarioBuilder.new.run(&block)
   end
 
   def fixtures_dir
