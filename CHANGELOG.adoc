@@ -15,7 +15,6 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 === Changed
 
 * Rename x_include_replacements attr on reader to include_replacements since it's public
-* Access inherited state using public accessors where possible
 
 === Fixed
 
