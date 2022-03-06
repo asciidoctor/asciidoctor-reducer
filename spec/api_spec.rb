@@ -57,7 +57,7 @@ describe Asciidoctor::Reducer do
 
       after include
       EOS
-      with_tmp_file do |the_output_file|
+      with_tmp_file tmpdir: output_dir do |the_output_file|
         subject.reduce_file the_source_file, to: the_output_file.path
         output_contents = the_output_file.read
         (expect output_contents).to eql (expected + ?\n)
@@ -73,7 +73,7 @@ describe Asciidoctor::Reducer do
 
       after include
       EOS
-      with_tmp_file do |the_output_file|
+      with_tmp_file tmpdir: output_dir do |the_output_file|
         the_output_pathname = ::Pathname.new the_output_file.path
         subject.reduce_file the_source_file, to: the_output_pathname
         output_contents = the_output_file.read
