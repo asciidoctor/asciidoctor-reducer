@@ -41,8 +41,7 @@ class ScenarioBuilder
 
   def create_file filename, contents
     if ::Array === filename
-      file = ::Tempfile.create filename, fixtures_dir, encoding: 'UTF-8', newline: :universal
-      file.write contents
+      (file = with_tmp_file filename).write contents
       file.close
       filename = file.path
     else
@@ -214,8 +213,9 @@ RSpec.configure do |config|
     Asciidoctor::LoggerManager.logger = old_logger
   end
 
-  def with_tmp_file ext = '.adoc', &block
-    Tempfile.create %W(asciidoctor-reducer- #{ext}), output_dir, encoding: 'UTF-8', newline: :universal, &block
+  def with_tmp_file basename = '.adoc', tmpdir: fixtures_dir, &block
+    basename = %W(tmp- #{basename}) unless Array === basename
+    Tempfile.create basename, tmpdir, encoding: 'UTF-8', newline: :universal, &block
   end
 end
 
