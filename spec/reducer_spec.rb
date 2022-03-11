@@ -219,143 +219,221 @@ describe Asciidoctor::Reducer do
   end
 
   it 'should resolve include with single line paragraph' do
-    doc = reduce_file fixture_file 'parent-with-include-with-single-line-paragraph.adoc'
-    expected_source = <<~EOS.chomp
-    before include
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      before include
 
-    single line paragraph
+      include::single-line-paragraph.adoc[]
 
-    after include
-    EOS
-    (expect doc).to have_source expected_source
+      after include
+      EOS
+
+      expected_source <<~'EOS'
+      before include
+
+      single line paragraph
+
+      after include
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
 
   it 'should skip escaped include' do
-    doc = reduce_file fixture_file 'parent-with-escaped-include.adoc'
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    before include
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      before include
 
-    \include::multiple-paragraphs.adoc[]
+      \include::multiple-paragraphs.adoc[]
 
-    after include
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      after include
+      EOS
+
+      expected_source input_source
+    end
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
 
   it 'should resolve include at start of document' do
-    doc = reduce_file fixture_file 'parent-with-include-at-start.adoc'
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    single line paragraph
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      include::single-line-paragraph.adoc[]
 
-    after include
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      after include
+      EOS
+
+      expected_source <<~'EOS'
+      single line paragraph
+
+      after include
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 2
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3]
   end
 
   it 'should resolve include at end of document' do
-    doc = reduce_file fixture_file 'parent-with-include-at-end.adoc'
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    before include
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      before include
 
-    single line paragraph
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      include::single-line-paragraph.adoc[]
+      EOS
+
+      expected_source <<~'EOS'
+      before include
+
+      single line paragraph
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 2
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3]
   end
 
   it 'should resolve include with multiline paragraph' do
-    doc = reduce_file fixture_file 'parent-with-include-with-multiline-paragraph.adoc'
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    before include
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      before include
 
-    first line
-    second line
-    third line
+      include::multiline-paragraph.adoc[]
 
-    after include
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      after include
+      EOS
+
+      expected_source <<~'EOS'
+      before include
+
+      first line
+      second line
+      third line
+
+      after include
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 7]
   end
 
   it 'should resolve include with multiple paragraphs' do
-    doc = reduce_file fixture_file 'parent-with-include-with-multiple-paragraphs.adoc'
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    before include
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      before include
 
-    first paragraph
+      include::multiple-paragraphs.adoc[]
 
-    second paragraph
-    with two lines
+      after include
+      EOS
 
-    after include
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      expected_source <<~'EOS'
+      before include
+
+      first paragraph
+
+      second paragraph
+      with two lines
+
+      after include
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 4
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 8]
   end
 
   it 'should resolve adjacent includes' do
-    doc = reduce_file fixture_file 'parent-with-adjacent-includes.adoc'
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    before includes
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      before include
 
-    single line paragraph
-    single line paragraph
+      include::single-line-paragraph.adoc[]
+      include::single-line-paragraph.adoc[]
 
-    after includes
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      after include
+      EOS
+
+      expected_source <<~'EOS'
+      before include
+
+      single line paragraph
+      single line paragraph
+
+      after include
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 6]
   end
 
   it 'should resolve include that follows include with nested include' do
-    doc = reduce_file fixture_file 'parent-with-include-after-include-with-nested-include.adoc'
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    before
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      before
 
-    before nested include
+      include::include-with-include.adoc[]
 
-    no includes here
+      then
 
-    just good old-fashioned paragraph text
+      include::no-includes.adoc[]
 
-    after nested include
+      after
+      EOS
 
-    then
+      expected_source <<~'EOS'
+      before
 
-    no includes here
+      before nested include
 
-    just good old-fashioned paragraph text
+      no includes here
 
-    after
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      just good old-fashioned paragraph text
+
+      after nested include
+
+      then
+
+      no includes here
+
+      just good old-fashioned paragraph text
+
+      after
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 9
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9, 11, 13, 15, 17]
   end
 
   it 'should assign same line number to preamble and its paragraph' do
-    doc = reduce_file fixture_file 'parent-with-include-with-preamble.adoc'
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    = Document Title
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      = Document Title
 
-    single line paragraph
+      include::single-line-paragraph.adoc[]
 
-    == Chapter A
+      == Chapter A
 
-    == Chapter B
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      == Chapter B
+      EOS
+
+      expected_source <<~'EOS'
+      = Document Title
+
+      single line paragraph
+
+      == Chapter A
+
+      == Chapter B
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     blocks = doc.find_by {|it| it.context != :document }
     (expect blocks).to have_size 5
     (expect (blocks.map {|it| it.lineno })).to eql [1, 3, 3, 5, 7]
@@ -500,49 +578,82 @@ describe Asciidoctor::Reducer do
   end
 
   it 'should reduce includes when safe mode is server' do
-    source_file = fixture_file 'parent-with-include-with-single-line-paragraph.adoc'
-    doc = reduce_file source_file, safe: :server
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    before include
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      before include
 
-    single line paragraph
+      include::single-line-paragraph.adoc[]
 
-    after include
-    EOS
-    (expect doc.attr 'docname').to eql (File.basename source_file, '.adoc')
-    (expect doc.attr 'docfile').to eql (File.basename source_file)
+      after include
+      EOS
+
+      reduce_options safe: :server
+
+      expected_source <<~'EOS'
+      before include
+
+      single line paragraph
+
+      after include
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
+    input_file = scenario.input_file
+    (expect doc.attr 'docname').to eql (File.basename input_file, '.adoc')
+    (expect doc.attr 'docfile').to eql (File.basename input_file)
     (expect doc.attr 'docdir').to be_empty
-    (expect doc.source_lines).to eql expected_lines
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
 
   it 'should replace includes with links if safe mode is secure' do
-    doc = reduce_file (fixture_file 'parent-with-nonadjacent-includes.adoc'), safe: :secure
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    before includes
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      before includes
 
-    link:single-line-paragraph.adoc[role=include]
+      include::single-line-paragraph.adoc[]
 
-    link:multiline-paragraph.adoc[role=include]
+      include::multiline-paragraph.adoc[]
 
-    after includes
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      after includes
+      EOS
+
+      reduce_options safe: :secure
+
+      expected_source <<~'EOS'
+      before includes
+
+      link:single-line-paragraph.adoc[role=include]
+
+      link:multiline-paragraph.adoc[role=include]
+
+      after includes
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 4
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
   end
 
   it 'should replace include with link if target is URL and allow-uri-read is not set' do
-    doc = reduce_file fixture_file 'parent-with-remote-include.adoc'
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    before include
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      before include
 
-    link:https://example.org/intro.adoc[role=include]
+      include::https://example.org/intro.adoc[]
 
-    after include
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      after include
+      EOS
+
+      expected_source <<~'EOS'
+      before include
+
+      link:https://example.org/intro.adoc[role=include]
+
+      after include
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
