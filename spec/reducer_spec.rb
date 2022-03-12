@@ -707,95 +707,181 @@ describe Asciidoctor::Reducer do
   end
 
   it 'should not process link macro following include skipped by include processor when safe mode is not secure' do
-    doc = reduce_file (fixture_file 'parent-with-link-macro-after-include.adoc'), extensions: (proc do
-      include_processor { process { next } }
-    end)
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    before includes
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      before includes
 
-    link:foobar.adoc[]
+      include::ignored.adoc[]
+      link:foobar.adoc[]
 
-    after includes
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      after includes
+      EOS
+
+      reduce_options extensions: (proc do
+        include_processor { process { next } }
+      end)
+
+      expected_source <<~'EOS'
+      before includes
+
+      link:foobar.adoc[]
+
+      after includes
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
 
   it 'should not process link macro following include skipped by include processor when safe mode is secure' do
-    doc = reduce_file (fixture_file 'parent-with-link-macro-after-include.adoc'), safe: :secure,
-      extensions: proc { include_processor { process { next } } }
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    before includes
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      before includes
 
-    link:foobar.adoc[]
+      include::ignored.adoc[]
+      link:foobar.adoc[]
 
-    after includes
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      after includes
+      EOS
+
+      reduce_options safe: :secure, extensions: (proc do
+        include_processor { process { next } }
+      end)
+
+      expected_source <<~'EOS'
+      before includes
+
+      link:foobar.adoc[]
+
+      after includes
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
 
   it 'should skip empty include' do
-    doc = reduce_file fixture_file 'parent-with-empty-include.adoc'
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    before include
-    after include
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      before include
+      include::empty.adoc[]
+      after include
+      EOS
+
+      expected_source <<~'EOS'
+      before include
+      after include
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 1
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1]
   end
 
   it 'should resolve include after empty include' do
-    doc = reduce_file fixture_file 'parent-with-include-after-empty-include.adoc'
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    before includes
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      before includes
+
+      include::empty.adoc[]
+
+      between includes
+
+      include::single-line-paragraph.adoc[]
+
+      after includes
+      EOS
+
+      expected_source <<~'EOS'
+      before includes
 
 
-    between includes
+      between includes
 
-    single line paragraph
+      single line paragraph
 
-    after includes
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      after includes
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 4
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 4, 6, 8]
   end
 
   it 'should skip nested empty include' do
-    doc = reduce_file fixture_file 'parent-with-nested-empty-include.adoc'
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    before top-level include
+    scenario, doc = create_scenario do
+      include_file = create_include_file <<~'EOS'
+      before include
+      include::empty.adoc[]
+      after include
+      EOS
 
-    before include
-    after include
+      input_source <<~EOS
+      before top-level include
 
-    after top-level include
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      include::#{include_file}[]
+
+      after top-level include
+      EOS
+
+      expected_source <<~'EOS'
+      before top-level include
+
+      before include
+      after include
+
+      after top-level include
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 6]
   end
 
   it 'should remove trailing empty lines when sourcemap is enabled' do
-    doc = reduce_file fixture_file 'parent-with-empty-trailing-include.adoc'
-    (expect doc.source_lines).to eql ['before include']
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      before include
+
+
+      include::empty.adoc[]
+      EOS
+
+      expected_source 'before include'
+    end
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 1
     (expect doc.blocks[0].lineno).to eql 1
   end
 
   it 'should remove trailing empty lines when sourcemap is not enabled' do
-    doc = reduce_file (fixture_file 'parent-with-empty-trailing-include.adoc'), sourcemap: false
-    (expect doc.source_lines).to eql ['before include']
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      before include
+
+
+      include::empty.adoc[]
+      EOS
+
+      reduce_options sourcemap: false
+
+      expected_source 'before include'
+    end
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 1
   end
 
   it 'should not crash if reduced document is empty' do
-    doc = reduce_file (fixture_file 'parent-with-only-empty-include.adoc'), sourcemap: false
-    (expect doc.source_lines).to be_empty
+    scenario, doc = create_scenario do
+      input_source 'include::empty.adoc[]'
+
+      reduce_options sourcemap: false
+
+      expected_source ''
+    end
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to be_empty
   end
 

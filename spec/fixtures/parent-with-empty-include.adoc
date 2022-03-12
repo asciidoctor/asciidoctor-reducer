@@ -1,3 +1,0 @@
-before include
-include::empty.adoc[]
-after include

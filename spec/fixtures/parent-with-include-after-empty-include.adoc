@@ -1,9 +1,0 @@
-before includes
-
-include::empty.adoc[]
-
-between includes
-
-include::single-line-paragraph.adoc[]
-
-after includes

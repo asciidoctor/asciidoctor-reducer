@@ -1,6 +1,0 @@
-before includes
-
-include::ignored.adoc[]
-link:foobar.adoc[]
-
-after includes
