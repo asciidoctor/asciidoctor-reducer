@@ -246,7 +246,7 @@ describe Asciidoctor::Reducer do
       input_source <<~'EOS'
       before include
 
-      \include::multiple-paragraphs.adoc[]
+      \include::not-processed.adoc[]
 
       after include
       EOS
