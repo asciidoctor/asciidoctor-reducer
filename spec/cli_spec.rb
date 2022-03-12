@@ -100,7 +100,7 @@ describe Asciidoctor::Reducer::Cli do
       end
     end
 
-    it '.only should create empty file specified by -o option if output is empty' do
+    it 'should create empty file specified by -o option if output is empty' do
       the_source_file = fixture_file 'with-only-empty-include.adoc'
       with_tmp_file tmpdir: output_dir do |the_output_file|
         (expect subject.run ['-o', the_output_file.path, the_source_file]).to eql 0
