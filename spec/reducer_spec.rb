@@ -136,7 +136,7 @@ describe Asciidoctor::Reducer do
       after include
       EOS
 
-      reduce_options sourcemap: false, extensions: proc {
+      reduce_options sourcemap: false, extensions: (proc do
         tree_processor do
           prefer
           process do |doc|
@@ -144,7 +144,7 @@ describe Asciidoctor::Reducer do
             nil
           end
         end
-      }
+      end)
 
       expected_source <<~'EOS'
       before include
@@ -707,9 +707,9 @@ describe Asciidoctor::Reducer do
   end
 
   it 'should not process link macro following include skipped by include processor when safe mode is not secure' do
-    doc = reduce_file (fixture_file 'parent-with-link-macro-after-include.adoc'), extensions: proc {
+    doc = reduce_file (fixture_file 'parent-with-link-macro-after-include.adoc'), extensions: (proc do
       include_processor { process { next } }
-    }
+    end)
     expected_lines = <<~'EOS'.chomp.split ?\n
     before includes
 
@@ -724,9 +724,7 @@ describe Asciidoctor::Reducer do
 
   it 'should not process link macro following include skipped by include processor when safe mode is secure' do
     doc = reduce_file (fixture_file 'parent-with-link-macro-after-include.adoc'), safe: :secure,
-      extensions: proc {
-        include_processor { process { next } }
-      }
+      extensions: proc { include_processor { process { next } } }
     expected_lines = <<~'EOS'.chomp.split ?\n
     before includes
 
@@ -819,13 +817,13 @@ describe Asciidoctor::Reducer do
   end
 
   it 'should include lines pushed by custom include processor' do
-    doc = reduce_file (fixture_file 'parent-with-include-with-single-line-paragraph.adoc'), extensions: proc {
+    doc = reduce_file (fixture_file 'parent-with-include-with-single-line-paragraph.adoc'), extensions: (proc do
       include_processor do
         process do |_, reader, target, attrs|
           reader.push_include ['pushed first', '', 'pushed last'], target, target, 1, attrs
         end
       end
-    }
+    end)
     expected_lines = <<~'EOS'.chomp.split ?\n
     before include
 
@@ -842,13 +840,13 @@ describe Asciidoctor::Reducer do
 
   it 'should include lines pushed by custom include processor when safe mode is secure' do
     doc = reduce_file (fixture_file 'parent-with-include-with-single-line-paragraph.adoc'), safe: :secure,
-      extensions: proc {
+      extensions: (proc do
         include_processor do
           process do |_, reader, target, attrs|
             reader.push_include ['pushed first', '', 'pushed last'], target, target, 1, attrs
           end
         end
-      }
+      end)
     expected_lines = <<~'EOS'.chomp.split ?\n
     before include
 
@@ -864,7 +862,7 @@ describe Asciidoctor::Reducer do
   end
 
   it 'should not replace lines if the target line does not match the expected line' do
-    doc = reduce_file (fixture_file 'parent-with-include-with-single-line-paragraph.adoc'), extensions: proc {
+    doc = reduce_file (fixture_file 'parent-with-include-with-single-line-paragraph.adoc'), extensions: (proc do
       tree_processor do
         prefer
         process do |interim_doc|
@@ -874,7 +872,7 @@ describe Asciidoctor::Reducer do
           nil
         end
       end
-    }
+    end)
     expected_lines = <<~'EOS'.chomp.split ?\n
     before include
 
@@ -896,7 +894,7 @@ describe Asciidoctor::Reducer do
       not a single one
       EOS
 
-      reduce_options extensions: proc {
+      reduce_options extensions: (proc do
         tree_processor do
           prefer
           process do |interim_doc|
@@ -904,7 +902,7 @@ describe Asciidoctor::Reducer do
             nil
           end
         end
-      }
+      end)
     end
     expect(captured_interim_doc).to be scenario.doc
   end

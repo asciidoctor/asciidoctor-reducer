@@ -164,7 +164,7 @@ describe Asciidoctor::Reducer do
       described_class::Extensions.register
       calls = 0
       result = subject.reduce_file (fixture_file 'parent-with-single-include.adoc'), sourcemap: true,
-        extensions: proc {
+        extensions: (proc do
           tree_processor do
             prefer
             process do
@@ -172,7 +172,7 @@ describe Asciidoctor::Reducer do
               nil
             end
           end
-        }
+        end)
       expected_lines = <<~'EOS'.chomp.split ?\n
       before include
 
