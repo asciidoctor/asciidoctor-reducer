@@ -903,70 +903,105 @@ describe Asciidoctor::Reducer do
   end
 
   it 'should include lines pushed by custom include processor' do
-    doc = reduce_file (fixture_file 'parent-with-include-with-single-line-paragraph.adoc'), extensions: (proc do
-      include_processor do
-        process do |_, reader, target, attrs|
-          reader.push_include ['pushed first', '', 'pushed last'], target, target, 1, attrs
-        end
-      end
-    end)
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    before include
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      before include
 
-    pushed first
+      include::custom-include.adoc[]
 
-    pushed last
+      after include
+      EOS
 
-    after include
-    EOS
-    (expect doc.source_lines).to eql expected_lines
-    (expect doc.blocks).to have_size 4
-    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
-  end
-
-  it 'should include lines pushed by custom include processor when safe mode is secure' do
-    doc = reduce_file (fixture_file 'parent-with-include-with-single-line-paragraph.adoc'), safe: :secure,
-      extensions: (proc do
+      reduce_options extensions: (proc do
         include_processor do
           process do |_, reader, target, attrs|
             reader.push_include ['pushed first', '', 'pushed last'], target, target, 1, attrs
           end
         end
       end)
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    before include
 
-    pushed first
+      expected_source <<~'EOS'
+      before include
 
-    pushed last
+      pushed first
 
-    after include
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      pushed last
+
+      after include
+      EOS
+    end
+
+    (expect doc).to have_source scenario.expected_source
+    (expect doc.blocks).to have_size 4
+    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
+  end
+
+  it 'should include lines pushed by custom include processor when safe mode is secure' do
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      before include
+
+      include::custom-include.adoc[]
+
+      after include
+      EOS
+
+      reduce_options safe: :secure, extensions: (proc do
+        include_processor do
+          process do |_, reader, target, attrs|
+            reader.push_include ['pushed first', '', 'pushed last'], target, target, 1, attrs
+          end
+        end
+      end)
+
+      expected_source <<~'EOS'
+      before include
+
+      pushed first
+
+      pushed last
+
+      after include
+      EOS
+    end
+
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 4
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
   end
 
   it 'should not replace lines if the target line does not match the expected line' do
-    doc = reduce_file (fixture_file 'parent-with-include-with-single-line-paragraph.adoc'), extensions: (proc do
-      tree_processor do
-        prefer
-        process do |interim_doc|
-          unless interim_doc.options[:reduced]
-            interim_doc.reader.include_replacements[1][:line] = 'include::not-a-match[]'
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      before include
+
+      include::single-line-paragraph.adoc[]
+
+      after include
+      EOS
+
+      reduce_options extensions: (proc do
+        tree_processor do
+          prefer
+          process do |interim_doc|
+            unless interim_doc.options[:reduced]
+              interim_doc.reader.include_replacements[1][:line] = 'include::not-a-match[]'
+            end
+            nil
           end
-          nil
         end
-      end
-    end)
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    before include
+      end)
 
-    include::single-line-paragraph.adoc[]
+      expected_source <<~'EOS'
+      before include
 
-    after include
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      include::single-line-paragraph.adoc[]
+
+      after include
+      EOS
+    end
+
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
@@ -990,7 +1025,7 @@ describe Asciidoctor::Reducer do
         end
       end)
     end
-    expect(captured_interim_doc).to be scenario.doc
+    (expect captured_interim_doc).to be scenario.doc
   end
 
   it 'should resolve include with tag' do
