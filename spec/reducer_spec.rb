@@ -1029,114 +1029,171 @@ describe Asciidoctor::Reducer do
   end
 
   it 'should resolve include with tag' do
-    doc = reduce_file fixture_file 'parent-with-include-with-tag.adoc'
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    before include
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      before include
 
-    Start of body.
+      include::include-with-tag.adoc[tag=body]
 
-    End of body.
+      after include
+      EOS
 
-    after include
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      expected_source <<~'EOS'
+      before include
+
+      Start of body.
+
+      End of body.
+
+      after include
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 4
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
   end
 
   it 'should resolve include with tags' do
-    doc = reduce_file fixture_file 'parent-with-include-with-tags.adoc'
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    before include
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      before include
 
-    The beginning.
-    The end.
+      include::include-with-tags.adoc[tags=beginning;end]
 
-    after include
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      after include
+      EOS
+
+      expected_source <<~'EOS'
+      before include
+
+      The beginning.
+      The end.
+
+      after include
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 6]
   end
 
   it 'should resolve include with lines' do
-    doc = reduce_file fixture_file 'parent-with-include-with-lines.adoc'
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    before include
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      before include
 
-    first paragraph, second line
+      include::include-by-lines.adoc[lines=2..7]
 
-    second paragraph, first line
-    second paragraph, second line
+      after include
+      EOS
 
-    third paragraph
+      expected_source <<~'EOS'
+      before include
 
-    after include
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      first paragraph, second line
+
+      second paragraph, first line
+      second paragraph, second line
+
+      third paragraph
+
+      after include
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 5
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 8, 10]
   end
 
   it 'should resolve include with leveloffset' do
-    doc = reduce_file fixture_file 'parent-with-include-with-leveloffset.adoc'
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    = Document Title
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      == Section
 
-    == Section
+      include::subsections.adoc[leveloffset=+1]
 
-    :leveloffset: +1
+      == Another Section
+      EOS
 
-    == Subsection
+      expected_source <<~'EOS'
+      == Section
 
-    === Nested Subsection
+      :leveloffset: +1
 
-    :leveloffset!:
+      == Subsection
 
-    == Another Section
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      === Nested Subsection
+
+      :leveloffset!:
+
+      == Another Section
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     blocks = doc.find_by context: :section
-    (expect blocks).to have_size 5
-    (expect (blocks.map {|it| it.lineno })).to eql [1, 3, 7, 9, 13]
+    (expect blocks).to have_size 4
+    (expect (blocks.map {|it| it.lineno })).to eql [1, 5, 7, 11]
   end
 
   it 'should resolve include between leveloffset attribute entries' do
-    doc = reduce_file fixture_file 'parent-with-leveloffset-and-include.adoc'
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    = Document Title
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      == Section
 
-    == Section
+      :leveloffset: +1
+      include::subsections.adoc[]
 
-    :leveloffset: +1
-    == Subsection
+      :!leveloffset:
+      == Another Section
+      EOS
 
-    === Nested Subsection
+      expected_source <<~'EOS'
+      == Section
 
-    :!leveloffset:
-    == Another Section
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      :leveloffset: +1
+      == Subsection
+
+      === Nested Subsection
+
+      :!leveloffset:
+      == Another Section
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     blocks = doc.find_by {|it| it.context != :document }
-    (expect blocks).to have_size 5
-    (expect (blocks.map {|it| it.lineno })).to eql [1, 3, 6, 8, 11]
+    (expect blocks).to have_size 4
+    (expect (blocks.map {|it| it.lineno })).to eql [1, 4, 6, 9]
   end
 
   it 'should preserve attribute entries in the document header' do
-    doc = reduce_file fixture_file 'parent-with-header-attributes.adoc'
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    = Document Title
-    :sectnums:
-    :icons: font
-    :toc:
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      = Document Title
+      :sectnums:
+      :icons: font
+      :toc:
 
-    before include
+      before include
 
-    single line paragraph
+      include::single-line-paragraph.adoc[]
 
-    after include
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      after include
+      EOS
+
+      expected_source <<~'EOS'
+      = Document Title
+      :sectnums:
+      :icons: font
+      :toc:
+
+      before include
+
+      single line paragraph
+
+      after include
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [6, 8, 10]
     (expect (doc.attr? 'sectnums')).to be true
@@ -1145,108 +1202,163 @@ describe Asciidoctor::Reducer do
   end
 
   it 'should use attribute defined in header when resolving include' do
-    input_file = (fixture_file 'parent-with-include-with-attribute-reference-from-header.adoc')
-    doc = reduce_file input_file
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    = Book Title
-    :chaptersdir: chapters
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      = Book Title
+      :chaptersdir: chapters
 
-    == Chapter One
+      include::{chaptersdir}/ch1.adoc[]
+      EOS
 
-    content
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      expected_source <<~'EOS'
+      = Book Title
+      :chaptersdir: chapters
+
+      == Chapter One
+
+      content
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     blocks = doc.find_by {|it| it.context != :document }
     (expect blocks).to have_size 3
     (expect (blocks.map {|it| it.lineno })).to eql [1, 4, 6]
   end
 
   it 'should use attribute defined in body when resolving include' do
-    doc = reduce_file fixture_file 'parent-with-include-with-attribute-reference-from-body.adoc'
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    = Book Title
-    :doctype: book
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      = Book Title
+      :doctype: book
 
-    Preamble.
+      Preamble.
 
-    :includesdir: chapters
-    == Chapter One
+      :includesdir: chapters
+      include::{includesdir}/ch1.adoc[]
 
-    content
+      :includesdir: appendices
+      include::{includesdir}/appx1.adoc[]
+      EOS
 
-    :includesdir: appendices
-    [appendix]
-    == Installation
+      expected_source <<~'EOS'
+      = Book Title
+      :doctype: book
 
-    content
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      Preamble.
+
+      :includesdir: chapters
+      == Chapter One
+
+      content
+
+      :includesdir: appendices
+      [appendix]
+      == Installation
+
+      content
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     blocks = doc.find_by {|it| it.context != :document }
     (expect blocks).to have_size 7
     (expect (blocks.map {|it| it.lineno })).to eql [1, 4, 4, 7, 9, 13, 15]
   end
 
   it 'should use attribute defined inside preprocessor conditional header when resolving include' do
-    input_file = fixture_file 'parent-with-include-with-attribute-reference-from-pp-conditional.adoc'
-    doc = reduce_file input_file
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    = Book Title
-    :chaptersdir: chapters
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      = Book Title
+      ifndef::chaptersdir[:chaptersdir: chapters]
 
-    == Chapter One
+      include::{chaptersdir}/ch1.adoc[]
+      EOS
 
-    content
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      expected_source <<~'EOS'
+      = Book Title
+      :chaptersdir: chapters
+
+      == Chapter One
+
+      content
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     blocks = doc.find_by {|it| it.context != :document }
     (expect blocks).to have_size 3
     (expect (blocks.map {|it| it.lineno })).to eql [1, 4, 6]
   end
 
   it 'should use attribute passed to API when resolving include' do
-    doc = reduce_file (fixture_file 'parent-with-include-with-attribute-reference-in-target.adoc'),
-      attributes: 'chaptersdir=chapters'
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    = Book Title
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      = Book Title
 
-    == Chapter One
+      include::{chaptersdir}/ch1.adoc[]
+      EOS
 
-    content
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      reduce_options attributes: 'chaptersdir=chapters'
+
+      expected_source <<~'EOS'
+      = Book Title
+
+      == Chapter One
+
+      content
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     blocks = doc.find_by {|it| it.context != :document }
     (expect blocks).to have_size 3
     (expect (blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
 
   it 'should use attribute passed to API when resolving attribute value on include directive' do
-    doc = reduce_file (fixture_file 'parent-with-include-with-attribute-reference-as-tag.adoc'), attributes: 'tag=body'
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    before include
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      before include
 
-    Start of body.
+      include::include-with-tag.adoc[tag={tag}]
 
-    End of body.
+      after include
+      EOS
 
-    after include
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      reduce_options attributes: 'tag=body'
+
+      expected_source <<~'EOS'
+      before include
+
+      Start of body.
+
+      End of body.
+
+      after include
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 4
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
   end
 
   it 'should skip include when attribute in target cannot be resolved and attribute-missing=drop-line' do
-    doc = nil
     with_memory_logger do |logger|
-      input_file = fixture_file 'parent-with-include-with-attribute-reference-in-target.adoc'
-      doc = reduce_file input_file, attributes: { 'attribute-missing' => 'drop-line' }
+      scenario, doc = create_scenario do
+        input_source <<~'EOS'
+        = Book Title
+
+        include::{chaptersdir}/ch1.adoc[]
+        EOS
+
+        reduce_options attributes: 'attribute-missing=drop-line'
+
+        expected_source '= Book Title'
+      end
+      (expect doc).to have_source scenario.expected_source
+      (expect doc.lineno).to eql 1
       messages = logger.messages
       (expect messages).to have_size 2
       (expect messages[1][:severity]).to eql :INFO
       (expect messages[1][:message][:text]).to include 'include dropped'
     end
-    (expect doc.source_lines).to eql ['= Book Title']
-    (expect doc.lineno).to eql 1
   end
 
   it 'should drop lines containing preprocessor directive when condition resolves to true' do

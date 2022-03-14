@@ -1,4 +1,0 @@
-= Book Title
-:chaptersdir: chapters
-
-include::{chaptersdir}/ch1.adoc[]

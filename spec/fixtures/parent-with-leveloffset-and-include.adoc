@@ -1,9 +1,0 @@
-= Document Title
-
-== Section
-
-:leveloffset: +1
-include::subsections.adoc[]
-
-:!leveloffset:
-== Another Section

@@ -127,16 +127,23 @@ describe Asciidoctor::Reducer::Cli do
     end
 
     it 'should allow runtime attribute to be specified using -a option' do
-      the_source_file = fixture_file 'parent-with-include-with-attribute-reference-in-target.adoc'
-      expected = <<~'EOS'.chomp
-      = Book Title
+      with_tmp_file do |the_source_file|
+        the_source_file.write <<~'EOS'
+        = Book Title
 
-      == Chapter One
+        include::{chaptersdir}/ch1.adoc[]
+        EOS
+        the_source_file.close
+        expected_source = <<~'EOS'.chomp
+        = Book Title
 
-      content
-      EOS
-      (expect subject.run [the_source_file, '-a', 'chaptersdir=chapters', '-a', 'doctitle=Untitled']).to eql 0
-      (expect $stdout.string.chomp).to eql expected
+        == Chapter One
+
+        content
+        EOS
+        (expect subject.run [the_source_file, '-a', 'chaptersdir=chapters', '-a', 'doctitle=Untitled']).to eql 0
+        (expect $stdout.string.chomp).to eql expected_source
+      end
     end
 
     it 'should set attribute value to empty string if only name is passed to -a option' do
