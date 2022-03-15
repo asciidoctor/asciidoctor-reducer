@@ -1362,124 +1362,195 @@ describe Asciidoctor::Reducer do
   end
 
   it 'should drop lines containing preprocessor directive when condition resolves to true' do
-    doc = reduce_file (fixture_file 'parent-with-include-with-pp-conditional.adoc'), attributes: { 'flag' => '' }
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    before include
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      before include
 
-    primary content
-    conditional content
+      include::preprocessor-conditional.adoc[]
 
-    after include
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      after include
+      EOS
+
+      reduce_options attributes: { 'flag' => '' }
+
+      expected_source <<~'EOS'
+      before include
+
+      primary content
+      conditional content
+
+      after include
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 6]
   end
 
   it 'should drop lines from start to end preprocessor directive when condition resolves to false' do
-    doc = reduce_file fixture_file 'parent-with-include-with-pp-conditional.adoc'
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    before include
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      before include
 
-    primary content
+      include::preprocessor-conditional.adoc[]
 
-    after include
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      after include
+      EOS
+
+      expected_source <<~'EOS'
+      before include
+
+      primary content
+
+      after include
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
 
   it 'should drop single line preprocessor conditional that resolves to false' do
-    input_file = fixture_file 'parent-with-include-with-attribute-reference-from-pp-conditional.adoc'
-    doc = reduce_file input_file, attributes: { 'chaptersdir' => 'chapters' }
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    = Book Title
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      = Book Title
+      ifndef::chaptersdir[:chaptersdir: chapters]
 
-    == Chapter One
+      include::{chaptersdir}/ch1.adoc[]
+      EOS
 
-    content
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      reduce_options attributes: { 'chaptersdir' => 'chapters' }
+
+      expected_source <<~'EOS'
+      = Book Title
+
+      == Chapter One
+
+      content
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     blocks = doc.find_by {|it| it.context != :document }
     (expect blocks).to have_size 3
     (expect (blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
 
   it 'should reduce preprocessor conditional following a nested include' do
-    doc = reduce_file (fixture_file 'parent-with-include-with-pp-conditionals-and-include.adoc'),
-      attributes: { 'flag' => '' }
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    before include
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      before include
 
-    before nested include
+      include::preprocessor-conditionals-and-include.adoc[]
 
-    no includes here
+      after include
+      EOS
 
-    just good old-fashioned paragraph text
+      reduce_options attributes: { 'flag' => '' }
 
-    after nested include
+      expected_source <<~'EOS'
+      before include
 
-    after include
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      before nested include
+
+      no includes here
+
+      just good old-fashioned paragraph text
+
+      after nested include
+
+      after include
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     blocks = doc.blocks
     (expect blocks).to have_size 6
     (expect (blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9, 11]
   end
 
   it 'should resolve include inside true preprocessor conditional' do
-    doc = reduce_file fixture_file 'parent-with-include-inside-true-pp-conditional.adoc'
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    :flag:
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      :flag:
 
-    before include
+      before include
 
-    single line paragraph
+      ifdef::flag[]
+      include::single-line-paragraph.adoc[]
+      endif::flag[]
 
-    after include
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      after include
+      EOS
+
+      expected_source <<~'EOS'
+      :flag:
+
+      before include
+
+      single line paragraph
+
+      after include
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [3, 5, 7]
   end
 
   it 'should not resolve include inside false preprocessor conditional' do
-    doc = reduce_file fixture_file 'parent-with-include-inside-false-pp-conditional.adoc'
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    before include
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      before include
 
-    after include
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      ifdef::no-such-attribute[]
+      include::single-line-paragraph.adoc[]
+
+      ifdef::backend[ignored]
+      endif::[]
+      after include
+      EOS
+
+      expected_source <<~'EOS'
+      before include
+
+      after include
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 2
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3]
   end
 
   it 'should keep preprocessor conditional if :preserve_conditionals option is set' do
-    doc = reduce_file (fixture_file 'parent-with-include-inside-false-pp-conditional.adoc'), preserve_conditionals: true
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    before include
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      before include
 
-    ifdef::no-such-attribute[]
-    include::single-line-paragraph.adoc[]
+      ifdef::no-such-attribute[]
+      include::single-line-paragraph.adoc[]
 
-    ifdef::backend[ignored]
-    endif::[]
-    after include
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      ifdef::backend[ignored]
+      endif::[]
+      after include
+      EOS
+
+      reduce_options preserve_conditionals: true
+
+      expected_source input_source
+    end
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 2
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 8]
   end
 
   it 'should keep single line preprocessor conditional if :preserve_conditionals option is set and no includes' do
-    doc = reduce_file (fixture_file 'parent-with-single-line-preprocessor-conditional.adoc'),
-      preserve_conditionals: true
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    ifdef::asciidoctor-version[text]
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+    scenario, doc = create_scenario do
+      input_source 'ifdef::asciidoctor-version[text]'
+
+      reduce_options preserve_conditionals: true
+
+      expected_source input_source
+    end
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 1
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1]
   end

@@ -1,5 +1,0 @@
-before include
-
-include::preprocessor-conditionals-and-include.adoc[]
-
-after include

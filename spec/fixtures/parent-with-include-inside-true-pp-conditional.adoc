@@ -1,9 +1,0 @@
-:flag:
-
-before include
-
-ifdef::flag[]
-include::single-line-paragraph.adoc[]
-endif::flag[]
-
-after include

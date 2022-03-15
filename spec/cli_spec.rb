@@ -157,7 +157,7 @@ describe Asciidoctor::Reducer::Cli do
     end
 
     it 'should reduce preprocessor conditionals by default' do
-      the_source_file = fixture_file 'parent-with-single-line-preprocessor-conditional.adoc'
+      the_source_file = fixture_file 'single-line-preprocessor-conditional.adoc'
       expected = <<~'EOS'.chomp
       text
       EOS
@@ -166,7 +166,7 @@ describe Asciidoctor::Reducer::Cli do
     end
 
     it 'should preserve preprocessor conditionals if --preserve-conditionals option is specified' do
-      the_source_file = fixture_file 'parent-with-single-line-preprocessor-conditional.adoc'
+      the_source_file = fixture_file 'single-line-preprocessor-conditional.adoc'
       expected = <<~'EOS'.chomp
       ifdef::asciidoctor-version[text]
       EOS
