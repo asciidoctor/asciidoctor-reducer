@@ -11,6 +11,7 @@ end
 
 require 'asciidoctor/reducer/api'
 require 'asciidoctor/reducer/cli'
+require 'forwardable'
 require 'open3' unless defined? Open3
 require 'shellwords'
 require 'socket'
@@ -28,14 +29,19 @@ unless (Pathname.instance_method :rmtree).arity > 0
 end
 
 class ScenarioBuilder
+  extend Forwardable
+  def_delegators :@example, :subject, :described_class
+
   attr_reader :doc
-  attr_reader :input_file
 
   UNDEFINED = ::Object.new
+  private_constant :UNDEFINED
 
   def initialize
-    @files = []
+    @example = nil
     @expected_source = @input_file = @input_source = nil
+    @files = []
+    @reduce = proc { reduce_file input_file, *@reduce_options }
     @reduce_options = []
   end
 
@@ -64,20 +70,33 @@ class ScenarioBuilder
     source == UNDEFINED ? @expected_source : (@expected_source = source.chomp)
   end
 
+  def input_file
+    @input_file ||= (create_input_file @input_source)
+  end
+
   def input_source source = UNDEFINED
     source == UNDEFINED ? @input_source : (@input_source = source.chomp)
   end
 
-  def reduce_options *args
-    @reduce_options = args
+  def reduce value = true, &block
+    @reduce = value && block_given? ? block : false
+  end
+
+  def reduce_options arg1 = UNDEFINED, *argv
+    arg1 == UNDEFINED ? @reduce_options : (@reduce_options = [arg1] + argv)
   end
 
   def run &block
     instance_exec(&block)
-    @doc = reduce_file (@input_file = create_input_file @input_source), *@reduce_options if @input_source
+    if @input_source && @reduce
+      @example = block.binding.receiver
+      @doc = @reduce.call
+    end
     self
   ensure
+    @example = nil
     @files.each {|it| File.unlink it }
+    freeze
   end
 
   def to_ary

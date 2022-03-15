@@ -887,15 +887,27 @@ describe Asciidoctor::Reducer do
 
   it 'should skip include that custom include processor handles but does not push' do
     described_class::Extensions.register
-    doc = Asciidoctor.load_file (fixture_file 'parent-with-include-with-single-line-paragraph.adoc'),
-      safe: :secure, sourcemap: true, extensions: proc { include_processor { process { next } } }
-    expected_lines = <<~'EOS'.chomp.split ?\n
-    before include
+    scenario, doc = create_scenario do
+      input_source <<~'EOS'
+      before include
+
+      include::single-line-paragraph.adoc[]
+
+      after include
+      EOS
+
+      reduce_options safe: :secure, sourcemap: true, extensions: proc { include_processor { process { next } } }
+
+      reduce { Asciidoctor.load_file input_file, *reduce_options }
+
+      expected_source <<~'EOS'
+      before include
 
 
-    after include
-    EOS
-    (expect doc.source_lines).to eql expected_lines
+      after include
+      EOS
+    end
+    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 2
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 4]
   ensure

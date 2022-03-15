@@ -11,28 +11,50 @@ describe Asciidoctor::Reducer do
     subject { described_class.method :reduce }
 
     it 'should reduce input when no options are specified' do
-      the_source = File.read (fixture_file 'preprocessor-conditional.adoc'), mode: 'r:UTF-8'
-      expected = 'primary content'
-      doc = subject.call the_source
-      (expect doc.source).to eql expected
+      scenario = create_scenario do
+        input_source <<~'EOS'
+        primary content
+        ifdef::flag[]
+        conditional content
+        endif::[]
+        EOS
+
+        reduce { subject.call input_source }
+
+        expected_source 'primary content'
+      end
+      (expect scenario.doc).to have_source scenario.expected_source
     end
 
     it 'should reduce input specified as File object' do
-      source_file = fixture_file 'parent-with-single-include.adoc'
-      expected_lines = <<~'EOS'.chomp.split ?\n
-      before include
+      scenario, doc = create_scenario do
+        input_source <<~'EOS'
+        before include
 
-      no includes here
+        include::no-includes.adoc[]
 
-      just good old-fashioned paragraph text
+        after include
+        EOS
 
-      after include
-      EOS
-      doc = File.open(source_file, mode: 'r:UTF-8') {|f| subject.call f }
-      (expect doc.source_lines).to eql expected_lines
-      (expect doc.attr 'docname').to eql (File.basename source_file, '.adoc')
-      (expect doc.attr 'docfile').to eql source_file
-      (expect doc.attr 'docdir').to eql (File.dirname source_file)
+        reduce do
+          File.open(input_file, mode: 'r:UTF-8') {|f| subject.call f }
+        end
+
+        expected_source <<~'EOS'
+        before include
+
+        no includes here
+
+        just good old-fashioned paragraph text
+
+        after include
+        EOS
+      end
+      (expect doc).to have_source scenario.expected_source
+      input_file = scenario.input_file
+      (expect doc.attr 'docname').to eql (File.basename input_file, '.adoc')
+      (expect doc.attr 'docfile').to eql input_file
+      (expect doc.attr 'docdir').to eql (File.dirname input_file)
     end
   end
 
