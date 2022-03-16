@@ -87,9 +87,9 @@ class ScenarioBuilder
   end
 
   def run &block
+    @example = block.binding.receiver
     instance_exec(&block)
     if @input_source && @reduce
-      @example = block.binding.receiver
       @doc = @reduce.call
     end
     self
