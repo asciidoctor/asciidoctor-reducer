@@ -3,6 +3,26 @@
 require_relative 'spec_helper'
 
 describe Asciidoctor::Reducer do
+  let :the_input_source do
+    <<~'EOS'
+    before include
+
+    include::single-line-paragraph.adoc[]
+
+    after include
+    EOS
+  end
+
+  let :the_expected_source do
+    <<~'EOS'
+    before include
+
+    single line paragraph
+
+    after include
+    EOS
+  end
+
   it 'should provide VERSION constant' do
     (expect described_class::VERSION).to match %r/^\d+\.\d+\.\d+(\.\S+)?$/
   end
@@ -26,23 +46,9 @@ describe Asciidoctor::Reducer do
 
     it 'should reduce input specified as File object' do
       scenario, doc = create_scenario do
-        input_source <<~'EOS'
-        before include
-
-        include::no-includes.adoc[]
-
-        after include
-        EOS
+        input_source the_input_source
         reduce { File.open(input_file, mode: 'r:UTF-8') {|f| subject.call f } }
-        expected_source <<~'EOS'
-        before include
-
-        no includes here
-
-        just good old-fashioned paragraph text
-
-        after include
-        EOS
+        expected_source the_expected_source
       end
       (expect doc).to have_source scenario.expected_source
       input_file = scenario.input_file
@@ -71,26 +77,6 @@ describe Asciidoctor::Reducer do
   end
 
   describe '#write' do
-    let :the_input_source do
-      <<~'EOS'
-      before include
-
-      include::single-line-paragraph.adoc[]
-
-      after include
-      EOS
-    end
-
-    let :the_expected_source do
-      <<~'EOS'
-      before include
-
-      single line paragraph
-
-      after include
-      EOS
-    end
-
     it 'should reduce input to file at path specified by :to option' do
       with_tmp_file tmpdir: output_dir do |the_output_file|
         scenario = create_scenario do
