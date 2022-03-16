@@ -160,7 +160,7 @@ describe Asciidoctor::Reducer do
     end
   end
 
-  describe 'extension registry' do
+  context 'extension registry' do
     let :call_tracer_tree_processor do
       (Class.new Asciidoctor::Extensions::TreeProcessor do
         attr_reader :calls
