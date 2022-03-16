@@ -3,6 +3,10 @@
 require_relative 'spec_helper'
 
 describe Asciidoctor::Reducer do
+  it 'should provide VERSION constant' do
+    (expect described_class::VERSION).to match %r/^\d+\.\d+\.\d+(\.\S+)?$/
+  end
+
   let :the_input_source do
     <<~'EOS'
     before include
@@ -21,10 +25,6 @@ describe Asciidoctor::Reducer do
 
     after include
     EOS
-  end
-
-  it 'should provide VERSION constant' do
-    (expect described_class::VERSION).to match %r/^\d+\.\d+\.\d+(\.\S+)?$/
   end
 
   describe '.reduce' do
