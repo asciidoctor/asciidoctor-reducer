@@ -3,10 +3,6 @@
 require_relative 'spec_helper'
 
 describe Asciidoctor::Reducer do
-  it 'should provide VERSION constant' do
-    (expect described_class::VERSION).to match %r/^\d+\.\d+\.\d+(\.\S+)?$/
-  end
-
   let :the_input_source do
     <<~'EOS'
     before include
@@ -25,6 +21,12 @@ describe Asciidoctor::Reducer do
 
     after include
     EOS
+  end
+
+  context 'version' do
+    it 'should provide VERSION constant' do
+      (expect described_class::VERSION).to match %r/^\d+\.\d+\.\d+(\.\S+)?$/
+    end
   end
 
   describe '.reduce' do
@@ -76,7 +78,7 @@ describe Asciidoctor::Reducer do
     end
   end
 
-  describe '#write' do
+  context ':to option' do
     it 'should reduce input to file at path specified by :to option' do
       with_tmp_file tmpdir: output_dir do |the_output_file|
         scenario = create_scenario do
