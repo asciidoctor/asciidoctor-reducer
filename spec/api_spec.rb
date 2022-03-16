@@ -18,9 +18,7 @@ describe Asciidoctor::Reducer do
         conditional content
         endif::[]
         EOS
-
         reduce { subject.call input_source }
-
         expected_source 'primary content'
       end
       (expect scenario.doc).to have_source scenario.expected_source
@@ -35,11 +33,7 @@ describe Asciidoctor::Reducer do
 
         after include
         EOS
-
-        reduce do
-          File.open(input_file, mode: 'r:UTF-8') {|f| subject.call f }
-        end
-
+        reduce { File.open(input_file, mode: 'r:UTF-8') {|f| subject.call f } }
         expected_source <<~'EOS'
         before include
 
@@ -62,83 +56,86 @@ describe Asciidoctor::Reducer do
     subject { described_class.method :reduce_file }
 
     it 'should reduce input when no options are specified' do
-      the_source_file = fixture_file 'preprocessor-conditional.adoc'
-      expected = 'primary content'
-      doc = subject.call the_source_file
-      (expect doc.source).to eql expected
+      scenario, doc = create_scenario do
+        input_source <<~'EOS'
+        primary content
+        ifdef::flag[]
+        conditional content
+        endif::[]
+        EOS
+        reduce { subject.call input_file }
+        expected_source 'primary content'
+      end
+      (expect doc).to have_source scenario.expected_source
     end
   end
 
   describe '#write' do
-    it 'should reduce input to file at path specified by :to option' do
-      the_source_file = fixture_file 'parent-with-include-with-single-line-paragraph.adoc'
-      expected = <<~'EOS'.chomp
+    let :the_input_source do
+      <<~'EOS'
+      before include
+
+      include::single-line-paragraph.adoc[]
+
+      after include
+      EOS
+    end
+
+    let :the_expected_source do
+      <<~'EOS'
       before include
 
       single line paragraph
 
       after include
       EOS
+    end
+
+    it 'should reduce input to file at path specified by :to option' do
       with_tmp_file tmpdir: output_dir do |the_output_file|
-        subject.reduce_file the_source_file, to: the_output_file.path
-        output_contents = the_output_file.read
-        (expect output_contents).to eql (expected + ?\n)
+        scenario = create_scenario do
+          input_source the_input_source
+          reduce { subject.reduce_file input_file, to: the_output_file.path }
+          expected_source the_expected_source
+        end
+
+        (expect the_output_file.read.chomp).to eql scenario.expected_source
       end
     end
 
     it 'should reduce input to file for Pathname specified by :to option' do
-      the_source_file = fixture_file 'parent-with-include-with-single-line-paragraph.adoc'
-      expected = <<~'EOS'.chomp
-      before include
-
-      single line paragraph
-
-      after include
-      EOS
       with_tmp_file tmpdir: output_dir do |the_output_file|
-        the_output_pathname = ::Pathname.new the_output_file.path
-        subject.reduce_file the_source_file, to: the_output_pathname
-        output_contents = the_output_file.read
-        (expect output_contents).to eql (expected + ?\n)
+        scenario = create_scenario do
+          input_source the_input_source
+          reduce { subject.reduce_file input_file, to: (Pathname.new the_output_file.path) }
+          expected_source the_expected_source
+        end
+
+        (expect the_output_file.read.chomp).to eql scenario.expected_source
       end
     end
 
     it 'should reduce input to string if :to option is String' do
-      the_source_file = fixture_file 'parent-with-include-with-single-line-paragraph.adoc'
-      expected = <<~'EOS'.chomp
-      before include
-
-      single line paragraph
-
-      after include
-      EOS
-      result = subject.reduce_file the_source_file, to: String
-      (expect result).to eql expected
+      scenario, result = create_scenario do
+        input_source the_input_source
+        reduce { subject.reduce_file input_file, to: String }
+        expected_source the_expected_source
+      end
+      (expect result).to eql scenario.expected_source
     end
 
     it 'should reduce input and send to write method if :to option is IO' do
-      the_source_file = fixture_file 'parent-with-include-with-single-line-paragraph.adoc'
-      expected = <<~'EOS'.chomp
-      before include
-
-      single line paragraph
-
-      after include
-      EOS
       to = StringIO.new
-      subject.reduce_file the_source_file, to: to
-      (expect to.string).to eql (expected + ?\n)
+      scenario = create_scenario do
+        input_source the_input_source
+        reduce { subject.reduce_file input_file, to: to }
+        expected_source the_expected_source
+      end
+
+      (expect to.string).to eql (scenario.expected_source + ?\n)
     end
 
     it 'should reduce input and send to write method if :to option value responds to write' do
-      the_source_file = fixture_file 'parent-with-include-with-single-line-paragraph.adoc'
-      expected = <<~'EOS'.chomp
-      before include
-
-      single line paragraph
-
-      after include
-      EOS
       to = (Class.new do
         attr_reader :string
 
@@ -150,34 +147,30 @@ describe Asciidoctor::Reducer do
           @string = string
         end
       end).new
-      subject.reduce_file the_source_file, to: to
-      (expect to.string).to eql (expected + ?\n)
+      scenario = create_scenario do
+        input_source the_input_source
+        reduce { subject.reduce_file input_file, to: to }
+        expected_source the_expected_source
+      end
+      (expect to.string).to eql (scenario.expected_source + ?\n)
     end
 
     it 'should reduce input but not write if :to option is /dev/null' do
-      the_source_file = fixture_file 'parent-with-include-with-single-line-paragraph.adoc'
-      expected = <<~'EOS'.chomp
-      before include
-
-      single line paragraph
-
-      after include
-      EOS
-      result = subject.reduce_file the_source_file, to: '/dev/null'
-      (expect result.source).to eql expected
+      scenario, doc = create_scenario do
+        input_source the_input_source
+        reduce { subject.reduce_file input_file, to: '/dev/null' }
+        expected_source the_expected_source
+      end
+      (expect doc).to have_source scenario.expected_source
     end
 
     it 'should reduce input but not write if :to option is nil' do
-      the_source_file = fixture_file 'parent-with-include-with-single-line-paragraph.adoc'
-      expected = <<~'EOS'.chomp
-      before include
-
-      single line paragraph
-
-      after include
-      EOS
-      result = subject.reduce_file the_source_file, to: nil
-      (expect result.source).to eql expected
+      scenario, doc = create_scenario do
+        input_source the_input_source
+        reduce { subject.reduce_file input_file, to: nil }
+        expected_source the_expected_source
+      end
+      (expect doc).to have_source scenario.expected_source
     end
   end
 
