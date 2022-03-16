@@ -30,7 +30,7 @@ end
 
 class ScenarioBuilder
   extend Forwardable
-  def_delegators :@example, :subject, :described_class
+  def_delegators :@example, :subject, :described_class, :the_input_source, :the_expected_source
 
   attr_reader :doc
 
