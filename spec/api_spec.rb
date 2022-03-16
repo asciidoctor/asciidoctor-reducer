@@ -175,19 +175,35 @@ describe Asciidoctor::Reducer do
   end
 
   describe 'extension registry' do
+    let :call_tracer_tree_processor do
+      (Class.new Asciidoctor::Extensions::TreeProcessor do
+        attr_reader :calls
+
+        def initialize *args
+          super
+          @calls = []
+        end
+
+        def process doc
+          @calls << (doc.options[:reduced] == true)
+          nil
+        end
+      end).new
+    end
+
+    let :register_extension_call_tracer do
+      ext = call_tracer_tree_processor
+      proc { prefer tree_processor ext }
+    end
+
+    let :extension_calls do
+      call_tracer_tree_processor.calls
+    end
+
     it 'should not register extension for call if extension is registered globally' do
       described_class::Extensions.register
-      calls = 0
       result = subject.reduce_file (fixture_file 'parent-with-single-include.adoc'), sourcemap: true,
-        extensions: (proc do
-          tree_processor do
-            prefer
-            process do
-              calls += 1
-              nil
-            end
-          end
-        end)
+        extensions: register_extension_call_tracer
       expected_lines = <<~'EOS'.chomp.split ?\n
       before include
 
@@ -197,7 +213,7 @@ describe Asciidoctor::Reducer do
 
       after include
       EOS
-      (expect calls).to eql 2
+      (expect extension_calls).to eql [false, true]
       (expect result.source_lines).to eql expected_lines
     ensure
       described_class::Extensions.unregister
@@ -205,16 +221,7 @@ describe Asciidoctor::Reducer do
 
     it 'should not register extension for call with custom extension registry if extension is registered globally' do
       described_class::Extensions.register
-      calls = []
-      ext_reg = Asciidoctor::Extensions.create do
-        tree_processor do
-          prefer
-          process do |doc|
-            calls << (doc.options[:reduced] == true)
-            nil
-          end
-        end
-      end
+      ext_reg = Asciidoctor::Extensions.create(&register_extension_call_tracer)
       result = subject.reduce_file (fixture_file 'parent-with-single-include.adoc'), extension_registry: ext_reg,
         sourcemap: true
       expected_lines = <<~'EOS'.chomp.split ?\n
@@ -228,24 +235,14 @@ describe Asciidoctor::Reducer do
       EOS
       (expect result.source_lines).to eql expected_lines
       (expect ext_reg.groups[:reducer]).to be_nil
-      (expect calls).to have_size 2
-      (expect calls).to eql [false, true]
+      (expect extension_calls).to eql [false, true]
     ensure
       described_class::Extensions.unregister
     end
 
     it 'should not register extension for call to load API if extension is registered globally' do
       described_class::Extensions.register
-      calls = []
-      ext_reg = Asciidoctor::Extensions.create do
-        tree_processor do
-          prefer
-          process do |doc|
-            calls << (doc.options[:reduced] == true)
-            nil
-          end
-        end
-      end
+      ext_reg = Asciidoctor::Extensions.create(&register_extension_call_tracer)
       result = Asciidoctor.load_file (fixture_file 'parent-with-single-include.adoc'), extension_registry: ext_reg,
         sourcemap: true, safe: :safe
       expected_lines = <<~'EOS'.chomp.split ?\n
@@ -259,23 +256,13 @@ describe Asciidoctor::Reducer do
       EOS
       (expect result.source_lines).to eql expected_lines
       (expect ext_reg.groups[:reducer]).to be_nil
-      (expect calls).to have_size 2
-      (expect calls).to eql [false, true]
+      (expect extension_calls).to eql [false, true]
     ensure
       described_class::Extensions.unregister
     end
 
     it 'should not register extensions in a custom extension registry twice when reloading document' do
-      calls = []
-      ext_reg = Asciidoctor::Extensions.create do
-        preprocessor do
-          prefer
-          process do |doc|
-            calls << (doc.options[:reduced] == true)
-            nil
-          end
-        end
-      end
+      ext_reg = Asciidoctor::Extensions.create(&register_extension_call_tracer)
       result = subject.reduce_file (fixture_file 'parent-with-single-include.adoc'), extension_registry: ext_reg,
         sourcemap: true
       expected_lines = <<~'EOS'.chomp.split ?\n
@@ -289,8 +276,7 @@ describe Asciidoctor::Reducer do
       EOS
       (expect result.source_lines).to eql expected_lines
       (expect ext_reg.groups[:reducer]).not_to be_nil
-      (expect calls).to have_size 2
-      (expect calls).to eql [false, true]
+      (expect extension_calls).to eql [false, true]
     end
   end
 end
