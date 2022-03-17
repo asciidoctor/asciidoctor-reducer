@@ -117,7 +117,7 @@ describe Asciidoctor::Reducer do
     end
 
     it 'should reduce input and send to write method if :to option value responds to write' do
-      to = (Class.new do
+      to = Class.new do
         attr_reader :string
 
         def initialize
@@ -127,7 +127,7 @@ describe Asciidoctor::Reducer do
         def write string
           @string = string
         end
-      end).new
+      end.new
       create_scenario do
         input_source the_input_source
         output_file to
@@ -155,7 +155,7 @@ describe Asciidoctor::Reducer do
 
   context 'extension registry' do
     let :call_tracer_tree_processor do
-      (Class.new Asciidoctor::Extensions::TreeProcessor do
+      Class.new Asciidoctor::Extensions::TreeProcessor do
         attr_reader :calls
 
         def initialize *args
@@ -167,7 +167,7 @@ describe Asciidoctor::Reducer do
           @calls << (doc.options[:reduced] == true)
           nil
         end
-      end).new
+      end.new
     end
 
     let :register_extension_call_tracer do

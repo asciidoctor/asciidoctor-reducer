@@ -13,10 +13,7 @@ describe Asciidoctor::Reducer::IncludeMapper do
       not a single one
       EOS
 
-      reduce_options extensions: (proc do
-        next if document.options[:reduced]
-        tree_processor ext_class
-      end)
+      reduce_options extensions: proc { tree_processor ext_class unless document.options[:reduced] }
     end.run
     (expect doc.source_lines[-1]).to eql 'not a single one'
   end
@@ -32,10 +29,7 @@ describe Asciidoctor::Reducer::IncludeMapper do
       after include
       EOS
 
-      reduce_options extensions: (proc do
-        next if document.options[:reduced]
-        tree_processor ext_class
-      end)
+      reduce_options extensions: proc { tree_processor ext_class unless document.options[:reduced] }
     end.run
     (expect doc.source_lines[-1]).to eql 'after include'
   end
@@ -60,10 +54,7 @@ describe Asciidoctor::Reducer::IncludeMapper do
       after include
       EOS
 
-      reduce_options extensions: (proc do
-        next if document.options[:reduced]
-        tree_processor ext_class
-      end)
+      reduce_options extensions: proc { tree_processor ext_class unless document.options[:reduced] }
     end.run
     (expect doc.source_lines[-1]).to eql %(//# includes=#{File.basename include_file, '.adoc'},no-includes)
   end
@@ -81,10 +72,7 @@ describe Asciidoctor::Reducer::IncludeMapper do
       end
       EOS
 
-      reduce_options extensions: (proc do
-        next if document.options[:reduced]
-        tree_processor ext_class
-      end)
+      reduce_options extensions: proc { tree_processor ext_class unless document.options[:reduced] }
     end.run
     (expect doc.source_lines[-1]).to eql '//# includes=single-line-paragraph'
   end

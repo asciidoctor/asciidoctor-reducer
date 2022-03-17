@@ -26,7 +26,7 @@ describe Asciidoctor::Reducer do
   end
 
   it 'should load document with no includes' do
-    scenario, doc = create_scenario do
+    doc = (scenario = create_scenario do
       input_source <<~'EOS'
       no includes to be found here
 
@@ -34,9 +34,8 @@ describe Asciidoctor::Reducer do
       EOS
 
       expected_source input_source
-    end
+    end).run
     (expect doc.options[:reduced]).to be_falsy
-    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 2
     (expect doc.sourcemap).to be true
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3]
@@ -717,9 +716,7 @@ describe Asciidoctor::Reducer do
       after includes
       EOS
 
-      reduce_options extensions: (proc do
-        include_processor { process { next } }
-      end)
+      reduce_options extensions: proc { include_processor { process { next } } }
 
       expected_source <<~'EOS'
       before includes
@@ -745,9 +742,7 @@ describe Asciidoctor::Reducer do
       after includes
       EOS
 
-      reduce_options safe: :secure, extensions: (proc do
-        include_processor { process { next } }
-      end)
+      reduce_options safe: :secure, extensions: proc { include_processor { process { next } } }
 
       expected_source <<~'EOS'
       before includes
