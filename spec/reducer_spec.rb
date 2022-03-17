@@ -46,7 +46,7 @@ describe Asciidoctor::Reducer do
   end
 
   it 'should not enable sourcemap on document with no includes' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       no includes to be found here
 
@@ -56,15 +56,14 @@ describe Asciidoctor::Reducer do
       reduce_options sourcemap: false
 
       expected_source input_source
-    end
+    end.run
     (expect doc.options[:reduced]).to be_falsy
-    (expect doc).to have_source scenario.expected_source
     (expect doc.sourcemap).to be_falsy
     (expect doc.blocks[0].source_location).to be_nil
   end
 
   it 'should resolve top-level include with no nested includes' do
-    scenario, doc = create_scenario do
+    doc = (scenario = create_scenario do
       input_source <<~'EOS'
       before include
 
@@ -82,9 +81,8 @@ describe Asciidoctor::Reducer do
 
       after include
       EOS
-    end
+    end).run
     (expect doc.options[:reduced]).to be true
-    (expect doc).to have_source scenario.expected_source
     (expect doc.blocks).to have_size 4
     (expect doc.sourcemap).to be true
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
@@ -97,7 +95,7 @@ describe Asciidoctor::Reducer do
   end
 
   it 'should not enable sourcemap on reduced document' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       before include
 
@@ -117,16 +115,15 @@ describe Asciidoctor::Reducer do
 
       after include
       EOS
-    end
+    end.run
     (expect doc.options[:reduced]).to be_falsy
-    (expect doc).to have_source scenario.expected_source
     (expect doc.sourcemap).to be_falsy
     (expect doc.blocks[0].source_location).to be_nil
   end
 
   it 'should not reload document with includes if sourcemap is not enabled' do
     docs = []
-    scenario, doc = create_scenario do
+    reduced_doc = create_scenario do
       input_source <<~'EOS'
       before include
 
@@ -154,15 +151,14 @@ describe Asciidoctor::Reducer do
 
       after include
       EOS
-    end
+    end.run
     (expect docs).to have_size 1
-    (expect docs[0].object_id).to eql doc.object_id
-    (expect doc).to have_source scenario.expected_source
-    (expect doc.catalog[:includes]['no-includes']).to be true
+    (expect docs[0].object_id).to eql reduced_doc.object_id
+    (expect reduced_doc.catalog[:includes]['no-includes']).to be true
   end
 
   it 'should resolve top-level include with nested include' do
-    scenario, doc = create_scenario do
+    doc = (scenario = create_scenario do
       include_file = create_include_file <<~'EOS'
       before nested include
 
@@ -192,8 +188,7 @@ describe Asciidoctor::Reducer do
 
       after include
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end).run
     (expect doc.blocks).to have_size 6
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9, 11]
     (expect (doc.blocks.map {|it| it.file }).uniq).to eql [scenario.input_file]
@@ -218,7 +213,7 @@ describe Asciidoctor::Reducer do
   end
 
   it 'should resolve include with single line paragraph' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       before include
 
@@ -234,14 +229,13 @@ describe Asciidoctor::Reducer do
 
       after include
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
 
   it 'should skip escaped include' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       before include
 
@@ -251,14 +245,13 @@ describe Asciidoctor::Reducer do
       EOS
 
       expected_source input_source
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
 
   it 'should resolve include at start of document' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       include::single-line-paragraph.adoc[]
 
@@ -270,14 +263,13 @@ describe Asciidoctor::Reducer do
 
       after include
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     (expect doc.blocks).to have_size 2
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3]
   end
 
   it 'should resolve include at end of document' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       before include
 
@@ -289,14 +281,13 @@ describe Asciidoctor::Reducer do
 
       single line paragraph
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     (expect doc.blocks).to have_size 2
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3]
   end
 
   it 'should resolve include with multiline paragraph' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       before include
 
@@ -314,14 +305,13 @@ describe Asciidoctor::Reducer do
 
       after include
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 7]
   end
 
   it 'should resolve include with multiple paragraphs' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       before include
 
@@ -340,14 +330,13 @@ describe Asciidoctor::Reducer do
 
       after include
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     (expect doc.blocks).to have_size 4
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 8]
   end
 
   it 'should resolve adjacent includes' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       before include
 
@@ -365,14 +354,13 @@ describe Asciidoctor::Reducer do
 
       after include
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 6]
   end
 
   it 'should resolve include that follows include with nested include' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       before
 
@@ -404,14 +392,13 @@ describe Asciidoctor::Reducer do
 
       after
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     (expect doc.blocks).to have_size 9
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9, 11, 13, 15, 17]
   end
 
   it 'should assign same line number to preamble and its paragraph' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       = Document Title
 
@@ -431,8 +418,7 @@ describe Asciidoctor::Reducer do
 
       == Chapter B
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     blocks = doc.find_by {|it| it.context != :document }
     (expect blocks).to have_size 5
     (expect (blocks.map {|it| it.lineno })).to eql [1, 3, 3, 5, 7]
@@ -577,7 +563,7 @@ describe Asciidoctor::Reducer do
   end
 
   it 'should reduce includes when safe mode is server' do
-    scenario, doc = create_scenario do
+    doc = (scenario = create_scenario do
       input_source <<~'EOS'
       before include
 
@@ -595,8 +581,7 @@ describe Asciidoctor::Reducer do
 
       after include
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end).run
     input_file = scenario.input_file
     (expect doc.attr 'docname').to eql (File.basename input_file, '.adoc')
     (expect doc.attr 'docfile').to eql (File.basename input_file)
@@ -606,7 +591,7 @@ describe Asciidoctor::Reducer do
   end
 
   it 'should replace includes with links if safe mode is secure' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       before includes
 
@@ -628,14 +613,13 @@ describe Asciidoctor::Reducer do
 
       after includes
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     (expect doc.blocks).to have_size 4
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
   end
 
   it 'should replace include with link if target is URL and allow-uri-read is not set' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       before include
 
@@ -651,8 +635,7 @@ describe Asciidoctor::Reducer do
 
       after include
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
@@ -706,7 +689,7 @@ describe Asciidoctor::Reducer do
   end
 
   it 'should not process link macro following include skipped by include processor when safe mode is not secure' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       before includes
 
@@ -725,14 +708,13 @@ describe Asciidoctor::Reducer do
 
       after includes
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
 
   it 'should not process link macro following include skipped by include processor when safe mode is secure' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       before includes
 
@@ -751,14 +733,13 @@ describe Asciidoctor::Reducer do
 
       after includes
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
 
   it 'should skip empty include' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       before include
       include::empty.adoc[]
@@ -769,14 +750,13 @@ describe Asciidoctor::Reducer do
       before include
       after include
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     (expect doc.blocks).to have_size 1
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1]
   end
 
   it 'should resolve include after empty include' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       before includes
 
@@ -799,14 +779,13 @@ describe Asciidoctor::Reducer do
 
       after includes
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     (expect doc.blocks).to have_size 4
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 4, 6, 8]
   end
 
   it 'should skip nested empty include' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       include_file = create_include_file <<~'EOS'
       before include
       include::empty.adoc[]
@@ -829,14 +808,13 @@ describe Asciidoctor::Reducer do
 
       after top-level include
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 6]
   end
 
   it 'should remove trailing empty lines when sourcemap is enabled' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       before include
 
@@ -845,14 +823,13 @@ describe Asciidoctor::Reducer do
       EOS
 
       expected_source 'before include'
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     (expect doc.blocks).to have_size 1
     (expect doc.blocks[0].lineno).to eql 1
   end
 
   it 'should remove trailing empty lines when sourcemap is not enabled' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       before include
 
@@ -863,26 +840,24 @@ describe Asciidoctor::Reducer do
       reduce_options sourcemap: false
 
       expected_source 'before include'
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     (expect doc.blocks).to have_size 1
   end
 
   it 'should not crash if reduced document is empty' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source 'include::empty.adoc[]'
 
       reduce_options sourcemap: false
 
       expected_source ''
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     (expect doc.blocks).to be_empty
   end
 
   it 'should skip include that custom include processor handles but does not push' do
     described_class::Extensions.register
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       before include
 
@@ -901,8 +876,7 @@ describe Asciidoctor::Reducer do
 
       after include
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     (expect doc.blocks).to have_size 2
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 4]
   ensure
@@ -910,7 +884,7 @@ describe Asciidoctor::Reducer do
   end
 
   it 'should include lines pushed by custom include processor' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       before include
 
@@ -936,15 +910,13 @@ describe Asciidoctor::Reducer do
 
       after include
       EOS
-    end
-
-    (expect doc).to have_source scenario.expected_source
+    end.run
     (expect doc.blocks).to have_size 4
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
   end
 
   it 'should include lines pushed by custom include processor when safe mode is secure' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       before include
 
@@ -970,15 +942,13 @@ describe Asciidoctor::Reducer do
 
       after include
       EOS
-    end
-
-    (expect doc).to have_source scenario.expected_source
+    end.run
     (expect doc.blocks).to have_size 4
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
   end
 
   it 'should not replace lines if the target line does not match the expected line' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       before include
 
@@ -1006,16 +976,14 @@ describe Asciidoctor::Reducer do
 
       after include
       EOS
-    end
-
-    (expect doc).to have_source scenario.expected_source
+    end.run
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
 
   it 'should not rebuild document if no includes are found' do
     captured_interim_doc = nil
-    scenario = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       no includes to be found
 
@@ -1031,12 +999,12 @@ describe Asciidoctor::Reducer do
           end
         end
       end)
-    end
-    (expect scenario.doc).to be captured_interim_doc
+    end.run
+    (expect captured_interim_doc).to be doc
   end
 
   it 'should resolve include with tag' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       before include
 
@@ -1054,14 +1022,13 @@ describe Asciidoctor::Reducer do
 
       after include
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     (expect doc.blocks).to have_size 4
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
   end
 
   it 'should resolve include with tags' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       before include
 
@@ -1078,14 +1045,13 @@ describe Asciidoctor::Reducer do
 
       after include
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 6]
   end
 
   it 'should resolve include with lines' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       before include
 
@@ -1106,14 +1072,13 @@ describe Asciidoctor::Reducer do
 
       after include
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     (expect doc.blocks).to have_size 5
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 8, 10]
   end
 
   it 'should resolve include with leveloffset' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       == Section
 
@@ -1135,15 +1100,14 @@ describe Asciidoctor::Reducer do
 
       == Another Section
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     blocks = doc.find_by context: :section
     (expect blocks).to have_size 4
     (expect (blocks.map {|it| it.lineno })).to eql [1, 5, 7, 11]
   end
 
   it 'should resolve include between leveloffset attribute entries' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       == Section
 
@@ -1165,15 +1129,14 @@ describe Asciidoctor::Reducer do
       :!leveloffset:
       == Another Section
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     blocks = doc.find_by {|it| it.context != :document }
     (expect blocks).to have_size 4
     (expect (blocks.map {|it| it.lineno })).to eql [1, 4, 6, 9]
   end
 
   it 'should preserve attribute entries in the document header' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       = Document Title
       :sectnums:
@@ -1199,8 +1162,7 @@ describe Asciidoctor::Reducer do
 
       after include
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [6, 8, 10]
     (expect (doc.attr? 'sectnums')).to be true
@@ -1209,7 +1171,7 @@ describe Asciidoctor::Reducer do
   end
 
   it 'should use attribute defined in header when resolving include' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       = Book Title
       :chaptersdir: chapters
@@ -1225,15 +1187,14 @@ describe Asciidoctor::Reducer do
 
       content
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     blocks = doc.find_by {|it| it.context != :document }
     (expect blocks).to have_size 3
     (expect (blocks.map {|it| it.lineno })).to eql [1, 4, 6]
   end
 
   it 'should use attribute defined in body when resolving include' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       = Book Title
       :doctype: book
@@ -1264,15 +1225,14 @@ describe Asciidoctor::Reducer do
 
       content
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     blocks = doc.find_by {|it| it.context != :document }
     (expect blocks).to have_size 7
     (expect (blocks.map {|it| it.lineno })).to eql [1, 4, 4, 7, 9, 13, 15]
   end
 
   it 'should use attribute defined inside preprocessor conditional header when resolving include' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       = Book Title
       ifndef::chaptersdir[:chaptersdir: chapters]
@@ -1288,15 +1248,14 @@ describe Asciidoctor::Reducer do
 
       content
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     blocks = doc.find_by {|it| it.context != :document }
     (expect blocks).to have_size 3
     (expect (blocks.map {|it| it.lineno })).to eql [1, 4, 6]
   end
 
   it 'should use attribute passed to API when resolving include' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       = Book Title
 
@@ -1312,15 +1271,14 @@ describe Asciidoctor::Reducer do
 
       content
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     blocks = doc.find_by {|it| it.context != :document }
     (expect blocks).to have_size 3
     (expect (blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
 
   it 'should use attribute passed to API when resolving attribute value on include directive' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       before include
 
@@ -1340,15 +1298,14 @@ describe Asciidoctor::Reducer do
 
       after include
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     (expect doc.blocks).to have_size 4
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
   end
 
   it 'should skip include when attribute in target cannot be resolved and attribute-missing=drop-line' do
     with_memory_logger do |logger|
-      scenario, doc = create_scenario do
+      doc = create_scenario do
         input_source <<~'EOS'
         = Book Title
 
@@ -1358,8 +1315,7 @@ describe Asciidoctor::Reducer do
         reduce_options attributes: 'attribute-missing=drop-line'
 
         expected_source '= Book Title'
-      end
-      (expect doc).to have_source scenario.expected_source
+      end.run
       (expect doc.lineno).to eql 1
       messages = logger.messages
       (expect messages).to have_size 2
@@ -1369,7 +1325,7 @@ describe Asciidoctor::Reducer do
   end
 
   it 'should drop lines containing preprocessor directive when condition resolves to true' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       before include
 
@@ -1388,14 +1344,13 @@ describe Asciidoctor::Reducer do
 
       after include
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 6]
   end
 
   it 'should drop lines from start to end preprocessor directive when condition resolves to false' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       before include
 
@@ -1411,14 +1366,13 @@ describe Asciidoctor::Reducer do
 
       after include
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
 
   it 'should drop single line preprocessor conditional that resolves to false' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       = Book Title
       ifndef::chaptersdir[:chaptersdir: chapters]
@@ -1435,15 +1389,14 @@ describe Asciidoctor::Reducer do
 
       content
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     blocks = doc.find_by {|it| it.context != :document }
     (expect blocks).to have_size 3
     (expect (blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
 
   it 'should reduce preprocessor conditional following a nested include' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       before include
 
@@ -1467,15 +1420,14 @@ describe Asciidoctor::Reducer do
 
       after include
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     blocks = doc.blocks
     (expect blocks).to have_size 6
     (expect (blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9, 11]
   end
 
   it 'should resolve include inside true preprocessor conditional' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       :flag:
 
@@ -1497,14 +1449,13 @@ describe Asciidoctor::Reducer do
 
       after include
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [3, 5, 7]
   end
 
   it 'should not resolve include inside false preprocessor conditional' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       before include
 
@@ -1521,14 +1472,13 @@ describe Asciidoctor::Reducer do
 
       after include
       EOS
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     (expect doc.blocks).to have_size 2
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3]
   end
 
   it 'should keep preprocessor conditional if :preserve_conditionals option is set' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source <<~'EOS'
       before include
 
@@ -1543,21 +1493,19 @@ describe Asciidoctor::Reducer do
       reduce_options preserve_conditionals: true
 
       expected_source input_source
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     (expect doc.blocks).to have_size 2
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 8]
   end
 
   it 'should keep single line preprocessor conditional if :preserve_conditionals option is set and no includes' do
-    scenario, doc = create_scenario do
+    doc = create_scenario do
       input_source 'ifdef::asciidoctor-version[text]'
 
       reduce_options preserve_conditionals: true
 
       expected_source input_source
-    end
-    (expect doc).to have_source scenario.expected_source
+    end.run
     (expect doc.blocks).to have_size 1
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1]
   end

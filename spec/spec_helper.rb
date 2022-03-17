@@ -35,6 +35,8 @@ class ScenarioBuilder
   UNDEFINED = ::Object.new
   private_constant :UNDEFINED
 
+  attr_reader :result
+
   def initialize
     @example = nil
     @expected_source = @input_file = @input_source = @output_file = @verify = nil
@@ -68,10 +70,6 @@ class ScenarioBuilder
 
   def create_input_file source
     create_file %w(main- .adoc), source
-  end
-
-  def doc
-    (instance_variable_defined? :@result) ? @result : run
   end
 
   def expected_source source = UNDEFINED
@@ -125,10 +123,6 @@ class ScenarioBuilder
     @example = nil
     @files.each {|it| File.unlink it }
     freeze
-  end
-
-  def to_ary
-    [self, doc]
   end
 
   def verify &block
