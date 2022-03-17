@@ -33,7 +33,7 @@ describe Asciidoctor::Reducer do
     subject { described_class.method :reduce }
 
     it 'should reduce input when no options are specified' do
-      create_scenario do
+      run_scenario do
         input_source <<~'END'
         primary content
         ifdef::flag[]
@@ -42,7 +42,7 @@ describe Asciidoctor::Reducer do
         END
         reduce { subject.call input_source }
         expected_source 'primary content'
-      end.run
+      end
     end
 
     it 'should reduce input specified as File object' do
@@ -62,7 +62,7 @@ describe Asciidoctor::Reducer do
     subject { described_class.method :reduce_file }
 
     it 'should reduce input when no options are specified' do
-      create_scenario do
+      run_scenario do
         input_source <<~'END'
         primary content
         ifdef::flag[]
@@ -71,49 +71,49 @@ describe Asciidoctor::Reducer do
         END
         reduce { subject.call input_file }
         expected_source 'primary content'
-      end.run
+      end
     end
   end
 
   context ':to option' do
     it 'should reduce input to file at path specified by :to option' do
       with_tmp_file tmpdir: output_dir do |the_output_file|
-        create_scenario do
+        run_scenario do
           input_source the_input_source
           output_file the_output_file
           reduce { subject.reduce_file input_file, to: the_output_file.path }
           expected_source the_expected_source
-        end.run
+        end
       end
     end
 
     it 'should reduce input to file for Pathname specified by :to option' do
       with_tmp_file tmpdir: output_dir do |the_output_file|
-        create_scenario do
+        run_scenario do
           input_source the_input_source
           output_file the_output_file
           reduce { subject.reduce_file input_file, to: (Pathname.new the_output_file.path) }
           expected_source the_expected_source
-        end.run
+        end
       end
     end
 
     it 'should reduce input to string if :to option is String' do
-      create_scenario do
+      run_scenario do
         input_source the_input_source
         reduce { subject.reduce_file input_file, to: String }
         expected_source the_expected_source
-      end.run
+      end
     end
 
     it 'should reduce input and send to write method if :to option is IO' do
       to = StringIO.new
-      create_scenario do
+      run_scenario do
         input_source the_input_source
         output_file to
         reduce { subject.reduce_file input_file, to: to }
         expected_source the_expected_source
-      end.run
+      end
     end
 
     it 'should reduce input and send to write method if :to option value responds to write' do
@@ -128,28 +128,28 @@ describe Asciidoctor::Reducer do
           @string = string
         end
       end.new
-      create_scenario do
+      run_scenario do
         input_source the_input_source
         output_file to
         reduce { subject.reduce_file input_file, to: to }
         expected_source the_expected_source
-      end.run
+      end
     end
 
     it 'should reduce input but not write if :to option is /dev/null' do
-      create_scenario do
+      run_scenario do
         input_source the_input_source
         reduce { subject.reduce_file input_file, to: '/dev/null' }
         expected_source the_expected_source
-      end.run
+      end
     end
 
     it 'should reduce input but not write if :to option is nil' do
-      create_scenario do
+      run_scenario do
         input_source the_input_source
         reduce { subject.reduce_file input_file, to: nil }
         expected_source the_expected_source
-      end.run
+      end
     end
   end
 

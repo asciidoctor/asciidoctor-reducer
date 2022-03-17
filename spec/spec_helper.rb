@@ -154,6 +154,10 @@ RSpec.configure do |config|
     ScenarioBuilder.new.build(&block)
   end
 
+  def run_scenario &block
+    create_scenario(&block).run
+  end
+
   def fixtures_dir
     File.join __dir__, 'fixtures'
   end

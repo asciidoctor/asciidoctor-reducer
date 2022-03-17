@@ -6,7 +6,7 @@ require 'asciidoctor/reducer/include_mapper/extension'
 describe Asciidoctor::Reducer::IncludeMapper do
   it 'should not add include mapping comment if document has no includes' do
     ext_class = described_class
-    doc = create_scenario do
+    doc = run_scenario do
       input_source <<~'END'
       no includes here
 
@@ -14,13 +14,13 @@ describe Asciidoctor::Reducer::IncludeMapper do
       END
 
       reduce_options extensions: proc { tree_processor ext_class unless document.options[:reduced] }
-    end.run
+    end
     (expect doc.source_lines[-1]).to eql 'not a single one'
   end
 
   it 'should not add include mapping comment if document only has partial includes' do
     ext_class = described_class
-    doc = create_scenario do
+    doc = run_scenario do
       input_source <<~'END'
       before include
 
@@ -30,14 +30,14 @@ describe Asciidoctor::Reducer::IncludeMapper do
       END
 
       reduce_options extensions: proc { tree_processor ext_class unless document.options[:reduced] }
-    end.run
+    end
     (expect doc.source_lines[-1]).to eql 'after include'
   end
 
   it 'should add include mapping comment to bottom of reduced file' do
     ext_class = described_class
     include_file = nil
-    doc = create_scenario do
+    doc = run_scenario do
       include_file = create_include_file <<~'END'
       before nested include
 
@@ -55,13 +55,13 @@ describe Asciidoctor::Reducer::IncludeMapper do
       END
 
       reduce_options extensions: proc { tree_processor ext_class unless document.options[:reduced] }
-    end.run
+    end
     (expect doc.source_lines[-1]).to eql %(//# includes=#{File.basename include_file, '.adoc'},no-includes)
   end
 
   it 'should only add entries to include mapping comment that are included fully' do
     ext_class = described_class
-    doc = create_scenario do
+    doc = run_scenario do
       input_source <<~'END'
       beginning
 
@@ -73,7 +73,7 @@ describe Asciidoctor::Reducer::IncludeMapper do
       END
 
       reduce_options extensions: proc { tree_processor ext_class unless document.options[:reduced] }
-    end.run
+    end
     (expect doc.source_lines[-1]).to eql '//# includes=single-line-paragraph'
   end
 
@@ -118,7 +118,7 @@ describe Asciidoctor::Reducer::IncludeMapper do
     groups_size = Asciidoctor::Extensions.groups.size
     (expect require 'asciidoctor/reducer/include_mapper').not_to be_nil
     (expect Asciidoctor::Extensions.groups.size).to be > groups_size
-    doc = create_scenario do
+    doc = run_scenario do
       input_source <<~'END'
       before include
 
@@ -126,7 +126,7 @@ describe Asciidoctor::Reducer::IncludeMapper do
 
       after include
       END
-    end.run
+    end
     (expect doc.source_lines[-1]).to eql '//# includes=no-includes'
   ensure
     Asciidoctor::Extensions.unregister Asciidoctor::Extensions.groups.keys.last
