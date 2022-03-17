@@ -46,11 +46,12 @@ describe Asciidoctor::Reducer do
     end
 
     it 'should reduce input specified as File object' do
-      doc = (scenario = create_scenario do
+      scenario = create_scenario do
         input_source the_input_source
         reduce { File.open(input_file, mode: 'r:UTF-8') {|f| subject.call f } }
         expected_source the_expected_source
-      end).run
+      end
+      doc = scenario.run
       input_file = scenario.input_file
       (expect doc.attr 'docname').to eql (File.basename input_file, '.adoc')
       (expect doc.attr 'docfile').to eql input_file
