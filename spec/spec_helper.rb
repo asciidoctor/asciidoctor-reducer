@@ -118,7 +118,7 @@ class ScenarioBuilder
     arg1 == UNDEFINED ? @reduce_options : (@reduce_options = [arg1] + argv)
   end
 
-  def run &block
+  def run
     @verify&.call if (@result = @input_source ? @reduce&.call : nil)
     @result
   ensure
