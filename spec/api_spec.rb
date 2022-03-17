@@ -33,7 +33,7 @@ describe Asciidoctor::Reducer do
     subject { described_class.method :reduce }
 
     it 'should reduce input when no options are specified' do
-      scenario = create_scenario do
+      create_scenario do
         input_source <<~'EOS'
         primary content
         ifdef::flag[]
@@ -42,17 +42,15 @@ describe Asciidoctor::Reducer do
         EOS
         reduce { subject.call input_source }
         expected_source 'primary content'
-      end
-      (expect scenario.doc).to have_source scenario.expected_source
+      end.run
     end
 
     it 'should reduce input specified as File object' do
-      scenario, doc = create_scenario do
+      doc = (scenario = create_scenario do
         input_source the_input_source
         reduce { File.open(input_file, mode: 'r:UTF-8') {|f| subject.call f } }
         expected_source the_expected_source
-      end
-      (expect doc).to have_source scenario.expected_source
+      end).run
       input_file = scenario.input_file
       (expect doc.attr 'docname').to eql (File.basename input_file, '.adoc')
       (expect doc.attr 'docfile').to eql input_file
@@ -64,7 +62,7 @@ describe Asciidoctor::Reducer do
     subject { described_class.method :reduce_file }
 
     it 'should reduce input when no options are specified' do
-      scenario, doc = create_scenario do
+      create_scenario do
         input_source <<~'EOS'
         primary content
         ifdef::flag[]
@@ -73,54 +71,49 @@ describe Asciidoctor::Reducer do
         EOS
         reduce { subject.call input_file }
         expected_source 'primary content'
-      end
-      (expect doc).to have_source scenario.expected_source
+      end.run
     end
   end
 
   context ':to option' do
     it 'should reduce input to file at path specified by :to option' do
       with_tmp_file tmpdir: output_dir do |the_output_file|
-        scenario = create_scenario do
+        create_scenario do
           input_source the_input_source
+          output_file the_output_file
           reduce { subject.reduce_file input_file, to: the_output_file.path }
           expected_source the_expected_source
-        end
-
-        (expect the_output_file.read.chomp).to eql scenario.expected_source
+        end.run
       end
     end
 
     it 'should reduce input to file for Pathname specified by :to option' do
       with_tmp_file tmpdir: output_dir do |the_output_file|
-        scenario = create_scenario do
+        create_scenario do
           input_source the_input_source
+          output_file the_output_file
           reduce { subject.reduce_file input_file, to: (Pathname.new the_output_file.path) }
           expected_source the_expected_source
-        end
-
-        (expect the_output_file.read.chomp).to eql scenario.expected_source
+        end.run
       end
     end
 
     it 'should reduce input to string if :to option is String' do
-      scenario, result = create_scenario do
+      create_scenario do
         input_source the_input_source
         reduce { subject.reduce_file input_file, to: String }
         expected_source the_expected_source
-      end
-      (expect result).to eql scenario.expected_source
+      end.run
     end
 
     it 'should reduce input and send to write method if :to option is IO' do
       to = StringIO.new
-      scenario = create_scenario do
+      create_scenario do
         input_source the_input_source
+        output_file to
         reduce { subject.reduce_file input_file, to: to }
         expected_source the_expected_source
-      end
-
-      (expect to.string).to eql (scenario.expected_source + ?\n)
+      end.run
     end
 
     it 'should reduce input and send to write method if :to option value responds to write' do
@@ -135,30 +128,28 @@ describe Asciidoctor::Reducer do
           @string = string
         end
       end).new
-      scenario = create_scenario do
+      create_scenario do
         input_source the_input_source
+        output_file to
         reduce { subject.reduce_file input_file, to: to }
         expected_source the_expected_source
-      end
-      (expect to.string).to eql (scenario.expected_source + ?\n)
+      end.run
     end
 
     it 'should reduce input but not write if :to option is /dev/null' do
-      scenario, doc = create_scenario do
+      create_scenario do
         input_source the_input_source
         reduce { subject.reduce_file input_file, to: '/dev/null' }
         expected_source the_expected_source
-      end
-      (expect doc).to have_source scenario.expected_source
+      end.run
     end
 
     it 'should reduce input but not write if :to option is nil' do
-      scenario, doc = create_scenario do
+      create_scenario do
         input_source the_input_source
         reduce { subject.reduce_file input_file, to: nil }
         expected_source the_expected_source
-      end
-      (expect doc).to have_source scenario.expected_source
+      end.run
     end
   end
 

@@ -30,19 +30,23 @@ end
 
 class ScenarioBuilder
   extend Forwardable
-  def_delegators :@example, :subject, :described_class, :the_input_source, :the_expected_source
-
-  attr_reader :doc
+  def_delegators :@example, :described_class, :subject, :the_expected_source, :the_input_source
 
   UNDEFINED = ::Object.new
   private_constant :UNDEFINED
 
   def initialize
     @example = nil
-    @expected_source = @input_file = @input_source = nil
+    @expected_source = @input_file = @input_source = @output_file = @verify = nil
     @files = []
     @reduce = proc { reduce_file input_file, *@reduce_options }
     @reduce_options = []
+  end
+
+  def build &block
+    @example = block.binding.receiver
+    instance_exec(&block)
+    self
   end
 
   def create_file filename, contents
@@ -66,8 +70,32 @@ class ScenarioBuilder
     create_file %w(main- .adoc), source
   end
 
+  def doc
+    (instance_variable_defined? :@result) ? @result : run
+  end
+
   def expected_source source = UNDEFINED
-    source == UNDEFINED ? @expected_source : (@expected_source = source.chomp)
+    return @expected_source if source == UNDEFINED
+    @expected_source = source.chomp
+    verify do
+      case @result
+      when Asciidoctor::Document
+        (@example.expect @result).to @example.have_source @expected_source
+        if @output_file
+          if @output_file.respond_to? :string
+            actual_source = @output_file.string
+          else
+            @output_file.rewind if @output_file.eof?
+            actual_source = @output_file.read
+            @output_file.rewind
+          end
+          (@example.expect actual_source).to @example.eql @expected_source + ?\n
+        end
+      when String
+        (@example.expect @result).to @example.eql @expected_source
+      end
+    end
+    @expected_source
   end
 
   def input_file
@@ -76,6 +104,10 @@ class ScenarioBuilder
 
   def input_source source = UNDEFINED
     source == UNDEFINED ? @input_source : (@input_source = source.chomp)
+  end
+
+  def output_file file = UNDEFINED
+    file == UNDEFINED ? @output_file : (@output_file = file)
   end
 
   def reduce value = true, &block
@@ -87,12 +119,8 @@ class ScenarioBuilder
   end
 
   def run &block
-    @example = block.binding.receiver
-    instance_exec(&block)
-    if @input_source && @reduce
-      @doc = @reduce.call
-    end
-    self
+    @verify&.call if (@result = @input_source ? @reduce&.call : nil)
+    @result
   ensure
     @example = nil
     @files.each {|it| File.unlink it }
@@ -100,7 +128,11 @@ class ScenarioBuilder
   end
 
   def to_ary
-    [self, @doc]
+    [self, doc]
+  end
+
+  def verify &block
+    @verify = block
   end
 end
 
@@ -125,7 +157,7 @@ RSpec.configure do |config|
   end
 
   def create_scenario &block
-    ScenarioBuilder.new.run(&block)
+    ScenarioBuilder.new.build(&block)
   end
 
   def fixtures_dir
