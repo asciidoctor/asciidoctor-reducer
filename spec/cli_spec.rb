@@ -128,19 +128,19 @@ describe Asciidoctor::Reducer::Cli do
 
     it 'should allow runtime attribute to be specified using -a option' do
       with_tmp_file do |the_source_file|
-        the_source_file.write <<~'EOS'
+        the_source_file.write <<~'END'
         = Book Title
 
         include::{chaptersdir}/ch1.adoc[]
-        EOS
+        END
         the_source_file.close
-        expected_source = <<~'EOS'.chomp
+        expected_source = <<~'END'.chomp
         = Book Title
 
         == Chapter One
 
         content
-        EOS
+        END
         (expect subject.run [the_source_file, '-a', 'chaptersdir=chapters', '-a', 'doctitle=Untitled']).to eql 0
         (expect $stdout.string.chomp).to eql expected_source
       end
@@ -148,41 +148,41 @@ describe Asciidoctor::Reducer::Cli do
 
     it 'should set attribute value to empty string if only name is passed to -a option' do
       the_source_file = fixture_file 'preprocessor-conditional.adoc'
-      expected = <<~'EOS'.chomp
+      expected = <<~'END'.chomp
       primary content
       conditional content
-      EOS
+      END
       (expect subject.run [the_source_file, '-a', 'flag']).to eql 0
       (expect $stdout.string.chomp).to eql expected
     end
 
     it 'should reduce preprocessor conditionals by default' do
       the_source_file = fixture_file 'single-line-preprocessor-conditional.adoc'
-      expected = <<~'EOS'.chomp
+      expected = <<~'END'.chomp
       text
-      EOS
+      END
       (expect subject.run [the_source_file]).to eql 0
       (expect $stdout.string.chomp).to eql expected
     end
 
     it 'should preserve preprocessor conditionals if --preserve-conditionals option is specified' do
       the_source_file = fixture_file 'single-line-preprocessor-conditional.adoc'
-      expected = <<~'EOS'.chomp
+      expected = <<~'END'.chomp
       ifdef::asciidoctor-version[text]
-      EOS
+      END
       (expect subject.run [the_source_file, '--preserve-conditionals']).to eql 0
       (expect $stdout.string.chomp).to eql expected
     end
 
     it 'should set level on logger to higher value specified by --log-level option' do
       the_source_file = fixture_file 'parent-with-unresolved-include.adoc'
-      expected = <<~'EOS'.chomp
+      expected = <<~'END'.chomp
       before include
 
       Unresolved directive in parent-with-unresolved-include.adoc - include::no-such-file.adoc[]
 
       after include
-      EOS
+      END
       (expect subject.run [the_source_file, '--log-level', 'fatal']).to eql 0
       (expect $stderr.string.chomp).to be_empty
       (expect $stdout.string.chomp).to eql expected
@@ -190,12 +190,12 @@ describe Asciidoctor::Reducer::Cli do
 
     it 'should ignore --log-level option if value is warn' do
       the_source_file = fixture_file 'parent-with-optional-unresolved-include.adoc'
-      expected = <<~'EOS'.chomp
+      expected = <<~'END'.chomp
       before include
 
 
       after include
-      EOS
+      END
       (expect subject.run [the_source_file, '--log-level', 'warn']).to eql 0
       (expect $stderr.string.chomp).to be_empty
       (expect $stdout.string.chomp).to eql expected
@@ -203,12 +203,12 @@ describe Asciidoctor::Reducer::Cli do
 
     it 'should set level on logger to lower value specified by --log-level option' do
       the_source_file = fixture_file 'parent-with-optional-unresolved-include.adoc'
-      expected = <<~'EOS'.chomp
+      expected = <<~'END'.chomp
       before include
 
 
       after include
-      EOS
+      END
       (expect subject.run [the_source_file, '--log-level', 'info']).to eql 0
       (expect $stderr.string.chomp).to include 'optional include dropped'
       (expect $stdout.string.chomp).to eql expected
@@ -216,13 +216,13 @@ describe Asciidoctor::Reducer::Cli do
 
     it 'should suppress log messages when -q option is specified' do
       the_source_file = fixture_file 'parent-with-unresolved-include.adoc'
-      expected = <<~'EOS'.chomp
+      expected = <<~'END'.chomp
       before include
 
       Unresolved directive in parent-with-unresolved-include.adoc - include::no-such-file.adoc[]
 
       after include
-      EOS
+      END
       (expect subject.run [the_source_file, '-q']).to eql 0
       (expect $stderr.string.chomp).to be_empty
       (expect $stdout.string.chomp).to eql expected
@@ -318,12 +318,12 @@ describe Asciidoctor::Reducer::Cli do
   context 'error' do
     it 'should suggest --trace option if application ends in error' do
       the_source_file = fixture_file 'parent-with-single-include.adoc'
-      ext_source = <<~'EOS'
+      ext_source = <<~'END'
       Asciidoctor::Extensions.register do
         tree_processor do
         end
       end
-      EOS
+      END
       with_tmp_file '.rb' do |the_ext_file|
         the_ext_file.write ext_source
         the_ext_file.flush
@@ -339,12 +339,12 @@ describe Asciidoctor::Reducer::Cli do
 
     it 'should show backtrace of error if --trace option is specifed' do
       the_source_file = fixture_file 'parent-with-single-include.adoc'
-      ext_source = <<~'EOS'
+      ext_source = <<~'END'
       Asciidoctor::Extensions.register do
         tree_processor do
         end
       end
-      EOS
+      END
       with_tmp_file '.rb' do |the_ext_file|
         the_ext_file.write ext_source
         the_ext_file.flush

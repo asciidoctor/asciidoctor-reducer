@@ -14,12 +14,12 @@ module Asciidoctor::Reducer
 
       opt_parser = ::OptionParser.new do |opts|
         opts.program_name = 'asciidoctor-reducer'
-        opts.banner = <<~EOS
+        opts.banner = <<~END
         Usage: #{opts.program_name} [OPTION]... FILE
 
         Reduces a composite AsciiDoc document containing includes and conditionals to a single AsciiDoc document.
 
-        EOS
+        END
 
         opts.on '-a KEY[=VALUE]', '--attribute=KEY[=VALUE]',
           'set a document attribute in the AsciiDoc document: [key, key!, key=value]' do |attr|

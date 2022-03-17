@@ -4,23 +4,23 @@ require_relative 'spec_helper'
 
 describe Asciidoctor::Reducer do
   let :the_input_source do
-    <<~'EOS'
+    <<~'END'
     before include
 
     include::single-line-paragraph.adoc[]
 
     after include
-    EOS
+    END
   end
 
   let :the_expected_source do
-    <<~'EOS'
+    <<~'END'
     before include
 
     single line paragraph
 
     after include
-    EOS
+    END
   end
 
   context 'version' do
@@ -34,12 +34,12 @@ describe Asciidoctor::Reducer do
 
     it 'should reduce input when no options are specified' do
       create_scenario do
-        input_source <<~'EOS'
+        input_source <<~'END'
         primary content
         ifdef::flag[]
         conditional content
         endif::[]
-        EOS
+        END
         reduce { subject.call input_source }
         expected_source 'primary content'
       end.run
@@ -63,12 +63,12 @@ describe Asciidoctor::Reducer do
 
     it 'should reduce input when no options are specified' do
       create_scenario do
-        input_source <<~'EOS'
+        input_source <<~'END'
         primary content
         ifdef::flag[]
         conditional content
         endif::[]
-        EOS
+        END
         reduce { subject.call input_file }
         expected_source 'primary content'
       end.run
@@ -183,7 +183,7 @@ describe Asciidoctor::Reducer do
       described_class::Extensions.register
       result = subject.reduce_file (fixture_file 'parent-with-single-include.adoc'), sourcemap: true,
         extensions: register_extension_call_tracer
-      expected_lines = <<~'EOS'.chomp.split ?\n
+      expected_lines = <<~'END'.chomp.split ?\n
       before include
 
       no includes here
@@ -191,7 +191,7 @@ describe Asciidoctor::Reducer do
       just good old-fashioned paragraph text
 
       after include
-      EOS
+      END
       (expect extension_calls).to eql [false, true]
       (expect result.source_lines).to eql expected_lines
     ensure
@@ -203,7 +203,7 @@ describe Asciidoctor::Reducer do
       ext_reg = Asciidoctor::Extensions.create(&register_extension_call_tracer)
       result = subject.reduce_file (fixture_file 'parent-with-single-include.adoc'), extension_registry: ext_reg,
         sourcemap: true
-      expected_lines = <<~'EOS'.chomp.split ?\n
+      expected_lines = <<~'END'.chomp.split ?\n
       before include
 
       no includes here
@@ -211,7 +211,7 @@ describe Asciidoctor::Reducer do
       just good old-fashioned paragraph text
 
       after include
-      EOS
+      END
       (expect result.source_lines).to eql expected_lines
       (expect ext_reg.groups[:reducer]).to be_nil
       (expect extension_calls).to eql [false, true]
@@ -224,7 +224,7 @@ describe Asciidoctor::Reducer do
       ext_reg = Asciidoctor::Extensions.create(&register_extension_call_tracer)
       result = Asciidoctor.load_file (fixture_file 'parent-with-single-include.adoc'), extension_registry: ext_reg,
         sourcemap: true, safe: :safe
-      expected_lines = <<~'EOS'.chomp.split ?\n
+      expected_lines = <<~'END'.chomp.split ?\n
       before include
 
       no includes here
@@ -232,7 +232,7 @@ describe Asciidoctor::Reducer do
       just good old-fashioned paragraph text
 
       after include
-      EOS
+      END
       (expect result.source_lines).to eql expected_lines
       (expect ext_reg.groups[:reducer]).to be_nil
       (expect extension_calls).to eql [false, true]
@@ -244,7 +244,7 @@ describe Asciidoctor::Reducer do
       ext_reg = Asciidoctor::Extensions.create(&register_extension_call_tracer)
       result = subject.reduce_file (fixture_file 'parent-with-single-include.adoc'), extension_registry: ext_reg,
         sourcemap: true
-      expected_lines = <<~'EOS'.chomp.split ?\n
+      expected_lines = <<~'END'.chomp.split ?\n
       before include
 
       no includes here
@@ -252,7 +252,7 @@ describe Asciidoctor::Reducer do
       just good old-fashioned paragraph text
 
       after include
-      EOS
+      END
       (expect result.source_lines).to eql expected_lines
       (expect ext_reg.groups[:reducer]).not_to be_nil
       (expect extension_calls).to eql [false, true]
