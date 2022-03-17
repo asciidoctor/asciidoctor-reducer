@@ -7,7 +7,7 @@ module Asciidoctor::Reducer
         unless (includes = doc.catalog[:includes].select {|_, v| v }.keys).empty?
           doc.source_lines.concat ['', %(//# includes=#{includes.join ','})]
         end
-      elsif (last_line = doc.source_lines[-1]) && (last_line.start_with? '//# includes=')
+      elsif (last_line = doc.source_lines[-1])&.start_with? '//# includes='
         doc.catalog[:includes].update ((last_line.slice 13, last_line.length).split ',').map {|it| [it, true] }.to_h
       end
       doc

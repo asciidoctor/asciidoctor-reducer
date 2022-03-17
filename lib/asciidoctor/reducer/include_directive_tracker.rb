@@ -16,7 +16,7 @@ module Asciidoctor::Reducer
       inc_lineno = @lineno # we're currently on the include line, which is 1-based
       result = super
       unless @x_reducer[:include_pushed]
-        if (ln = peek_line true) && (ln.end_with? ']') && !(unresolved = ln.start_with? 'Unresolved directive in ')
+        if ((ln = peek_line true)&.end_with? ']') && !(unresolved = ln.start_with? 'Unresolved directive in ')
           if inc_lineno == @lineno && (unresolved = ln.start_with? 'link:')
             ln = %(#{ln.slice 0, (ln.length - 1)}role=include])
           end
