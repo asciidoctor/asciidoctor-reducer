@@ -1037,7 +1037,7 @@ describe Asciidoctor::Reducer do
         end
       end)
     end
-    (expect captured_interim_doc).to be scenario.doc
+    (expect scenario.doc).to be captured_interim_doc
   end
 
   it 'should resolve include with tag' do
