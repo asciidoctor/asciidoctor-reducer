@@ -88,7 +88,18 @@ describe Asciidoctor::Reducer do
       end
     end
 
-    it 'should reduce input to file for Pathname specified by :to option' do
+    it 'should reduce input to File object specified by :to option' do
+      with_tmp_file tmpdir: output_dir do |the_output_file|
+        run_scenario do
+          input_source the_input_source
+          output_file the_output_file
+          reduce { subject.reduce_file input_file, to: the_output_file }
+          expected_source the_expected_source
+        end
+      end
+    end
+
+    it 'should reduce input to file for Pathname object specified by :to option' do
       with_tmp_file tmpdir: output_dir do |the_output_file|
         run_scenario do
           input_source the_input_source
@@ -99,7 +110,7 @@ describe Asciidoctor::Reducer do
       end
     end
 
-    it 'should reduce input to string if :to option is String' do
+    it 'should reduce input to string if :to option is String class' do
       run_scenario do
         input_source the_input_source
         reduce { subject.reduce_file input_file, to: String }
@@ -107,7 +118,7 @@ describe Asciidoctor::Reducer do
       end
     end
 
-    it 'should reduce input and send to write method if :to option is IO' do
+    it 'should reduce input and send to write method if :to option is StringIO object' do
       to = StringIO.new
       run_scenario do
         input_source the_input_source
@@ -137,7 +148,7 @@ describe Asciidoctor::Reducer do
       end
     end
 
-    it 'should reduce input but not write if :to option is /dev/null' do
+    it 'should reduce input but not write if :to option is /dev/null string' do
       run_scenario do
         input_source the_input_source
         reduce { subject.reduce_file input_file, to: '/dev/null' }
