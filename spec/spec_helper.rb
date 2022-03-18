@@ -316,12 +316,13 @@ RSpec::Matchers.define :have_message do |expected|
   end
 end
 
-RSpec::Matchers.define :log_messages do |*expecteds, using_log_level: nil|
+RSpec::Matchers.define :log_messages do |*expecteds, **opts|
+  expecteds.empty? ? (expecteds, opts = [opts], {}) : (expecteds = expecteds.flatten)
   match notify_expectation_failures: true do |actual|
-    with_memory_logger using_log_level do |logger|
+    with_memory_logger opts[:using_log_level] do |logger|
       (expect Asciidoctor::LoggerManager.logger).to be logger
       actual.call
-      expecteds.flatten.each_with_index do |expected, idx|
+      expecteds.each_with_index do |expected, idx|
         expected[:at] = idx unless expected.key? :at
         (expect logger).to have_message expected
       end
