@@ -193,81 +193,55 @@ describe Asciidoctor::Reducer do
 
     it 'should not register extension for call if extension is registered globally' do
       described_class::Extensions.register
-      result = subject.reduce_file (fixture_file 'parent-with-single-include.adoc'), sourcemap: true,
-        extensions: register_extension_call_tracer
-      expected_lines = <<~'END'.chomp.split ?\n
-      before include
-
-      no includes here
-
-      just good old-fashioned paragraph text
-
-      after include
-      END
+      extensions = register_extension_call_tracer
+      run_scenario do
+        input_source the_input_source
+        reduce_options sourcemap: true, extensions: extensions
+        expected_source the_expected_source
+      end
       (expect extension_calls).to eql [false, true]
-      (expect result.source_lines).to eql expected_lines
     ensure
       described_class::Extensions.unregister
     end
 
     it 'should not register extension for call with custom extension registry if extension is registered globally' do
       described_class::Extensions.register
-      ext_reg = Asciidoctor::Extensions.create(&register_extension_call_tracer)
-      result = subject.reduce_file (fixture_file 'parent-with-single-include.adoc'), extension_registry: ext_reg,
-        sourcemap: true
-      expected_lines = <<~'END'.chomp.split ?\n
-      before include
-
-      no includes here
-
-      just good old-fashioned paragraph text
-
-      after include
-      END
-      (expect result.source_lines).to eql expected_lines
-      (expect ext_reg.groups[:reducer]).to be_nil
+      extension_registry = Asciidoctor::Extensions.create(&register_extension_call_tracer)
+      run_scenario do
+        input_source the_input_source
+        reduce_options sourcemap: true, extension_registry: extension_registry
+        expected_source the_expected_source
+      end
       (expect extension_calls).to eql [false, true]
+      (expect extension_registry.groups[:reducer]).to be_nil
     ensure
       described_class::Extensions.unregister
     end
 
-    it 'should not register extension for call to load API if extension is registered globally' do
+    it 'should not register extension for call to Asciidoctor load API if extension is registered globally' do
       described_class::Extensions.register
-      ext_reg = Asciidoctor::Extensions.create(&register_extension_call_tracer)
-      result = Asciidoctor.load_file (fixture_file 'parent-with-single-include.adoc'), extension_registry: ext_reg,
-        sourcemap: true, safe: :safe
-      expected_lines = <<~'END'.chomp.split ?\n
-      before include
-
-      no includes here
-
-      just good old-fashioned paragraph text
-
-      after include
-      END
-      (expect result.source_lines).to eql expected_lines
-      (expect ext_reg.groups[:reducer]).to be_nil
+      extension_registry = Asciidoctor::Extensions.create(&register_extension_call_tracer)
+      run_scenario do
+        input_source the_input_source
+        reduce_options safe: :safe, sourcemap: true, extension_registry: extension_registry
+        reduce { Asciidoctor.load_file input_file, *reduce_options }
+        expected_source the_expected_source
+      end
       (expect extension_calls).to eql [false, true]
+      (expect extension_registry.groups[:reducer]).to be_nil
     ensure
       described_class::Extensions.unregister
     end
 
-    it 'should not register extensions in a custom extension registry twice when reloading document' do
-      ext_reg = Asciidoctor::Extensions.create(&register_extension_call_tracer)
-      result = subject.reduce_file (fixture_file 'parent-with-single-include.adoc'), extension_registry: ext_reg,
-        sourcemap: true
-      expected_lines = <<~'END'.chomp.split ?\n
-      before include
-
-      no includes here
-
-      just good old-fashioned paragraph text
-
-      after include
-      END
-      (expect result.source_lines).to eql expected_lines
-      (expect ext_reg.groups[:reducer]).not_to be_nil
+    it 'should not register extensions in a custom extension registry again when reloading document' do
+      extension_registry = Asciidoctor::Extensions.create(&register_extension_call_tracer)
+      run_scenario do
+        input_source the_input_source
+        reduce_options sourcemap: true, extension_registry: extension_registry
+        expected_source the_expected_source
+      end
       (expect extension_calls).to eql [false, true]
+      (expect extension_registry.groups[:reducer]).not_to be_nil
     end
   end
 end
