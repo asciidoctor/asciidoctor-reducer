@@ -425,21 +425,28 @@ describe Asciidoctor::Reducer do
   end
 
   it 'should flag top-level include that cannot be resolved as an unresolved directive' do
-    doc = nil
     (expect do
-      doc = reduce_file fixture_file 'parent-with-unresolved-include.adoc'
+      doc = run_scenario do
+        input_source <<~'END'
+        before include
+
+        include::no-such-file.adoc[]
+
+        after include
+        END
+
+        expected_source <<~END
+        before include
+
+        Unresolved directive in #{File.basename input_file} - include::no-such-file.adoc[]
+
+        after include
+        END
+      end
+      (expect doc.blocks).to have_size 3
+      (expect doc.blocks[1].source).to start_with 'Unresolved directive'
+      (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
     end).to log_messages [{ severity: :ERROR, message: '~include file not found:', last: true }]
-    expected_lines = <<~'END'.chomp.split ?\n
-    before include
-
-    Unresolved directive in parent-with-unresolved-include.adoc - include::no-such-file.adoc[]
-
-    after include
-    END
-    (expect doc.source_lines).to eql expected_lines
-    (expect doc.blocks).to have_size 3
-    (expect doc.blocks[1].source).to start_with 'Unresolved directive'
-    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
 
   it 'should resolve include after unresolved include' do
