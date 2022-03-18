@@ -428,9 +428,7 @@ describe Asciidoctor::Reducer do
     doc = nil
     with_memory_logger do |logger|
       doc = reduce_file fixture_file 'parent-with-unresolved-include.adoc'
-      messages = logger.messages
-      (expect messages).to have_size 1
-      (expect messages[0][:message][:text]).to include 'include file not found'
+      (expect logger).to have_message severity: :ERROR, message: '~include file not found:', last: true
     end
     expected_lines = <<~'END'.chomp.split ?\n
     before include
@@ -449,9 +447,7 @@ describe Asciidoctor::Reducer do
     doc = nil
     with_memory_logger do |logger|
       doc = reduce_file fixture_file 'parent-with-include-after-unresolved-include.adoc'
-      messages = logger.messages
-      (expect messages).to have_size 1
-      (expect messages[0][:message][:text]).to include 'include file not found'
+      (expect logger).to have_message severity: :ERROR, message: '~include file not found:', last: true
     end
     expected_lines = <<~'END'.chomp.split ?\n
     :optional:
@@ -477,9 +473,7 @@ describe Asciidoctor::Reducer do
     with_memory_logger do |logger|
       doc = reduce_file (fixture_file 'parent-with-include-after-unresolved-include.adoc'),
         attributes: { 'optional' => 'opts=optional' }
-      messages = logger.messages
-      (expect messages).to have_size 1
-      (expect messages[0][:message][:text]).to include 'include file not found'
+      (expect logger).to have_message severity: :INFO, message: '~optional include dropped', last: true
     end
     expected_lines = <<~'END'.chomp.split ?\n
     :optional:
@@ -502,9 +496,7 @@ describe Asciidoctor::Reducer do
     doc = nil
     with_memory_logger do |logger|
       doc = reduce_file fixture_file 'parent-with-optional-unresolved-include.adoc'
-      messages = logger.messages
-      (expect messages).to have_size 1
-      (expect messages[0][:message][:text]).to include 'include file not found'
+      (expect logger).to have_message severity: :INFO, message: '~optional include dropped', last: true
     end
     expected_lines = <<~'END'.chomp.split ?\n
     before include
@@ -521,9 +513,7 @@ describe Asciidoctor::Reducer do
     doc = nil
     with_memory_logger do |logger|
       doc = reduce_file fixture_file 'parent-with-nested-unresolved-include.adoc'
-      messages = logger.messages
-      (expect messages).to have_size 1
-      (expect messages[0][:message][:text]).to include 'include file not found'
+      (expect logger).to have_message severity: :ERROR, message: '~include file not found:', last: true
     end
     expected_lines = <<~'END'.chomp.split ?\n
     before top-level include
@@ -546,9 +536,8 @@ describe Asciidoctor::Reducer do
     doc = nil
     with_memory_logger do |logger|
       doc = reduce_file fixture_file 'parent-with-include-with-empty-target.adoc'
-      messages = logger.messages
-      (expect messages).to have_size 1
-      (expect messages[0][:message][:text]).to include 'resolved target is blank'
+      (expect logger).to have_message \
+        severity: :WARN, message: '~include dropped because resolved target is blank:', last: true
     end
     expected_lines = <<~'END'.chomp.split ?\n
     before include
@@ -1317,10 +1306,9 @@ describe Asciidoctor::Reducer do
         expected_source '= Book Title'
       end
       (expect doc.lineno).to eql 1
-      messages = logger.messages
-      (expect messages).to have_size 2
-      (expect messages[1][:severity]).to eql :INFO
-      (expect messages[1][:message][:text]).to include 'include dropped'
+      (expect logger).to have_message severity: :INFO, message: '~dropping line', at: 0
+      (expect logger).to have_message \
+        severity: :INFO, message: '~include dropped due to missing attribute:', at: 1, last: true
     end
   end
 
@@ -1522,10 +1510,7 @@ describe Asciidoctor::Reducer do
   it 'should suppress log messages when reloading document' do
     with_memory_logger do |logger|
       reduce_file fixture_file 'parent-with-include-and-warning.adoc'
-      messages = logger.messages
-      (expect messages).to have_size 1
-      (expect messages[0][:severity]).to eql :WARN
-      (expect messages[0][:message][:text]).to include 'unterminated'
+      (expect logger).to have_message severity: :WARN, message: 'unterminated open block', last: true
       (expect Asciidoctor::LoggerManager.logger).to be logger
     end
   end
