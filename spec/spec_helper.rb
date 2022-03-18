@@ -35,6 +35,7 @@ class ScenarioBuilder
   UNDEFINED = ::Object.new
   private_constant :UNDEFINED
 
+  attr_reader :example
   attr_reader :result
 
   def initialize
