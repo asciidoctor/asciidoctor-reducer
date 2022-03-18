@@ -315,3 +315,19 @@ RSpec::Matchers.define :have_message do |expected|
       (actual ? %(, but got #{actual[:severity]} message `#{Hash === (m = actual[:message]) ? m[:text] : m}') : '')
   end
 end
+
+RSpec::Matchers.define :log_messages do |*expecteds, using_log_level: nil|
+  match notify_expectation_failures: true do |actual|
+    with_memory_logger using_log_level do |logger|
+      (expect Asciidoctor::LoggerManager.logger).to be logger
+      actual.call
+      expecteds.flatten.each_with_index do |expected, idx|
+        expected[:at] = idx unless expected.key? :at
+        (expect logger).to have_message expected
+      end
+    end
+    true
+  end
+
+  supports_block_expectations
+end

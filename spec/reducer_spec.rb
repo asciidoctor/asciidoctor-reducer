@@ -426,10 +426,9 @@ describe Asciidoctor::Reducer do
 
   it 'should flag top-level include that cannot be resolved as an unresolved directive' do
     doc = nil
-    with_memory_logger do |logger|
+    (expect do
       doc = reduce_file fixture_file 'parent-with-unresolved-include.adoc'
-      (expect logger).to have_message severity: :ERROR, message: '~include file not found:', last: true
-    end
+    end).to log_messages [{ severity: :ERROR, message: '~include file not found:', last: true }]
     expected_lines = <<~'END'.chomp.split ?\n
     before include
 
@@ -445,10 +444,9 @@ describe Asciidoctor::Reducer do
 
   it 'should resolve include after unresolved include' do
     doc = nil
-    with_memory_logger do |logger|
+    (expect do
       doc = reduce_file fixture_file 'parent-with-include-after-unresolved-include.adoc'
-      (expect logger).to have_message severity: :ERROR, message: '~include file not found:', last: true
-    end
+    end).to log_messages [{ severity: :ERROR, message: '~include file not found:', last: true }]
     expected_lines = <<~'END'.chomp.split ?\n
     :optional:
 
@@ -470,11 +468,10 @@ describe Asciidoctor::Reducer do
 
   it 'should resolve include after unresolved optional include' do
     doc = nil
-    with_memory_logger do |logger|
+    (expect do
       doc = reduce_file (fixture_file 'parent-with-include-after-unresolved-include.adoc'),
         attributes: { 'optional' => 'opts=optional' }
-      (expect logger).to have_message severity: :INFO, message: '~optional include dropped', last: true
-    end
+    end).to log_messages [{ severity: :INFO, message: '~optional include dropped', last: true }], using_log_level: :INFO
     expected_lines = <<~'END'.chomp.split ?\n
     :optional:
 
@@ -494,10 +491,9 @@ describe Asciidoctor::Reducer do
 
   it 'should skip optional top-level include that cannot be resolved' do
     doc = nil
-    with_memory_logger do |logger|
+    (expect do
       doc = reduce_file fixture_file 'parent-with-optional-unresolved-include.adoc'
-      (expect logger).to have_message severity: :INFO, message: '~optional include dropped', last: true
-    end
+    end).to log_messages [{ severity: :INFO, message: '~optional include dropped', last: true }], using_log_level: :INFO
     expected_lines = <<~'END'.chomp.split ?\n
     before include
 
@@ -511,10 +507,9 @@ describe Asciidoctor::Reducer do
 
   it 'should flag nested include that cannot be resolved as an unresolved directive' do
     doc = nil
-    with_memory_logger do |logger|
+    (expect do
       doc = reduce_file fixture_file 'parent-with-nested-unresolved-include.adoc'
-      (expect logger).to have_message severity: :ERROR, message: '~include file not found:', last: true
-    end
+    end).to log_messages [{ severity: :ERROR, message: '~include file not found:', last: true }]
     expected_lines = <<~'END'.chomp.split ?\n
     before top-level include
 
@@ -534,11 +529,11 @@ describe Asciidoctor::Reducer do
 
   it 'should flag include as an unresolved directive if target is empty' do
     doc = nil
-    with_memory_logger do |logger|
+    (expect do
       doc = reduce_file fixture_file 'parent-with-include-with-empty-target.adoc'
-      (expect logger).to have_message \
-        severity: :WARN, message: '~include dropped because resolved target is blank:', last: true
-    end
+    end).to log_messages [
+      { severity: :WARN, message: '~include dropped because resolved target is blank:', last: true },
+    ]
     expected_lines = <<~'END'.chomp.split ?\n
     before include
 
@@ -1293,7 +1288,7 @@ describe Asciidoctor::Reducer do
   end
 
   it 'should skip include when attribute in target cannot be resolved and attribute-missing=drop-line' do
-    with_memory_logger do |logger|
+    (expect do
       doc = run_scenario do
         input_source <<~'END'
         = Book Title
@@ -1306,10 +1301,10 @@ describe Asciidoctor::Reducer do
         expected_source '= Book Title'
       end
       (expect doc.lineno).to eql 1
-      (expect logger).to have_message severity: :INFO, message: '~dropping line', at: 0
-      (expect logger).to have_message \
-        severity: :INFO, message: '~include dropped due to missing attribute:', at: 1, last: true
-    end
+    end).to log_messages [
+      { severity: :INFO, message: '~dropping line', at: 0 },
+      { severity: :INFO, message: '~include dropped due to missing attribute:', at: 1, last: true },
+    ], using_log_level: :INFO
   end
 
   it 'should drop lines containing preprocessor directive when condition resolves to true' do
@@ -1508,10 +1503,18 @@ describe Asciidoctor::Reducer do
   end
 
   it 'should suppress log messages when reloading document' do
-    with_memory_logger do |logger|
-      reduce_file fixture_file 'parent-with-include-and-warning.adoc'
-      (expect logger).to have_message severity: :WARN, message: 'unterminated open block', last: true
-      (expect Asciidoctor::LoggerManager.logger).to be logger
-    end
+    doc = nil
+    (expect do
+      doc = reduce_file fixture_file 'parent-with-include-and-warning.adoc'
+    end).to log_messages [{ severity: :WARN, message: 'unterminated open block', last: true }]
+    expected_lines = <<~'END'.chomp.split ?\n
+    before include
+
+    single line paragraph
+
+    --
+    after include
+    END
+    (expect doc.source_lines).to eql expected_lines
   end
 end
