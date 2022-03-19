@@ -3,9 +3,7 @@
 require_relative 'spec_helper'
 
 describe Asciidoctor::Reducer::Extensions do
-  describe '.group' do
-    subject { described_class.method :group }
-
+  describe_method '.group' do
     it 'should return extension group' do
       group = subject.call
       (expect group).to be_kind_of Proc
@@ -16,17 +14,13 @@ describe Asciidoctor::Reducer::Extensions do
     end
   end
 
-  describe '.key' do
-    subject { described_class.method :key }
-
+  describe_method '.key' do
     it 'should return key for extension group' do
       (expect subject.call).to eql :reducer
     end
   end
 
-  describe '.prepare_registry' do
-    subject { described_class.method :prepare_registry }
-
+  describe_method '.prepare_registry' do
     it 'should prepare a new registry if no registry is specified' do
       registry = subject.call
       (expect registry).not_to be_nil
@@ -35,9 +29,7 @@ describe Asciidoctor::Reducer::Extensions do
     end
   end
 
-  describe '.register' do
-    subject { described_class.method :register }
-
+  describe_method '.register' do
     it 'should register extensions globally under group named reducer' do
       subject.call
       (expect Asciidoctor::Extensions.groups).to have_key described_class.key
@@ -50,9 +42,7 @@ describe Asciidoctor::Reducer::Extensions do
     end
   end
 
-  describe '.unregister' do
-    subject { described_class.method :unregister }
-
+  describe_method '.unregister' do
     it 'should unregister extensions globally under group named reducer' do
       Asciidoctor::Extensions.register described_class.key, &described_class.group
       (expect Asciidoctor::Extensions.groups).to have_key described_class.key

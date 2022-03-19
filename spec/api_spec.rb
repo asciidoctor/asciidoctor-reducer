@@ -29,9 +29,7 @@ describe Asciidoctor::Reducer do
     end
   end
 
-  describe '.reduce' do
-    subject { described_class.method :reduce }
-
+  describe_method '.reduce' do
     it 'should reduce input when no options are specified' do
       run_scenario do
         input_source <<~'END'
@@ -59,9 +57,7 @@ describe Asciidoctor::Reducer do
     end
   end
 
-  describe '.reduce_file' do
-    subject { described_class.method :reduce_file }
-
+  describe_method '.reduce_file' do
     it 'should reduce input when no options are specified' do
       run_scenario do
         input_source <<~'END'

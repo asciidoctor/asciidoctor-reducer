@@ -155,6 +155,14 @@ RSpec.configure do |config|
     ScenarioBuilder.new.build(&block)
   end
 
+  def describe_method refname, *args, &block
+    describe refname, *args do
+      name = (refname.delete_prefix (operator = refname.chr)).to_sym
+      subject { super().method name }
+      instance_exec(&block)
+    end
+  end
+
   def fixtures_dir
     File.join __dir__, 'fixtures'
   end
