@@ -189,6 +189,11 @@ Naming/PredicateName:
   Enabled: false # FIXME consider reenabling later (might impact API)
 Naming/VariableNumber:
   Enabled: false # reason: this is just nitpicky
+RSpec:
+  Language:
+    ExampleGroups:
+      Regular:
+      - describe_method
 RSpec/BeEql:
   Enabled: false # NOTE can lead to cryptic error messages
 RSpec/BeforeAfterAll:

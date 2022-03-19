@@ -212,6 +212,7 @@ describe Asciidoctor::Reducer do
 
     context 'when registered globally' do
       before { described_class::Extensions.register }
+
       after { described_class::Extensions.unregister }
 
       it 'should not register extension for call' do

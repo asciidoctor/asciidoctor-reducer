@@ -157,8 +157,7 @@ RSpec.configure do |config|
 
   def describe_method refname, *args, &block
     describe refname, *args do
-      name = (refname.delete_prefix (operator = refname.chr)).to_sym
-      subject { super().method name }
+      subject { super().method refname.slice 1, refname.length }
       instance_exec(&block)
     end
   end
