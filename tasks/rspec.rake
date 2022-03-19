@@ -4,9 +4,11 @@ begin
   require 'rspec/core/rake_task'
   RSpec::Core::RakeTask.new :spec do |t|
     t.verbose = true
-    opts = %W(-f#{ENV['CI'] && ENV['COVERAGE'] ? 'd' : 'p'} --order random)
-    opts.unshift '-w' if $VERBOSE || ENV['COVERAGE']
-    t.rspec_opts = opts
+    t.rspec_opts = [
+      $VERBOSE || ENV['COVERAGE'] ? '-w' : nil,
+      ENV['CI'] && ENV['COVERAGE'] ? '-fd' : '-fp',
+      ENV['GITHUB_RUN_ID'] ? %(--seed #{ENV['GITHUB_RUN_ID']}) : nil,
+    ].compact
   end
 rescue LoadError
   warn $!.message
