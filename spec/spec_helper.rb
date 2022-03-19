@@ -38,8 +38,8 @@ class ScenarioBuilder
   attr_reader :example
   attr_reader :result
 
-  def initialize
-    @example = nil
+  def initialize example
+    @example = example
     @expected_source = @input_file = @input_source = @output_file = @verify = nil
     @files = []
     @reduce = proc { reduce_file input_file, *@reduce_options }
@@ -47,7 +47,6 @@ class ScenarioBuilder
   end
 
   def build &block
-    @example = block.binding.receiver
     instance_exec(&block)
     self
   end
@@ -152,7 +151,7 @@ RSpec.configure do |config|
   end
 
   def create_scenario &block
-    ScenarioBuilder.new.build(&block)
+    (ScenarioBuilder.new block.binding.receiver).build(&block)
   end
 
   def describe_method refname, *args, &block
