@@ -163,6 +163,18 @@ describe Asciidoctor::Reducer do
         expected_source the_expected_source
       end
     end
+
+    it 'should not pass :to option to Asciidoctor.load_file' do
+      with_tmp_file tmpdir: output_dir do |the_output_file|
+        doc = run_scenario do
+          input_source the_input_source
+          output_file the_output_file
+          reduce { subject.reduce_file input_file, to: the_output_file }
+          expected_source the_expected_source
+        end
+        (expect doc.options).not_to have_key :to
+      end
+    end
   end
 
   context 'extension registry' do

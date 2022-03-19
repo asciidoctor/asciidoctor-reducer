@@ -9,6 +9,7 @@ module Asciidoctor::Reducer
   class << self
     def reduce input, opts = {}
       opts = opts.merge extension_registry: (Extensions.prepare_registry opts[:extension_registry] || opts[:extensions])
+      to = opts.delete :to
       opts[:safe] = ::Asciidoctor::SafeMode::SAFE unless opts.key? :safe
       case input
       when ::File
@@ -18,7 +19,7 @@ module Asciidoctor::Reducer
       else
         doc = ::Asciidoctor.load input, opts
       end
-      write doc, opts[:to]
+      write doc, to
     end
 
     def reduce_file input_file, opts = {}
