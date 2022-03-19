@@ -30,26 +30,26 @@ describe Asciidoctor::Reducer::Extensions do
   end
 
   describe_method '.register' do
-    it 'should register extensions globally under group named reducer' do
+    after { Asciidoctor::Extensions.unregister described_class.key if Asciidoctor::Extensions.groups }
+
+    it 'should register extensions globally under group name' do
       subject.call
       (expect Asciidoctor::Extensions.groups).to have_key described_class.key
       doc = Asciidoctor.load []
       reg = Asciidoctor::Extensions::Registry.new.activate doc
       (expect reg.preprocessors).to have_size 1
       (expect reg.treeprocessors).to have_size 1
-    ensure
-      described_class.unregister
     end
   end
 
   describe_method '.unregister' do
-    it 'should unregister extensions globally under group named reducer' do
+    after { Asciidoctor::Extensions.unregister described_class.key if Asciidoctor::Extensions.groups }
+
+    it 'should unregister extensions globally under group name' do
       Asciidoctor::Extensions.register described_class.key, &described_class.group
       (expect Asciidoctor::Extensions.groups).to have_key described_class.key
       subject.call
       (expect Asciidoctor::Extensions.groups).not_to have_key described_class.key
-    ensure
-      Asciidoctor::Extensions.unregister described_class.key
     end
   end
 end
