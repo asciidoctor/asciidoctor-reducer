@@ -155,10 +155,6 @@ RSpec.configure do |config|
     ScenarioBuilder.new.build(&block)
   end
 
-  def run_scenario &block
-    create_scenario(&block).run
-  end
-
   def fixtures_dir
     File.join __dir__, 'fixtures'
   end
@@ -207,6 +203,10 @@ RSpec.configure do |config|
         Open3.capture3 env_override, cmd, *args
       end
     end
+  end
+
+  def run_scenario &block
+    create_scenario(&block).run
   end
 
   def windows?
