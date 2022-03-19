@@ -1,8 +1,0 @@
-= Document Title
-:attribute-missing: warn
-
-image::{no-such-attribute}.png[]
-
-|===
-cell
-|===
