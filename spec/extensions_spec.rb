@@ -46,6 +46,7 @@ describe Asciidoctor::Reducer::Extensions do
     after { Asciidoctor::Extensions.unregister described_class.key if Asciidoctor::Extensions.groups }
 
     it 'should not fail if extensions are not registered globally' do
+      Asciidoctor::Extensions.groups
       Asciidoctor::Extensions.remove_instance_variable :@groups
       expect { subject.call }.not_to raise_exception
       (expect Asciidoctor::Extensions.groups).not_to have_key described_class.key

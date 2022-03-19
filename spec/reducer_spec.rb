@@ -11,6 +11,7 @@ describe Asciidoctor::Reducer do
   end
 
   it 'should register extensions globally when asciidoctor/reducer is required' do
+    $".delete ::File.expand_path 'lib/asciidoctor/reducer.rb', (::File.dirname __dir__)
     (expect require 'asciidoctor/reducer').not_to be_nil
     (expect Asciidoctor::Extensions.groups).to have_key described_class::Extensions.key
   ensure
