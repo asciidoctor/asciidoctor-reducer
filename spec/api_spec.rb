@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative 'spec_helper'
-
 describe Asciidoctor::Reducer do
   let :the_input_source do
     <<~'END'

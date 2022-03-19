@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require_relative 'spec_helper'
 require 'asciidoctor/reducer/include_mapper/extension'
 
 describe Asciidoctor::Reducer::IncludeMapper do
