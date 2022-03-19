@@ -37,7 +37,8 @@ module Asciidoctor::Reducer
     end
 
     def unregister
-      ::Asciidoctor::Extensions.unregister key
+      #::Asciidoctor::Extensions.unregister key # NOTE: fails if groups is not initialized
+      ::Asciidoctor::Extensions.groups.delete key
     end
   end
 end

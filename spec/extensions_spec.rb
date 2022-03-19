@@ -45,6 +45,11 @@ describe Asciidoctor::Reducer::Extensions do
   describe_method '.unregister' do
     after { Asciidoctor::Extensions.unregister described_class.key if Asciidoctor::Extensions.groups }
 
+    it 'should not fail if extensions are not registered globally' do
+      expect { subject.call }.not_to raise_exception
+      (expect Asciidoctor::Extensions.groups).not_to have_key described_class.key
+    end
+
     it 'should unregister extensions globally under group name' do
       Asciidoctor::Extensions.register described_class.key, &described_class.group
       (expect Asciidoctor::Extensions.groups).to have_key described_class.key
