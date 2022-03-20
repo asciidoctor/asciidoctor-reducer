@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative 'spec_helper'
-
 describe Asciidoctor::Reducer::Cli do
   # NOTE override subject to return class object; RSpec returns instance of class by default
   subject { described_class }

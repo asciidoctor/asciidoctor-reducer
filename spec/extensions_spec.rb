@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative 'spec_helper'
-
 describe Asciidoctor::Reducer::Extensions do
   describe_method '.group' do
     it 'should return extension group' do
