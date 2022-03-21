@@ -29,7 +29,7 @@ unless (Pathname.instance_method :rmtree).arity > 0
 end
 
 class ScenarioBuilder
-  extend Forwardable
+  extend ::Forwardable
   def_delegators :@example, :described_class, :subject, :the_expected_source, :the_input_source
 
   UNDEFINED = ::Object.new
@@ -81,7 +81,7 @@ class ScenarioBuilder
     @expected_source = source.chomp
     verify do
       case @result
-      when Asciidoctor::Document
+      when ::Asciidoctor::Document
         (@example.expect @result).to @example.have_source @expected_source
         if @output_file
           if @output_file.respond_to? :string
@@ -93,7 +93,7 @@ class ScenarioBuilder
           end
           (@example.expect actual_source).to @example.eql @expected_source + ?\n
         end
-      when String
+      when ::String
         (@example.expect @result).to @example.eql @expected_source
       end
     end
@@ -135,7 +135,7 @@ class ScenarioBuilder
     @result
   ensure
     @example = nil
-    @files.each {|it| File.unlink it }
+    @files.each {|it| ::File.unlink it }
     freeze
   end
 
