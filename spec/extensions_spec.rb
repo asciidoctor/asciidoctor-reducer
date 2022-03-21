@@ -56,5 +56,14 @@ describe Asciidoctor::Reducer::Extensions do
       subject.call
       (expect Asciidoctor::Extensions.groups).not_to have_key described_class.key
     end
+
+    it 'should not failed if called consecutively' do
+      Asciidoctor::Extensions.register described_class.key, &described_class.group
+      (expect Asciidoctor::Extensions.groups).to have_key described_class.key
+      subject.call
+      (expect Asciidoctor::Extensions.groups).not_to have_key described_class.key
+      subject.call
+      (expect Asciidoctor::Extensions.groups).not_to have_key described_class.key
+    end
   end
 end
