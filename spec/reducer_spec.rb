@@ -39,7 +39,7 @@ describe Asciidoctor::Reducer do
     (expect doc.sourcemap).to be true
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3]
     input_file = scenario.input_file
-    (expect doc.attr 'docname').to eql (File.basename input_file, '.adoc')
+    (expect doc.attr 'docname').to eql (scenario.input_file_basename '.adoc')
     (expect doc.attr 'docfile').to eql input_file
     (expect doc.attr 'docdir').to eql (File.dirname input_file)
   end
@@ -87,7 +87,7 @@ describe Asciidoctor::Reducer do
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
     input_file = scenario.input_file
     (expect (doc.blocks.map {|it| it.file }).uniq).to eql [input_file]
-    (expect doc.attr 'docname').to eql (File.basename input_file, '.adoc')
+    (expect doc.attr 'docname').to eql (scenario.input_file_basename '.adoc')
     (expect doc.attr 'docfile').to eql input_file
     (expect doc.attr 'docdir').to eql (File.dirname input_file)
     (expect doc.catalog[:includes]['no-includes']).to be true
@@ -436,7 +436,7 @@ describe Asciidoctor::Reducer do
       expected_source <<~END
       before include
 
-      Unresolved directive in #{File.basename input_file} - include::no-such-file.adoc[]
+      Unresolved directive in #{input_file_basename} - include::no-such-file.adoc[]
 
       after include
       END
@@ -465,7 +465,7 @@ describe Asciidoctor::Reducer do
       expected_source <<~END
       before includes
 
-      Unresolved directive in #{File.basename input_file} - include::no-such-file.adoc[]
+      Unresolved directive in #{input_file_basename} - include::no-such-file.adoc[]
 
       between includes
 
@@ -495,7 +495,7 @@ describe Asciidoctor::Reducer do
       expected_source <<~END
       before includes
 
-      Unresolved directive in #{File.basename input_file} - include::no-such-file.adoc[]
+      Unresolved directive in #{input_file_basename} - include::no-such-file.adoc[]
       single line paragraph
 
       after includes
@@ -614,7 +614,7 @@ describe Asciidoctor::Reducer do
       expected_source <<~EOS
       before include
 
-      Unresolved directive in #{File.basename input_file} - include::{empty}[]
+      Unresolved directive in #{input_file_basename} - include::{empty}[]
 
       after include
       EOS
@@ -647,9 +647,8 @@ describe Asciidoctor::Reducer do
       after include
       END
     end).run
-    input_file = scenario.input_file
-    (expect doc.attr 'docname').to eql (File.basename input_file, '.adoc')
-    (expect doc.attr 'docfile').to eql (File.basename input_file)
+    (expect doc.attr 'docname').to eql (scenario.input_file_basename '.adoc')
+    (expect doc.attr 'docfile').to eql scenario.input_file_basename
     (expect doc.attr 'docdir').to be_empty
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]

@@ -49,7 +49,7 @@ describe Asciidoctor::Reducer do
       end
       doc = scenario.run
       input_file = scenario.input_file
-      (expect doc.attr 'docname').to eql (File.basename input_file, '.adoc')
+      (expect doc.attr 'docname').to eql (scenario.input_file_basename '.adoc')
       (expect doc.attr 'docfile').to eql input_file
       (expect doc.attr 'docdir').to eql (File.dirname input_file)
     end

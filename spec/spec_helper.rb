@@ -104,6 +104,10 @@ class ScenarioBuilder
     @input_file ||= (create_input_file @input_source)
   end
 
+  def input_file_basename suffix = nil
+    suffix ? (::File.basename input_file, suffix) : (::File.basename input_file)
+  end
+
   def input_source source = UNDEFINED
     source == UNDEFINED ? @input_source : (@input_source = source.chomp)
   end
