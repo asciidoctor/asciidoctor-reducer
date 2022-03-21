@@ -40,7 +40,7 @@ class ScenarioBuilder
 
   def initialize example
     @example = example
-    @expected_source = @input_file = @input_source = @output_file = @verify = nil
+    @expected_log_messages = @expected_source = @input_file = @input_source = @output_file = @result = @verify = nil
     @files = []
     @reduce = proc { reduce_file input_file, *@reduce_options }
     @reduce_options = []
@@ -70,6 +70,10 @@ class ScenarioBuilder
 
   def create_input_file source
     create_file %w(main- .adoc), source
+  end
+
+  def expected_log_messages *argv
+    @expected_log_messages = argv
   end
 
   def expected_source source = UNDEFINED
@@ -117,7 +121,17 @@ class ScenarioBuilder
   end
 
   def run
-    @verify&.call if (@result = @input_source ? @reduce&.call : nil)
+    if @input_source && @reduce
+      if @expected_log_messages
+        (@example.expect do
+          @result = @reduce.call
+          @verify&.call
+        end).to @example.log_messages(*@expected_log_messages)
+      else
+        @result = @reduce.call
+        @verify&.call
+      end
+    end
     @result
   ensure
     @example = nil
@@ -324,13 +338,18 @@ end
 
 RSpec::Matchers.define :log_messages do |*expecteds, **opts|
   expecteds.empty? ? (expecteds, opts = [opts], {}) : (expecteds = expecteds.flatten)
+  expecteds = [] unless expecteds.length > 1 || expecteds[0]
   match notify_expectation_failures: true do |actual|
     with_memory_logger opts[:using_log_level] do |logger|
       (expect Asciidoctor::LoggerManager.logger).to be logger
       actual.call
-      expecteds.each_with_index do |expected, idx|
-        expected[:at] = idx unless expected.key? :at
-        (expect logger).to have_message expected
+      if expecteds.empty?
+        (expect logger.messages).to be_empty
+      else
+        expecteds.each_with_index do |expected, idx|
+          expected[:at] = idx unless expected.key? :at
+          (expect logger).to have_message expected
+        end
       end
     end
     true

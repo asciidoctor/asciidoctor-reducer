@@ -187,7 +187,7 @@ describe Asciidoctor::Reducer::Cli do
     end
 
     it 'should ignore --log-level option if value is warn' do
-      the_source_file = fixture_file 'parent-with-optional-unresolved-include.adoc'
+      the_source_file = fixture_file 'with-optional-unresolved-include.adoc'
       expected = <<~'END'.chomp
       before include
 
@@ -200,7 +200,7 @@ describe Asciidoctor::Reducer::Cli do
     end
 
     it 'should set level on logger to lower value specified by --log-level option' do
-      the_source_file = fixture_file 'parent-with-optional-unresolved-include.adoc'
+      the_source_file = fixture_file 'with-optional-unresolved-include.adoc'
       expected = <<~'END'.chomp
       before include
 

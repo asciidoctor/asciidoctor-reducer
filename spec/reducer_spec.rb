@@ -424,130 +424,205 @@ describe Asciidoctor::Reducer do
   end
 
   it 'should flag top-level include that cannot be resolved as an unresolved directive' do
-    (expect do
-      doc = run_scenario do
-        input_source <<~'END'
-        before include
+    doc = run_scenario do
+      input_source <<~'END'
+      before include
 
-        include::no-such-file.adoc[]
+      include::no-such-file.adoc[]
 
-        after include
-        END
+      after include
+      END
 
-        expected_source <<~END
-        before include
+      expected_source <<~END
+      before include
 
-        Unresolved directive in #{File.basename input_file} - include::no-such-file.adoc[]
+      Unresolved directive in #{File.basename input_file} - include::no-such-file.adoc[]
 
-        after include
-        END
-      end
-      (expect doc.blocks).to have_size 3
-      (expect doc.blocks[1].source).to start_with 'Unresolved directive'
-      (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
-    end).to log_messages [{ severity: :ERROR, message: '~include file not found:', last: true }]
+      after include
+      END
+
+      expected_log_messages [{ severity: :ERROR, message: '~include file not found:', last: true }]
+    end
+    (expect doc.blocks).to have_size 3
+    (expect doc.blocks[1].source).to start_with 'Unresolved directive'
+    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
 
-  it 'should resolve include after unresolved include' do
-    doc = nil
-    (expect do
-      doc = reduce_file fixture_file 'parent-with-include-after-unresolved-include.adoc'
-    end).to log_messages [{ severity: :ERROR, message: '~include file not found:', last: true }]
-    expected_lines = <<~'END'.chomp.split ?\n
-    :optional:
+  it 'should resolve include that follows unresolved include' do
+    doc = run_scenario do
+      input_source <<~'END'
+      before includes
 
-    before includes
+      include::no-such-file.adoc[]
 
-    Unresolved directive in parent-with-include-after-unresolved-include.adoc - include::no-such-file.adoc[{optional}]
+      between includes
 
-    between includes
+      include::single-line-paragraph.adoc[]
 
-    single line paragraph
+      after includes
+      END
 
-    after includes
-    END
-    (expect doc.source_lines).to eql expected_lines
+      expected_source <<~END
+      before includes
+
+      Unresolved directive in #{File.basename input_file} - include::no-such-file.adoc[]
+
+      between includes
+
+      single line paragraph
+
+      after includes
+      END
+
+      expected_log_messages [{ severity: :ERROR, message: '~include file not found:', last: true }]
+    end
     (expect doc.blocks).to have_size 5
     (expect doc.blocks[1].source).to start_with 'Unresolved directive'
-    (expect (doc.blocks.map {|it| it.lineno })).to eql [3, 5, 7, 9, 11]
+    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9]
+  end
+
+  it 'should resolve include directly adjacent to unresolved include' do
+    doc = run_scenario do
+      input_source <<~'END'
+      before includes
+
+      include::no-such-file.adoc[]
+      include::single-line-paragraph.adoc[]
+
+      after includes
+      END
+
+      expected_source <<~END
+      before includes
+
+      Unresolved directive in #{File.basename input_file} - include::no-such-file.adoc[]
+      single line paragraph
+
+      after includes
+      END
+
+      expected_log_messages [{ severity: :ERROR, message: '~include file not found:', last: true }]
+    end
+    (expect doc.blocks).to have_size 3
+    (expect doc.blocks[1].source).to start_with 'Unresolved directive'
+    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 6]
   end
 
   it 'should resolve include after unresolved optional include' do
-    doc = nil
-    (expect do
-      doc = reduce_file (fixture_file 'parent-with-include-after-unresolved-include.adoc'),
-        attributes: { 'optional' => 'opts=optional' }
-    end).to log_messages [{ severity: :INFO, message: '~optional include dropped', last: true }], using_log_level: :INFO
-    expected_lines = <<~'END'.chomp.split ?\n
-    :optional:
+    doc = run_scenario do
+      input_source <<~'END'
+      before includes
 
-    before includes
+      include::no-such-file.adoc[opts=optional]
+
+      between includes
+
+      include::single-line-paragraph.adoc[]
+
+      after includes
+      END
+
+      expected_source <<~END
+      before includes
 
 
-    between includes
+      between includes
 
-    single line paragraph
+      single line paragraph
 
-    after includes
-    END
-    (expect doc.source_lines).to eql expected_lines
+      after includes
+      END
+
+      expected_log_messages [{ severity: :INFO, message: '~optional include dropped', last: true }],
+        using_log_level: :INFO
+    end
     (expect doc.blocks).to have_size 4
-    (expect (doc.blocks.map {|it| it.lineno })).to eql [3, 6, 8, 10]
+    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 4, 6, 8]
   end
 
   it 'should skip optional top-level include that cannot be resolved' do
-    doc = nil
-    (expect do
-      doc = reduce_file fixture_file 'parent-with-optional-unresolved-include.adoc'
-    end).to log_messages [{ severity: :INFO, message: '~optional include dropped', last: true }], using_log_level: :INFO
-    expected_lines = <<~'END'.chomp.split ?\n
-    before include
+    doc = run_scenario do
+      input_source <<~'END'
+      before include
+
+      include::no-such-file.adoc[opts=optional]
+
+      after include
+      END
+
+      expected_source <<~'END'
+      before include
 
 
-    after include
-    END
-    (expect doc.source_lines).to eql expected_lines
+      after include
+      END
+
+      expected_log_messages [{ severity: :INFO, message: '~optional include dropped', last: true }],
+        using_log_level: :INFO
+    end
     (expect doc.blocks).to have_size 2
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 4]
   end
 
   it 'should flag nested include that cannot be resolved as an unresolved directive' do
-    doc = nil
-    (expect do
-      doc = reduce_file fixture_file 'parent-with-nested-unresolved-include.adoc'
-    end).to log_messages [{ severity: :ERROR, message: '~include file not found:', last: true }]
-    expected_lines = <<~'END'.chomp.split ?\n
-    before top-level include
+    doc = run_scenario do
+      include_file = create_include_file <<~'END'
+      before include
 
-    before include
+      include::no-such-file.adoc[]
 
-    Unresolved directive in parent-with-unresolved-include.adoc - include::no-such-file.adoc[]
+      after include
+      END
 
-    after include
+      input_source <<~END
+      before top-level include
 
-    after top-level include
-    END
-    (expect doc.source_lines).to eql expected_lines
+      include::#{include_file}[]
+
+      after top-level include
+      END
+
+      expected_source <<~END
+      before top-level include
+
+      before include
+
+      Unresolved directive in #{File.basename include_file} - include::no-such-file.adoc[]
+
+      after include
+
+      after top-level include
+      END
+
+      expected_log_messages [{ severity: :ERROR, message: '~include file not found:', last: true }]
+    end
     (expect doc.blocks).to have_size 5
     (expect doc.blocks[2].source).to start_with 'Unresolved directive'
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9]
   end
 
   it 'should flag include as an unresolved directive if target is empty' do
-    doc = nil
-    (expect do
-      doc = reduce_file fixture_file 'parent-with-include-with-empty-target.adoc'
-    end).to log_messages [
-      { severity: :WARN, message: '~include dropped because resolved target is blank:', last: true },
-    ]
-    expected_lines = <<~'END'.chomp.split ?\n
-    before include
+    doc = run_scenario do
+      input_source <<~'EOS'
+      before include
 
-    Unresolved directive in parent-with-include-with-empty-target.adoc - include::{empty}[]
+      include::{empty}[]
 
-    after include
-    END
-    (expect doc.source_lines).to eql expected_lines
+      after include
+      EOS
+
+      expected_source <<~EOS
+      before include
+
+      Unresolved directive in #{File.basename input_file} - include::{empty}[]
+
+      after include
+      EOS
+
+      expected_log_messages [
+        { severity: :WARN, message: '~include dropped because resolved target is blank:', last: true },
+      ]
+    end
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
@@ -1294,23 +1369,23 @@ describe Asciidoctor::Reducer do
   end
 
   it 'should skip include when attribute in target cannot be resolved and attribute-missing=drop-line' do
-    (expect do
-      doc = run_scenario do
-        input_source <<~'END'
-        = Book Title
+    doc = run_scenario do
+      input_source <<~'END'
+      = Book Title
 
-        include::{chaptersdir}/ch1.adoc[]
-        END
+      include::{chaptersdir}/ch1.adoc[]
+      END
 
-        reduce_options attributes: 'attribute-missing=drop-line'
+      reduce_options attributes: 'attribute-missing=drop-line'
 
-        expected_source '= Book Title'
-      end
-      (expect doc.lineno).to eql 1
-    end).to log_messages [
-      { severity: :INFO, message: '~dropping line', at: 0 },
-      { severity: :INFO, message: '~include dropped due to missing attribute:', at: 1, last: true },
-    ], using_log_level: :INFO
+      expected_source '= Book Title'
+
+      expected_log_messages [
+        { severity: :INFO, message: '~dropping line' },
+        { severity: :INFO, message: '~include dropped due to missing attribute:', last: true },
+      ], using_log_level: :INFO
+    end
+    (expect doc.lineno).to eql 1
   end
 
   it 'should drop lines containing preprocessor directive when condition resolves to true' do
@@ -1499,48 +1574,49 @@ describe Asciidoctor::Reducer do
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1]
   end
 
-  it 'should not log messages generated by document if null logger is specified' do
-    with_memory_logger do |logger|
-      null_logger = Asciidoctor::NullLogger.new
-      run_scenario do
-        input_source <<~'END'
-        image::{no-such-attribute}.png[]
+  it 'should not log messages generated by document if logger is turned off' do
+    actual_logger = nil
+    run_scenario do
+      input_source <<~'END'
+      image::{no-such-attribute}.png[]
 
-        |===
-        cell
-        |===
-        END
+      |===
+      cell
+      |===
+      END
 
-        reduce_options sourcemap: false, logger: null_logger, attributes: 'attribute-missing=warn'
+      reduce_options sourcemap: false, logger: nil, attributes: 'attribute-missing=warn'
 
-        expected_source input_source
-      end
-      (expect logger.messages).to be_empty
-      (expect Asciidoctor::LoggerManager.logger).to be null_logger
+      reduce { (reduce_file input_file, *reduce_options).tap { actual_logger = Asciidoctor::LoggerManager.logger } }
+
+      expected_source input_source
+
+      expected_log_messages nil
     end
+    (expect actual_logger).to be_a Asciidoctor::NullLogger
   end
 
   it 'should suppress log messages when reloading document' do
-    (expect do
-      run_scenario do
-        input_source <<~'END'
-        before include
+    run_scenario do
+      input_source <<~'END'
+      before include
 
-        include::single-line-paragraph.adoc[]
+      include::single-line-paragraph.adoc[]
 
-        --
-        after include
-        END
+      --
+      after include
+      END
 
-        expected_source <<~'END'
-        before include
+      expected_source <<~'END'
+      before include
 
-        single line paragraph
+      single line paragraph
 
-        --
-        after include
-        END
-      end
-    end).to log_messages [{ severity: :WARN, message: 'unterminated open block', last: true }]
+      --
+      after include
+      END
+
+      expected_log_messages [{ severity: :WARN, message: 'unterminated open block', last: true }]
+    end
   end
 end

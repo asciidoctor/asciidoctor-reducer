@@ -1,5 +1,0 @@
-before top-level include
-
-include::parent-with-unresolved-include.adoc[]
-
-after top-level include
