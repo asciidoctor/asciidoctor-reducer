@@ -100,6 +100,16 @@ describe Asciidoctor::Reducer do
       end
     end
 
+    it 'should fail to reduce file if File object specified by :to option is closed' do
+      expect do
+        run_scenario do
+          input_source the_input_source
+          output_file create_output_file
+          reduce { File.open(output_file, mode: 'w:UTF-8') {|f| subject.reduce_file input_file, to: f.tap(&:close) } }
+        end
+      end.to raise_exception IOError, 'closed stream'
+    end
+
     it 'should reduce input to file for Pathname object specified by :to option' do
       run_scenario do
         input_source the_input_source
