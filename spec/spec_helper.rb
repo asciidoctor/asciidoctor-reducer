@@ -89,7 +89,7 @@ class ScenarioBuilder
         (@example.expect @result).to @example.have_source @expected_source
         if @output_file
           if ::String === @output_file
-            actual_source = ::File.read @output_file, mode: 'r:UTF-8'
+            actual_source = ::File.read @output_file, mode: 'rb:UTF-8'
           elsif @output_file.respond_to? :string
             actual_source = @output_file.string
           else
