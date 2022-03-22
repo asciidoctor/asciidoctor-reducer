@@ -21,6 +21,7 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 
 * Replace remote include with link if `allow-uri-read` attribute is not set
 * Don't raise error if `Asciidoctor::Reducer::Extensions.unregister` is called when extensions are not registered globally
+* Ensure output is written to file with universal newlines (\n) on Windows
 
 == 1.0.0.alpha.8 (2022-02-23) - @mojavelinux
 

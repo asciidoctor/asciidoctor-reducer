@@ -35,7 +35,7 @@ module Asciidoctor::Reducer
       output += LF unless output.empty?
       if ::Pathname === to || (!(to.respond_to? :write) && (to = ::Pathname.new to.to_s))
         to.dirname.mkpath
-        to.write output, encoding: UTF_8
+        to.write output, encoding: UTF_8, newline: :universal
       else
         to.write output
       end
