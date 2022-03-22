@@ -25,6 +25,55 @@ describe Asciidoctor::Reducer::Extensions do
       (expect registry.groups.keys).to have_size 1
       (expect registry.groups[described_class.key]).not_to be_nil
     end
+
+    it 'should add extension group to specified registry if not present' do
+      seed_registry = ::Asciidoctor::Extensions.create :seed do
+        tree_processor do
+          process do |doc|
+            doc.source_lines << '// looks good!'
+            doc
+          end
+        end
+      end
+      registry = subject.call seed_registry
+      (expect registry).not_to be_nil
+      (expect registry.groups.keys).to have_size 2
+      (expect registry.groups.keys).to eql [:seed, described_class.key]
+      (expect registry.groups[described_class.key]).not_to be_nil
+      run_scenario do
+        input_source 'include::single-line-paragraph.adoc[]'
+        reduce_options safe: :safe, extension_registry: registry
+        reduce { Asciidoctor.load_file input_file, *reduce_options }
+        expected_source <<~'END'
+        single line paragraph
+        // looks good!
+        END
+      end
+    end
+
+    it 'should prepare a new registry from proc and add extension group' do
+      seed_registry_proc = proc do
+        tree_processor do
+          process do |doc|
+            doc.source_lines << '// looks good!'
+            doc
+          end
+        end
+      end
+      registry = subject.call seed_registry_proc
+      (expect registry).not_to be_nil
+      (expect registry.groups.keys).to have_size 2
+      (expect registry.groups[described_class.key]).not_to be_nil
+      run_scenario do
+        input_source 'include::single-line-paragraph.adoc[]'
+        reduce_options safe: :safe, extension_registry: registry
+        reduce { Asciidoctor.load_file input_file, *reduce_options }
+        expected_source <<~'END'
+        single line paragraph
+        // looks good!
+        END
+      end
+    end
   end
 
   describe_method '.register' do
