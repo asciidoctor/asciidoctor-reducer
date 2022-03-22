@@ -19,11 +19,19 @@ describe Asciidoctor::Reducer::Extensions do
   end
 
   describe_method '.prepare_registry' do
-    it 'should prepare a new registry if no registry is specified' do
+    it 'should prepare new registry if no registry is specified and extension group is not registered globally' do
       registry = subject.call
       (expect registry).not_to be_nil
       (expect registry.groups.keys).to have_size 1
       (expect registry.groups[described_class.key]).not_to be_nil
+    end
+
+    it 'should not prepare new registry if no registry is specified and extension group is registered globally' do
+      described_class.register
+      registry = subject.call
+      (expect registry).to be_nil
+    ensure
+      described_class.unregister
     end
 
     it 'should add extension group to specified registry if not present' do

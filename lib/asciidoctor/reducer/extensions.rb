@@ -22,14 +22,13 @@ module Asciidoctor::Reducer
 
     def prepare_registry registry = nil
       registry = ::Asciidoctor::Extensions.create(&registry) if ::Proc === registry
-      unless ::Asciidoctor::Extensions.groups[key]
-        if registry
-          registry.groups[key] = group
-        else
-          registry = ::Asciidoctor::Extensions.create key, &group
-        end
+      return registry if ::Asciidoctor::Extensions.groups[key]
+      if registry
+        registry.groups[key] = group
+        registry
+      else
+        ::Asciidoctor::Extensions.create key, &group
       end
-      registry
     end
 
     def register
@@ -37,8 +36,7 @@ module Asciidoctor::Reducer
     end
 
     def unregister
-      #::Asciidoctor::Extensions.unregister key # NOTE: fails if groups is not initialized
-      ::Asciidoctor::Extensions.groups.delete key
+      ::Asciidoctor::Extensions.groups.delete key # NOTE `Extensions.unregister key` fails if groups is not initialized
     end
   end
 end
