@@ -72,6 +72,10 @@ class ScenarioBuilder
     create_file %w(main- .adoc), source
   end
 
+  def create_output_file
+    (with_tmp_file %w(tmp- .adoc), tmpdir: output_dir).tap(&:close).path
+  end
+
   def expected_log_messages *argv
     @expected_log_messages = argv
   end
@@ -84,7 +88,9 @@ class ScenarioBuilder
       when ::Asciidoctor::Document
         (@example.expect @result).to @example.have_source @expected_source
         if @output_file
-          if @output_file.respond_to? :string
+          if ::String === @output_file
+            actual_source = ::File.read @output_file, mode: 'r:UTF-8'
+          elsif @output_file.respond_to? :string
             actual_source = @output_file.string
           else
             @output_file.rewind if @output_file.eof?

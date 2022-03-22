@@ -72,17 +72,15 @@ describe Asciidoctor::Reducer do
 
   context ':to option' do
     it 'should reduce input to file at path specified by :to option' do
-      with_tmp_file tmpdir: output_dir do |the_output_file|
-        run_scenario do
-          input_source the_input_source
-          output_file the_output_file
-          reduce { subject.reduce_file input_file, to: the_output_file.path }
-          expected_source the_expected_source
-        end
+      run_scenario do
+        input_source the_input_source
+        output_file create_output_file
+        reduce { subject.reduce_file input_file, to: output_file }
+        expected_source the_expected_source
       end
     end
 
-    it 'should reduce input to File object specified by :to option' do
+    it 'should reduce input to managed File object specified by :to option' do
       with_tmp_file tmpdir: output_dir do |the_output_file|
         run_scenario do
           input_source the_input_source
@@ -93,14 +91,21 @@ describe Asciidoctor::Reducer do
       end
     end
 
+    it 'should reduce input to open File object specified by :to option' do
+      run_scenario do
+        input_source the_input_source
+        output_file create_output_file
+        reduce { File.open(output_file, mode: 'w:UTF-8') {|f| subject.reduce_file input_file, to: f } }
+        expected_source the_expected_source
+      end
+    end
+
     it 'should reduce input to file for Pathname object specified by :to option' do
-      with_tmp_file tmpdir: output_dir do |the_output_file|
-        run_scenario do
-          input_source the_input_source
-          output_file the_output_file
-          reduce { subject.reduce_file input_file, to: (Pathname.new the_output_file.path) }
-          expected_source the_expected_source
-        end
+      run_scenario do
+        input_source the_input_source
+        output_file create_output_file
+        reduce { subject.reduce_file input_file, to: (Pathname.new output_file) }
+        expected_source the_expected_source
       end
     end
 
@@ -113,10 +118,9 @@ describe Asciidoctor::Reducer do
     end
 
     it 'should reduce input and send to write method if :to option is StringIO object' do
-      to = StringIO.new
       run_scenario do
         input_source the_input_source
-        output_file to
+        output_file (to = StringIO.new)
         reduce { subject.reduce_file input_file, to: to }
         expected_source the_expected_source
       end
@@ -159,15 +163,13 @@ describe Asciidoctor::Reducer do
     end
 
     it 'should not pass :to option to Asciidoctor.load_file' do
-      with_tmp_file tmpdir: output_dir do |the_output_file|
-        doc = run_scenario do
-          input_source the_input_source
-          output_file the_output_file
-          reduce { subject.reduce_file input_file, to: the_output_file }
-          expected_source the_expected_source
-        end
-        (expect doc.options).not_to have_key :to
+      doc = run_scenario do
+        input_source the_input_source
+        output_file create_output_file
+        reduce { subject.reduce_file input_file, to: output_file }
+        expected_source the_expected_source
       end
+      (expect doc.options).not_to have_key :to
     end
   end
 
