@@ -194,19 +194,27 @@ describe Asciidoctor::Reducer do
   end
 
   it 'should resolve nested include relative to include file' do
-    doc = reduce_file fixture_file 'parent-with-nested-include-in-subdir.adoc'
-    expected_source = <<~'END'.chomp
-    before include
+    doc = run_scenario do
+      input_source <<~'EOS'
+      before include
 
-    before relative include
+      include::subdir/with-relative-include.adoc[]
 
-    contents of relative include
+      after include
+      EOS
 
-    after relative include
+      expected_source <<~'EOS'
+      before include
 
-    after include
-    END
-    (expect doc).to have_source expected_source
+      before relative include
+
+      contents of relative include
+
+      after relative include
+
+      after include
+      EOS
+    end
     (expect doc.blocks).to have_size 5
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9]
   end
