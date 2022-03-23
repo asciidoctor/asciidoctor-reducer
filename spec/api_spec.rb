@@ -66,6 +66,15 @@ describe Asciidoctor::Reducer do
         expected_source 'primary content'
       end
     end
+
+    it 'should convert CRLF newlines in input file to LF newlines in output file' do
+      run_scenario do
+        input_source the_input_source
+        output_file create_output_file
+        reduce { subject.call (create_file %w(main- .adoc), input_source, newline: :crlf), to: output_file }
+        expected_source the_expected_source
+      end
+    end
   end
 
   context ':to option' do
