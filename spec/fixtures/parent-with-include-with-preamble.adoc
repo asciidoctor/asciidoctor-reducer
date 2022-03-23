@@ -1,7 +1,0 @@
-= Document Title
-
-include::single-line-paragraph.adoc[]
-
-== Chapter A
-
-== Chapter B
