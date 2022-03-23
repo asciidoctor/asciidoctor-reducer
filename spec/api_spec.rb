@@ -183,6 +183,15 @@ describe Asciidoctor::Reducer do
       end
     end
 
+    it 'should allow :to option to be used with reduce method' do
+      run_scenario do
+        input_source the_input_source
+        output_file create_output_file
+        reduce { subject.reduce input_source, to: output_file, attributes: { 'docdir' => fixtures_dir } }
+        expected_source the_expected_source
+      end
+    end
+
     it 'should not pass :to option to Asciidoctor.load_file' do
       doc = run_scenario do
         input_source the_input_source
