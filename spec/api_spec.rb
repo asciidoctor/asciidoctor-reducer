@@ -41,6 +41,30 @@ describe Asciidoctor::Reducer do
       end
     end
 
+    it 'should reduce input when options are specified' do
+      doc = run_scenario do
+        input_source <<~'END'
+        primary content
+        ifdef::flag[]
+        conditional content
+        endif::[]
+
+        include::single-line-paragraph.adoc[]
+        END
+        reduce { subject.call input_source, safe: :unsafe, sourcemap: true, attributes: { 'docdir' => fixtures_dir } }
+        expected_source <<~'END'
+        primary content
+
+        single line paragraph
+        END
+      end
+      (expect doc.options[:sourcemap]).to be true
+      (expect doc.sourcemap).to be true
+      (expect doc.options[:safe]).to be :unsafe
+      (expect doc.safe).to be Asciidoctor::SafeMode::UNSAFE
+      (expect doc.attr 'docdir').to eql fixtures_dir
+    end
+
     it 'should reduce input specified as File object' do
       doc = (scenario = create_scenario do
         input_source the_input_source
@@ -65,6 +89,30 @@ describe Asciidoctor::Reducer do
         reduce { subject.call input_file }
         expected_source 'primary content'
       end
+    end
+
+    it 'should reduce input when options are specified' do
+      doc = run_scenario do
+        input_source <<~'END'
+        primary content
+        ifdef::flag[]
+        conditional content
+        endif::[]
+
+        include::single-line-paragraph.adoc[]
+        END
+        reduce { subject.call input_file, safe: :unsafe, sourcemap: true }
+        expected_source <<~'END'
+        primary content
+
+        single line paragraph
+        END
+      end
+      (expect doc.options[:sourcemap]).to be true
+      (expect doc.sourcemap).to be true
+      (expect doc.options[:safe]).to be :unsafe
+      (expect doc.safe).to be Asciidoctor::SafeMode::UNSAFE
+      (expect doc.attr 'docdir').to eql fixtures_dir
     end
 
     it 'should convert CRLF newlines in input file to LF newlines in output file' do
