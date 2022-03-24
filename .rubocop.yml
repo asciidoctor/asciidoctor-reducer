@@ -180,7 +180,9 @@ Naming/FileName:
   Enabled: true
   Exclude: [ lib/asciidoctor-reducer.rb ]
 Naming/HeredocDelimiterNaming:
-  Enabled: false # reason: EOS is meaningful
+  Enabled: true
+  ForbiddenDelimiters:
+  - !ruby/regexp '/^\s*EO[A-Z]\s*$/'
 Naming/InclusiveLanguage:
   Enabled: true
 Naming/MethodParameterName:

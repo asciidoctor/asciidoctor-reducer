@@ -195,15 +195,15 @@ describe Asciidoctor::Reducer do
 
   it 'should resolve nested include relative to include file' do
     doc = run_scenario do
-      input_source <<~'EOS'
+      input_source <<~'END'
       before include
 
       include::subdir/with-relative-include.adoc[]
 
       after include
-      EOS
+      END
 
-      expected_source <<~'EOS'
+      expected_source <<~'END'
       before include
 
       before relative include
@@ -213,7 +213,7 @@ describe Asciidoctor::Reducer do
       after relative include
 
       after include
-      EOS
+      END
     end
     (expect doc.blocks).to have_size 5
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9]
@@ -611,21 +611,21 @@ describe Asciidoctor::Reducer do
 
   it 'should flag include as an unresolved directive if target is empty' do
     doc = run_scenario do
-      input_source <<~'EOS'
+      input_source <<~'END'
       before include
 
       include::{empty}[]
 
       after include
-      EOS
+      END
 
-      expected_source <<~EOS
+      expected_source <<~END
       before include
 
       Unresolved directive in #{input_file_basename} - include::{empty}[]
 
       after include
-      EOS
+      END
 
       expected_log_messages [
         { severity: :WARN, message: '~include dropped because resolved target is blank:', last: true },
