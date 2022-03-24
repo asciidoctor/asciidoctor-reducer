@@ -51,7 +51,8 @@ describe Asciidoctor::Reducer do
 
         include::single-line-paragraph.adoc[]
         END
-        reduce { subject.call input_source, safe: :unsafe, sourcemap: true, attributes: { 'docdir' => fixtures_dir } }
+        reduce_options safe: :unsafe, sourcemap: true, attributes: { 'docdir' => fixtures_dir }
+        reduce { subject.call input_source, *reduce_options }
         expected_source <<~'END'
         primary content
 
@@ -101,7 +102,8 @@ describe Asciidoctor::Reducer do
 
         include::single-line-paragraph.adoc[]
         END
-        reduce { subject.call input_file, safe: :unsafe, sourcemap: true }
+        reduce_options safe: :unsafe, sourcemap: true
+        reduce { subject.call input_file, *reduce_options }
         expected_source <<~'END'
         primary content
 
