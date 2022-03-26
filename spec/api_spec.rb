@@ -154,9 +154,8 @@ describe Asciidoctor::Reducer do
 
     it 'should convert CRLF newlines in input file to LF newlines in output file' do
       run_scenario do
-        input_source the_input_source
         output_file create_output_file
-        reduce { subject.call (create_file %w(main- .adoc), input_source, newline: :crlf), to: output_file }
+        reduce { subject.call (create_file %w(main- .adoc), the_input_source, newline: :crlf), to: output_file }
         expected_source the_expected_source
       end
     end
@@ -279,9 +278,8 @@ describe Asciidoctor::Reducer do
 
     it 'should allow :to option to be used with reduce method' do
       run_scenario do
-        input_source the_input_source
         output_file create_output_file
-        reduce { subject.reduce input_source, to: output_file, attributes: { 'docdir' => fixtures_dir } }
+        reduce { subject.reduce the_input_source, to: output_file, attributes: { 'docdir' => fixtures_dir } }
         expected_source the_expected_source
       end
     end

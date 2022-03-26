@@ -131,15 +131,13 @@ class ScenarioBuilder
   end
 
   def run
-    if @input_source && @reduce
+    if @reduce
       if @expected_log_messages
         (@example.expect do
-          @result = @reduce.call
-          @verify&.call
+          @verify&.call if (@result = @reduce.call)
         end).to @example.log_messages(*@expected_log_messages)
       else
-        @result = @reduce.call
-        @verify&.call
+        @verify&.call if (@result = @reduce.call)
       end
     end
     @result
