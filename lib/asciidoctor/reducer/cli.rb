@@ -51,7 +51,7 @@ module Asciidoctor::Reducer
 
         opts.on '-S', '--safe-mode SAFE_MODE', ['unsafe', 'safe', 'server', 'secure'],
           'set safe mode level: [unsafe, safe, server, secure] (default: unsafe)' do |name|
-          options[:safe] = ::Asciidoctor::SafeMode.value_for_name name
+          options[:safe] = name.to_sym
         end
 
         opts.on '--trace', 'trace the cause of application errors (default: false)' do
