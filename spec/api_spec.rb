@@ -143,10 +143,10 @@ describe Asciidoctor::Reducer do
         END
         reduce_options attributes: { 'flag' => '' }
         reduce { subject.call input_file, *reduce_options }
-        expected_source <<~'EOS'
+        expected_source <<~'END'
         single line paragraph
         conditional content
-        EOS
+        END
       end
       (expect doc.options[:safe]).to eql :safe
       (expect doc.safe).to eql Asciidoctor::SafeMode::SAFE

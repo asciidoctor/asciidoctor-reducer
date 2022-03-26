@@ -136,8 +136,8 @@ class ScenarioBuilder
         (@example.expect do
           @verify&.call if (@result = @reduce.call)
         end).to @example.log_messages(*@expected_log_messages)
-      else
-        @verify&.call if (@result = @reduce.call)
+      elsif (@result = @reduce.call)
+        @verify&.call
       end
     end
     @result
