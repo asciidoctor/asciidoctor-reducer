@@ -41,6 +41,19 @@ describe Asciidoctor::Reducer do
       end
     end
 
+    it 'should reduce input when options are nil' do
+      run_scenario do
+        input_source <<~'END'
+        primary content
+        ifdef::flag[]
+        conditional content
+        endif::[]
+        END
+        reduce { subject.call input_source, nil }
+        expected_source 'primary content'
+      end
+    end
+
     it 'should reduce input when options are specified' do
       doc = run_scenario do
         input_source <<~'END'
@@ -104,6 +117,19 @@ describe Asciidoctor::Reducer do
         endif::[]
         END
         reduce { subject.call input_file }
+        expected_source 'primary content'
+      end
+    end
+
+    it 'should reduce input when options are nil' do
+      run_scenario do
+        input_source <<~'END'
+        primary content
+        ifdef::flag[]
+        conditional content
+        endif::[]
+        END
+        reduce { subject.call input_file, nil }
         expected_source 'primary content'
       end
     end
@@ -368,6 +394,14 @@ describe Asciidoctor::Reducer do
           expected_source the_expected_source
         end
         (expect extension_calls).to eql [false, true]
+      end
+
+      it 'should not pass :extension_registry option with nil value' do
+        doc = run_scenario do
+          input_source the_input_source
+          expected_source the_expected_source
+        end
+        (expect doc.options).not_to have_key :extension_registry
       end
 
       it 'should not register extension for call with custom extension registry' do
