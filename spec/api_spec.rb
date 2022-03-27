@@ -155,7 +155,8 @@ describe Asciidoctor::Reducer do
     it 'should convert CRLF newlines in input file to LF newlines in output file' do
       run_scenario do
         output_file create_output_file
-        reduce { subject.call (create_file %w(main- .adoc), the_input_source, newline: :crlf), to: output_file }
+        reduce_options to: output_file
+        reduce { subject.call (create_file %w(main- .adoc), the_input_source, newline: :crlf), *reduce_options }
         expected_source the_expected_source
       end
     end
@@ -166,7 +167,8 @@ describe Asciidoctor::Reducer do
       run_scenario do
         input_source the_input_source
         output_file create_output_file
-        reduce { subject.reduce_file input_file, to: output_file }
+        reduce_options to: output_file
+        reduce { subject.reduce_file input_file, *reduce_options }
         expected_source the_expected_source
       end
     end
@@ -175,8 +177,9 @@ describe Asciidoctor::Reducer do
       (scenario = create_scenario do
         input_source the_input_source
         output_file create_output_file
+        reduce_options to: output_file
         reduce do
-          subject.reduce_file input_file, to: output_file
+          subject.reduce_file input_file, *reduce_options
           (File.read output_file, mode: 'rb').chomp
         end
         expected_source the_expected_source
@@ -189,7 +192,8 @@ describe Asciidoctor::Reducer do
         run_scenario do
           input_source the_input_source
           output_file the_output_file
-          reduce { subject.reduce_file input_file, to: the_output_file }
+          reduce_options to: the_output_file
+          reduce { subject.reduce_file input_file, *reduce_options }
           expected_source the_expected_source
         end
       end
@@ -218,7 +222,8 @@ describe Asciidoctor::Reducer do
       run_scenario do
         input_source the_input_source
         output_file create_output_file
-        reduce { subject.reduce_file input_file, to: (Pathname.new output_file) }
+        reduce_options to: (Pathname.new output_file)
+        reduce { subject.reduce_file input_file, *reduce_options }
         expected_source the_expected_source
       end
     end
@@ -226,7 +231,8 @@ describe Asciidoctor::Reducer do
     it 'should reduce input to string if :to option is String class' do
       run_scenario do
         input_source the_input_source
-        reduce { subject.reduce_file input_file, to: String }
+        reduce_options to: String
+        reduce { subject.reduce_file input_file, *reduce_options }
         expected_source the_expected_source
       end
     end
@@ -235,7 +241,8 @@ describe Asciidoctor::Reducer do
       run_scenario do
         input_source the_input_source
         output_file (to = StringIO.new)
-        reduce { subject.reduce_file input_file, to: to }
+        reduce_options to: to
+        reduce { subject.reduce_file input_file, *reduce_options }
         expected_source the_expected_source
       end
     end
@@ -255,7 +262,8 @@ describe Asciidoctor::Reducer do
       run_scenario do
         input_source the_input_source
         output_file to
-        reduce { subject.reduce_file input_file, to: to }
+        reduce_options to: to
+        reduce { subject.reduce_file input_file, *reduce_options }
         expected_source the_expected_source
       end
     end
@@ -263,7 +271,8 @@ describe Asciidoctor::Reducer do
     it 'should reduce input but not write if :to option is /dev/null string' do
       run_scenario do
         input_source the_input_source
-        reduce { subject.reduce_file input_file, to: '/dev/null' }
+        reduce_options to: '/dev/null'
+        reduce { subject.reduce_file input_file, *reduce_options }
         expected_source the_expected_source
       end
     end
@@ -271,7 +280,8 @@ describe Asciidoctor::Reducer do
     it 'should reduce input but not write if :to option is nil' do
       run_scenario do
         input_source the_input_source
-        reduce { subject.reduce_file input_file, to: nil }
+        reduce_options to: nil
+        reduce { subject.reduce_file input_file, *reduce_options }
         expected_source the_expected_source
       end
     end
@@ -279,7 +289,8 @@ describe Asciidoctor::Reducer do
     it 'should allow :to option to be used with reduce method' do
       run_scenario do
         output_file create_output_file
-        reduce { subject.reduce the_input_source, to: output_file, attributes: { 'docdir' => fixtures_dir } }
+        reduce_options to: output_file, attributes: { 'docdir' => fixtures_dir }
+        reduce { subject.reduce the_input_source, *reduce_options }
         expected_source the_expected_source
       end
     end
@@ -288,7 +299,8 @@ describe Asciidoctor::Reducer do
       doc = run_scenario do
         input_source the_input_source
         output_file create_output_file
-        reduce { subject.reduce_file input_file, to: output_file }
+        reduce_options to: output_file
+        reduce { subject.reduce_file input_file, *reduce_options }
         expected_source the_expected_source
       end
       (expect doc.options).not_to have_key :to
@@ -298,7 +310,8 @@ describe Asciidoctor::Reducer do
       doc = run_scenario do
         input_source the_input_source
         output_file create_output_file
-        reduce { subject.reduce input_source, to: output_file, attributes: { 'docdir' => fixtures_dir } }
+        reduce_options to: output_file, attributes: { 'docdir' => fixtures_dir }
+        reduce { subject.reduce input_source, *reduce_options }
         expected_source the_expected_source
       end
       (expect doc.options).not_to have_key :to
