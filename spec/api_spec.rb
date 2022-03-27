@@ -52,7 +52,7 @@ describe Asciidoctor::Reducer do
         include::single-line-paragraph.adoc[]
         END
         reduce_options safe: :unsafe, sourcemap: true, attributes: { 'docdir' => fixtures_dir }
-        reduce { subject.call input_source, *reduce_options }
+        reduce { subject.call input_source, reduce_options }
         expected_source <<~'END'
         primary content
 
@@ -75,7 +75,7 @@ describe Asciidoctor::Reducer do
         endif::[]
         END
         reduce_options attributes: { 'docdir' => fixtures_dir }
-        reduce { subject.call input_source, *reduce_options }
+        reduce { subject.call input_source, reduce_options }
         expected_source 'single line paragraph'
       end
       (expect doc.options[:safe]).to eql :safe
@@ -119,7 +119,7 @@ describe Asciidoctor::Reducer do
         include::single-line-paragraph.adoc[]
         END
         reduce_options safe: :unsafe, sourcemap: true
-        reduce { subject.call input_file, *reduce_options }
+        reduce { subject.call input_file, reduce_options }
         expected_source <<~'END'
         primary content
 
@@ -142,7 +142,7 @@ describe Asciidoctor::Reducer do
         endif::[]
         END
         reduce_options attributes: { 'flag' => '' }
-        reduce { subject.call input_file, *reduce_options }
+        reduce { subject.call input_file, reduce_options }
         expected_source <<~'END'
         single line paragraph
         conditional content
@@ -156,7 +156,7 @@ describe Asciidoctor::Reducer do
       run_scenario do
         output_file create_output_file
         reduce_options to: output_file
-        reduce { subject.call (create_file %w(main- .adoc), the_input_source, newline: :crlf), *reduce_options }
+        reduce { subject.call (create_file %w(main- .adoc), the_input_source, newline: :crlf), reduce_options }
         expected_source the_expected_source
       end
     end
@@ -168,7 +168,7 @@ describe Asciidoctor::Reducer do
         input_source the_input_source
         output_file create_output_file
         reduce_options to: output_file
-        reduce { subject.reduce_file input_file, *reduce_options }
+        reduce { subject.reduce_file input_file, reduce_options }
         expected_source the_expected_source
       end
     end
@@ -179,7 +179,7 @@ describe Asciidoctor::Reducer do
         output_file create_output_file
         reduce_options to: output_file
         reduce do
-          subject.reduce_file input_file, *reduce_options
+          subject.reduce_file input_file, reduce_options
           (File.read output_file, mode: 'rb').chomp
         end
         expected_source the_expected_source
@@ -193,7 +193,7 @@ describe Asciidoctor::Reducer do
           input_source the_input_source
           output_file the_output_file
           reduce_options to: the_output_file
-          reduce { subject.reduce_file input_file, *reduce_options }
+          reduce { subject.reduce_file input_file, reduce_options }
           expected_source the_expected_source
         end
       end
@@ -223,7 +223,7 @@ describe Asciidoctor::Reducer do
         input_source the_input_source
         output_file create_output_file
         reduce_options to: (Pathname.new output_file)
-        reduce { subject.reduce_file input_file, *reduce_options }
+        reduce { subject.reduce_file input_file, reduce_options }
         expected_source the_expected_source
       end
     end
@@ -232,7 +232,7 @@ describe Asciidoctor::Reducer do
       run_scenario do
         input_source the_input_source
         reduce_options to: String
-        reduce { subject.reduce_file input_file, *reduce_options }
+        reduce { subject.reduce_file input_file, reduce_options }
         expected_source the_expected_source
       end
     end
@@ -242,7 +242,7 @@ describe Asciidoctor::Reducer do
         input_source the_input_source
         output_file (to = StringIO.new)
         reduce_options to: to
-        reduce { subject.reduce_file input_file, *reduce_options }
+        reduce { subject.reduce_file input_file, reduce_options }
         expected_source the_expected_source
       end
     end
@@ -263,7 +263,7 @@ describe Asciidoctor::Reducer do
         input_source the_input_source
         output_file to
         reduce_options to: to
-        reduce { subject.reduce_file input_file, *reduce_options }
+        reduce { subject.reduce_file input_file, reduce_options }
         expected_source the_expected_source
       end
     end
@@ -272,7 +272,7 @@ describe Asciidoctor::Reducer do
       run_scenario do
         input_source the_input_source
         reduce_options to: '/dev/null'
-        reduce { subject.reduce_file input_file, *reduce_options }
+        reduce { subject.reduce_file input_file, reduce_options }
         expected_source the_expected_source
       end
     end
@@ -281,7 +281,7 @@ describe Asciidoctor::Reducer do
       run_scenario do
         input_source the_input_source
         reduce_options to: nil
-        reduce { subject.reduce_file input_file, *reduce_options }
+        reduce { subject.reduce_file input_file, reduce_options }
         expected_source the_expected_source
       end
     end
@@ -290,7 +290,7 @@ describe Asciidoctor::Reducer do
       run_scenario do
         output_file create_output_file
         reduce_options to: output_file, attributes: { 'docdir' => fixtures_dir }
-        reduce { subject.reduce the_input_source, *reduce_options }
+        reduce { subject.reduce the_input_source, reduce_options }
         expected_source the_expected_source
       end
     end
@@ -300,7 +300,7 @@ describe Asciidoctor::Reducer do
         input_source the_input_source
         output_file create_output_file
         reduce_options to: output_file
-        reduce { subject.reduce_file input_file, *reduce_options }
+        reduce { subject.reduce_file input_file, reduce_options }
         expected_source the_expected_source
       end
       (expect doc.options).not_to have_key :to
@@ -311,7 +311,7 @@ describe Asciidoctor::Reducer do
         input_source the_input_source
         output_file create_output_file
         reduce_options to: output_file, attributes: { 'docdir' => fixtures_dir }
-        reduce { subject.reduce input_source, *reduce_options }
+        reduce { subject.reduce input_source, reduce_options }
         expected_source the_expected_source
       end
       (expect doc.options).not_to have_key :to
@@ -386,7 +386,7 @@ describe Asciidoctor::Reducer do
         run_scenario do
           input_source the_input_source
           reduce_options safe: :safe, sourcemap: true, extension_registry: extension_registry
-          reduce { Asciidoctor.load_file input_file, *reduce_options }
+          reduce { Asciidoctor.load_file input_file, reduce_options }
           expected_source the_expected_source
         end
         (expect extension_calls).to eql [false, true]

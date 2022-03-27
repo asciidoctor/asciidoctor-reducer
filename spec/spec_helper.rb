@@ -42,8 +42,8 @@ class ScenarioBuilder
     @example = example
     @expected_log_messages = @expected_source = @input_file = @input_source = @output_file = @result = @verify = nil
     @files = []
-    @reduce = proc { reduce_file input_file, *@reduce_options }
-    @reduce_options = []
+    @reduce = proc { reduce_file input_file, **@reduce_options }
+    @reduce_options = {}
   end
 
   def build &block
@@ -126,8 +126,8 @@ class ScenarioBuilder
     @reduce = value && block_given? ? block : false
   end
 
-  def reduce_options arg1 = UNDEFINED, *argv
-    arg1 == UNDEFINED ? @reduce_options : (@reduce_options = [arg1] + argv)
+  def reduce_options opts = UNDEFINED
+    opts == UNDEFINED ? @reduce_options : (@reduce_options = opts)
   end
 
   def run

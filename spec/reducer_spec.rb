@@ -940,7 +940,7 @@ describe Asciidoctor::Reducer do
 
       reduce_options safe: :secure, sourcemap: true, extensions: proc { include_processor { process { next } } }
 
-      reduce { Asciidoctor.load_file input_file, *reduce_options }
+      reduce { Asciidoctor.load_file input_file, reduce_options }
 
       expected_source <<~'END'
       before include
@@ -1606,7 +1606,7 @@ describe Asciidoctor::Reducer do
 
       reduce_options sourcemap: false, logger: nil, attributes: 'attribute-missing=warn'
 
-      reduce { (reduce_file input_file, *reduce_options).tap { actual_logger = Asciidoctor::LoggerManager.logger } }
+      reduce { (reduce_file input_file, reduce_options).tap { actual_logger = Asciidoctor::LoggerManager.logger } }
 
       expected_source input_source
 

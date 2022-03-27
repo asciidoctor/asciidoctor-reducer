@@ -51,7 +51,7 @@ describe Asciidoctor::Reducer::Extensions do
       run_scenario do
         input_source 'include::single-line-paragraph.adoc[]'
         reduce_options safe: :safe, extension_registry: registry
-        reduce { Asciidoctor.load_file input_file, *reduce_options }
+        reduce { Asciidoctor.load_file input_file, reduce_options }
         expected_source <<~'END'
         single line paragraph
         // looks good!
@@ -75,7 +75,7 @@ describe Asciidoctor::Reducer::Extensions do
       run_scenario do
         input_source 'include::single-line-paragraph.adoc[]'
         reduce_options safe: :safe, extension_registry: registry
-        reduce { Asciidoctor.load_file input_file, *reduce_options }
+        reduce { Asciidoctor.load_file input_file, reduce_options }
         expected_source <<~'END'
         single line paragraph
         // looks good!
