@@ -1124,10 +1124,22 @@ describe Asciidoctor::Reducer do
 
   it 'should resolve include with lines' do
     doc = run_scenario do
-      input_source <<~'END'
+      include_file = create_include_file <<~'END'
+      first paragraph, first line
+      first paragraph, second line
+
+      second paragraph, first line
+      second paragraph, second line
+
+      third paragraph
+
+      fourth paragraph
+      END
+
+      input_source <<~END
       before include
 
-      include::include-by-lines.adoc[lines=2..7]
+      include::#{include_file}[lines=2..7]
 
       after include
       END
