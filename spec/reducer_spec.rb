@@ -713,51 +713,59 @@ describe Asciidoctor::Reducer do
   end
 
   it 'should reduce remote include if allow-uri-read is set' do
-    doc = with_local_webserver do |base_url|
-      described_class.reduce <<~END, attributes: { 'allow-uri-read' => '' }
-      before include
+    with_local_webserver do |base_url|
+      run_scenario do
+        input_source <<~END
+        before include
 
-      include::#{base_url}/no-includes.adoc[]
+        include::#{base_url}/no-includes.adoc[]
 
-      after include
-      END
+        after include
+        END
+
+        reduce_options attributes: 'allow-uri-read'
+
+        expected_source <<~'END'
+        before include
+
+        no includes here
+
+        just good old-fashioned paragraph text
+
+        after include
+        END
+      end
     end
-    expected_lines = <<~'END'.chomp.split ?\n
-    before include
-
-    no includes here
-
-    just good old-fashioned paragraph text
-
-    after include
-    END
-    (expect doc.source_lines).to eql expected_lines
   end
 
   it 'should reduce remote include with include if allow-uri-read is set' do
-    doc = with_local_webserver do |base_url|
-      described_class.reduce <<~END, attributes: { 'allow-uri-read' => '' }
-      before include
+    with_local_webserver do |base_url|
+      run_scenario do
+        input_source <<~END
+        before include
 
-      include::#{base_url}/include-with-include.adoc[]
+        include::#{base_url}/include-with-include.adoc[]
 
-      after include
-      END
+        after include
+        END
+
+        reduce_options attributes: 'allow-uri-read'
+
+        expected_source <<~'END'
+        before include
+
+        before nested include
+
+        no includes here
+
+        just good old-fashioned paragraph text
+
+        after nested include
+
+        after include
+        END
+      end
     end
-    expected_lines = <<~'END'.chomp.split ?\n
-    before include
-
-    before nested include
-
-    no includes here
-
-    just good old-fashioned paragraph text
-
-    after nested include
-
-    after include
-    END
-    (expect doc.source_lines).to eql expected_lines
   end
 
   it 'should not process link macro following include skipped by include processor when safe mode is not secure' do
