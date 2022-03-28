@@ -5,7 +5,7 @@ describe Asciidoctor::Reducer do
     <<~'END'
     before include
 
-    include::single-line-paragraph.adoc[]
+    include::multiple-paragraphs.adoc[]
 
     after include
     END
@@ -15,7 +15,10 @@ describe Asciidoctor::Reducer do
     <<~'END'
     before include
 
-    single line paragraph
+    first paragraph
+
+    second paragraph
+    with two lines
 
     after include
     END
