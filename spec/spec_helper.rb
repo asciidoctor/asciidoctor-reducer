@@ -122,8 +122,8 @@ class ScenarioBuilder
     file == UNDEFINED ? @output_file : (@output_file = file)
   end
 
-  def reduce value = true, &block
-    @reduce = value && block_given? ? block : false
+  def reduce value = UNDEFINED, &block
+    value == UNDEFINED ? (block_given? ? (@reduce = block) : @reduce) : (@reduce = !!value)
   end
 
   def reduce_options opts = UNDEFINED

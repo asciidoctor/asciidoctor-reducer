@@ -1614,7 +1614,7 @@ describe Asciidoctor::Reducer do
 
       reduce_options sourcemap: false, logger: nil, attributes: 'attribute-missing=warn'
 
-      reduce { (reduce_file input_file, reduce_options).tap { actual_logger = Asciidoctor::LoggerManager.logger } }
+      reduce(&->(s_reduce) { proc { s_reduce.call.tap { actual_logger = Asciidoctor::LoggerManager.logger } } }[reduce])
 
       expected_source input_source
 
