@@ -22,7 +22,8 @@ module Asciidoctor::Reducer
         END
 
         opts.on '-a KEY[=VALUE]', '--attribute=KEY[=VALUE]',
-          'set a document attribute in the AsciiDoc document: [key, key!, key=value]' do |attr|
+          'set a document attribute in the AsciiDoc document: [key, key!, key=value]',
+          'may be specified multiple times' do |attr|
           key, val = attr.split '=', 2
           val ||= ''
           options[:attributes][key] = val
@@ -45,7 +46,8 @@ module Asciidoctor::Reducer
           options[:log_level] = nil
         end
 
-        opts.on '-rLIBRARY', '--require LIBRARY', 'require the specified library or libraries before running' do |path|
+        opts.on '-rLIBRARY', '--require LIBRARY', 'require the specified library or libraries before reducing',
+          'may be specified multiple times' do |path|
           (options[:requires] ||= []).concat path.split ','
         end
 
