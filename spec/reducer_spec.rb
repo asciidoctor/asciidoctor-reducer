@@ -1488,10 +1488,22 @@ describe Asciidoctor::Reducer do
 
   it 'should reduce preprocessor conditional following a nested include' do
     doc = run_scenario do
-      input_source <<~'END'
+      include_file = create_include_file <<~'END'
+      ifdef::flag[]
+      before nested include
+      endif::[]
+
+      include::no-includes.adoc[]
+
+      ifdef::flag[]
+      after nested include
+      endif::[]
+      END
+
+      input_source <<~END
       before include
 
-      include::preprocessor-conditionals-and-include.adoc[]
+      include::#{include_file}[]
 
       after include
       END
