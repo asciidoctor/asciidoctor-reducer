@@ -97,7 +97,7 @@ class ScenarioBuilder
         (@example.expect @result).to @example.eql @expected_source
       when ::Integer
         # TODO allow exitstatus/exit_code to be specified
-        (@example.expect @result).to @example.be 0
+        (@example.expect @result).to @example.eql 0
         verify_output_file = true if @output_file
       end
       if verify_output_file

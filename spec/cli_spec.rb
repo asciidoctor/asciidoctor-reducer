@@ -46,7 +46,7 @@ describe Asciidoctor::Reducer::Cli do
 
     it 'should read args from ARGV by default' do
       out, _, res = run_command asciidoctor_reducer_bin, '-v'
-      (expect res.exitstatus).to be 0
+      (expect res.exitstatus).to eql 0
       (expect out.chomp).to eql %(asciidoctor-reducer #{Asciidoctor::Reducer::VERSION})
     end
   end
@@ -80,7 +80,7 @@ describe Asciidoctor::Reducer::Cli do
       out, err, res = run_command asciidoctor_reducer_bin, '-r', the_ext_file, the_source_file, '-a', 'signal=KILL'
       (expect res.exitstatus).to be_nil
       (expect res.success?).to be_falsey
-      (expect res.termsig).to be 9
+      (expect res.termsig).to eql 9
       (expect out).to be_empty
       (expect err).to be_empty
     end
@@ -143,7 +143,7 @@ describe Asciidoctor::Reducer::Cli do
         input_source the_input_source
         reduce { subject.run [input_file, '-o', Dir.tmpdir] }
       end
-      (expect exit_code).to be 1
+      (expect exit_code).to eql 1
       message = $stderr.string.chomp.downcase
       if message.include? 'permission'
         (expect message).to include 'permission denied'
@@ -350,7 +350,7 @@ describe Asciidoctor::Reducer::Cli do
         output_file $stdout
         reduce { subject.run [input_file, '-r', 'no-such-library'] }
         verify do
-          (example.expect result).to example.be 1
+          (example.expect result).to example.eql 1
           (example.expect $stderr.string).to example.start_with expected_message
           (example.expect $stdout.string).to example.be_empty
         end
