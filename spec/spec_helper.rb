@@ -84,23 +84,29 @@ class ScenarioBuilder
     return @expected_source if source == UNDEFINED
     @expected_source = source.chomp
     verify do
+      verify_output_file = nil
       case @result
       when ::Asciidoctor::Document
         (@example.expect @result).to @example.have_source @expected_source
-        if @output_file
-          if ::String === @output_file
-            actual_source = ::File.read @output_file, mode: 'rb:UTF-8'
-          elsif @output_file.respond_to? :string
-            actual_source = @output_file.string
-          else
-            @output_file.rewind if @output_file.eof?
-            actual_source = @output_file.read
-            @output_file.rewind
-          end
-          (@example.expect actual_source).to @example.eql @expected_source + ?\n
-        end
+        verify_output_file = true if @output_file
       when ::String
         (@example.expect @result).to @example.eql @expected_source
+      when ::Integer
+        # TODO allow exitstatus/exit_code to be specified
+        (@example.expect @result).to @example.be 0
+        verify_output_file = true if @output_file
+      end
+      if verify_output_file
+        if ::String === @output_file
+          actual_source = ::File.read @output_file, mode: 'rb:UTF-8'
+        elsif @output_file.respond_to? :string
+          actual_source = @output_file.string
+        else
+          @output_file.rewind if @output_file.eof?
+          actual_source = @output_file.read
+          @output_file.rewind
+        end
+        (@example.expect actual_source).to @example.eql @expected_source + (@expected_source.empty? ? '' : ?\n)
       end
     end
     @expected_source
