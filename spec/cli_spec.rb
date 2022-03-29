@@ -14,6 +14,29 @@ describe Asciidoctor::Reducer::Cli do
     $stdin, $stdout, $stderr = @old_stdin, @old_stdout, @old_stderr # rubocop:disable RSpec/InstanceVariable,RSpec/ExpectOutput
   end
 
+  let :the_input_source do
+    <<~'END'
+    before include
+
+    include::multiple-paragraphs.adoc[]
+
+    after include
+    END
+  end
+
+  let :the_expected_source do
+    <<~'END'
+    before include
+
+    first paragraph
+
+    second paragraph
+    with two lines
+
+    after include
+    END
+  end
+
   context 'bin script' do
     it 'should install bin script named asciidoctor-reducer' do
       bin_script = (Pathname.new Gem.bindir) / 'asciidoctor-reducer'
@@ -89,33 +112,38 @@ describe Asciidoctor::Reducer::Cli do
     end
 
     it 'should write output to file specified by the -o option' do
-      the_source_file = fixture_file 'parent-with-single-include.adoc'
-      with_tmp_file tmpdir: output_dir do |the_output_file|
-        (expect subject.run ['-o', the_output_file.path, the_source_file]).to eql 0
-        output_contents = the_output_file.read.chomp
-        (expect output_contents).not_to include 'include::'
-        (expect output_contents).to include 'just good old-fashioned paragraph text'
+      run_scenario do
+        input_source the_input_source
+        output_file create_output_file
+        reduce { subject.run ['-o', output_file, input_file] }
+        expected_source the_expected_source
       end
     end
 
     it 'should create empty file specified by -o option if output is empty' do
-      the_source_file = fixture_file 'with-only-empty-include.adoc'
-      with_tmp_file tmpdir: output_dir do |the_output_file|
-        (expect subject.run ['-o', the_output_file.path, the_source_file]).to eql 0
-        output_contents = the_output_file.read
-        (expect output_contents).to be_empty
+      run_scenario do
+        input_source 'include::empty.adoc[]'
+        output_file create_output_file
+        reduce { subject.run ['-o', output_file, input_file] }
+        expected_source ''
       end
     end
 
     it 'should write to stdout when -o option is -' do
-      the_source_file = fixture_file 'parent-with-single-include.adoc'
-      (expect subject.run [the_source_file, '-o', '-']).to eql 0
-      (expect $stdout.string.chomp).to include 'just good old-fashioned paragraph text'
+      run_scenario do
+        input_source the_input_source
+        output_file $stdout
+        reduce { subject.run [input_file, '-o', '-'] }
+        expected_source the_expected_source
+      end
     end
 
     it 'should exit with status code 1 when value of -o option is a directory' do
-      the_source_file = fixture_file 'parent-with-single-include.adoc'
-      (expect subject.run [the_source_file, '-o', Dir.tmpdir]).to eql 1
+      exit_code = run_scenario do
+        input_source the_input_source
+        reduce { subject.run [input_file, '-o', Dir.tmpdir] }
+      end
+      (expect exit_code).to be 1
       message = $stderr.string.chomp.downcase
       if message.include? 'permission'
         (expect message).to include 'permission denied'
@@ -125,158 +153,208 @@ describe Asciidoctor::Reducer::Cli do
     end
 
     it 'should allow runtime attribute to be specified using -a option' do
-      with_tmp_file do |the_source_file|
-        the_source_file.write <<~'END'
+      run_scenario do
+        input_source <<~'END'
         = Book Title
 
         include::{chaptersdir}/ch1.adoc[]
         END
-        the_source_file.close
-        expected_source = <<~'END'.chomp
+
+        output_file $stdout
+
+        reduce { subject.run [input_file, '-a', 'chaptersdir=chapters', '-a', 'doctitle=Untitled'] }
+
+        expected_source <<~'END'
         = Book Title
 
         == Chapter One
 
         content
         END
-        (expect subject.run [the_source_file, '-a', 'chaptersdir=chapters', '-a', 'doctitle=Untitled']).to eql 0
-        (expect $stdout.string.chomp).to eql expected_source
       end
     end
 
     it 'should set attribute value to empty string if only name is passed to -a option' do
-      the_source_file = fixture_file 'preprocessor-conditional.adoc'
-      expected = <<~'END'.chomp
-      primary content
-      conditional content
-      END
-      (expect subject.run [the_source_file, '-a', 'flag']).to eql 0
-      (expect $stdout.string.chomp).to eql expected
+      run_scenario do
+        input_source <<~'END'
+        primary content
+        ifdef::flag[]
+        ifeval::["{flag}" == ""]
+        conditional content
+        endif::[]
+        endif::flag[]
+        END
+
+        output_file $stdout
+
+        reduce { subject.run [input_file, '-a', 'flag'] }
+
+        expected_source <<~'END'
+        primary content
+        conditional content
+        END
+      end
     end
 
     it 'should reduce preprocessor conditionals by default' do
-      the_source_file = fixture_file 'single-line-preprocessor-conditional.adoc'
-      expected = <<~'END'.chomp
-      text
-      END
-      (expect subject.run [the_source_file]).to eql 0
-      (expect $stdout.string.chomp).to eql expected
+      run_scenario do
+        input_source 'ifdef::asciidoctor-version[text]'
+        output_file $stdout
+        reduce { subject.run [input_file] }
+        expected_source 'text'
+      end
     end
 
     it 'should preserve preprocessor conditionals if --preserve-conditionals option is specified' do
-      the_source_file = fixture_file 'single-line-preprocessor-conditional.adoc'
-      expected = <<~'END'.chomp
-      ifdef::asciidoctor-version[text]
-      END
-      (expect subject.run [the_source_file, '--preserve-conditionals']).to eql 0
-      (expect $stdout.string.chomp).to eql expected
+      run_scenario do
+        input_source 'ifdef::asciidoctor-version[text]'
+        output_file $stdout
+        reduce { subject.run [input_file, '--preserve-conditionals'] }
+        expected_source input_source
+      end
     end
 
     it 'should set level on logger to higher value specified by --log-level option' do
-      the_source_file = fixture_file 'parent-with-unresolved-include.adoc'
-      expected = <<~'END'.chomp
-      before include
+      run_scenario do
+        input_source <<~'END'
+        before include
 
-      Unresolved directive in parent-with-unresolved-include.adoc - include::no-such-file.adoc[]
+        include::no-such-file.adoc[]
 
-      after include
-      END
-      (expect subject.run [the_source_file, '--log-level', 'fatal']).to eql 0
+        after include
+        END
+        output_file $stdout
+        reduce { subject.run [input_file, '--log-level', 'fatal'] }
+        expected_source <<~END
+        before include
+
+        Unresolved directive in #{input_file_basename} - include::no-such-file.adoc[]
+
+        after include
+        END
+      end
       (expect $stderr.string.chomp).to be_empty
-      (expect $stdout.string.chomp).to eql expected
     end
 
     it 'should ignore --log-level option if value is warn' do
-      the_source_file = fixture_file 'with-optional-unresolved-include.adoc'
-      expected = <<~'END'.chomp
-      before include
+      run_scenario do
+        input_source <<~'END'
+        before include
+
+        include::no-such-file.adoc[opts=optional]
+
+        after include
+        END
+        output_file $stdout
+        reduce { subject.run [input_file, '--log-level', 'warn'] }
+        expected_source <<~'END'
+        before include
 
 
-      after include
-      END
-      (expect subject.run [the_source_file, '--log-level', 'warn']).to eql 0
+        after include
+        END
+      end
       (expect $stderr.string.chomp).to be_empty
-      (expect $stdout.string.chomp).to eql expected
     end
 
     it 'should set level on logger to lower value specified by --log-level option' do
-      the_source_file = fixture_file 'with-optional-unresolved-include.adoc'
-      expected = <<~'END'.chomp
-      before include
+      run_scenario do
+        input_source <<~'END'
+        before include
+
+        include::no-such-file.adoc[opts=optional]
+
+        after include
+        END
+        output_file $stdout
+        reduce { subject.run [input_file, '--log-level', 'info'] }
+        expected_source <<~'END'
+        before include
 
 
-      after include
-      END
-      (expect subject.run [the_source_file, '--log-level', 'info']).to eql 0
+        after include
+        END
+      end
       (expect $stderr.string.chomp).to include 'optional include dropped'
-      (expect $stdout.string.chomp).to eql expected
     end
 
     it 'should suppress log messages when -q option is specified' do
-      the_source_file = fixture_file 'parent-with-unresolved-include.adoc'
-      expected = <<~'END'.chomp
-      before include
+      run_scenario do
+        input_source <<~'END'
+        before include
 
-      Unresolved directive in parent-with-unresolved-include.adoc - include::no-such-file.adoc[]
+        include::no-such-file.adoc[]
 
-      after include
-      END
-      (expect subject.run [the_source_file, '-q']).to eql 0
+        after include
+        END
+        output_file $stdout
+        reduce { subject.run [input_file, '-q'] }
+        expected_source <<~END
+        before include
+
+        Unresolved directive in #{input_file_basename} - include::no-such-file.adoc[]
+
+        after include
+        END
+      end
       (expect $stderr.string.chomp).to be_empty
-      (expect $stdout.string.chomp).to eql expected
     end
 
     it 'should require library specified by -r option' do
-      the_source_file = fixture_file 'parent-with-single-include.adoc'
-      with_tmp_file '.rb' do |the_ext_file|
-        the_ext_file.write %(puts 'extension required'\n)
-        the_ext_file.flush
-        (expect subject.run [the_source_file, '-r', the_ext_file.path]).to eql 0
+      run_scenario do
+        input_source the_input_source
+        the_ext_file = create_extension_file %(puts 'extension required'\n)
+        output_file $stdout
+        reduce { subject.run [input_file, '-r', the_ext_file] }
+        expected_source <<~END
+        extension required
+        #{the_expected_source.chomp}
+        END
       end
-      stdout_lines = $stdout.string.chomp.lines
-      (expect stdout_lines[0]).to include 'extension required'
-      (expect stdout_lines[1..-1].join).to include 'just good old-fashioned paragraph text'
     end
 
     it 'should require libraries specified by single -r option' do
-      the_source_file = fixture_file 'parent-with-single-include.adoc'
-      with_tmp_file '.rb' do |a_ext_file|
-        with_tmp_file '.rb' do |b_ext_file|
-          a_ext_file.write %(puts 'extension required'\n)
-          b_ext_file.write %(puts 'another extension required'\n)
-          a_ext_file.flush
-          b_ext_file.flush
-          (expect subject.run [the_source_file, '-r', ([a_ext_file.path, b_ext_file.path].join ',')]).to eql 0
-        end
+      run_scenario do
+        input_source the_input_source
+        a_ext_file = create_extension_file %(puts 'extension required'\n)
+        b_ext_file = create_extension_file %(puts 'another extension required'\n)
+        output_file $stdout
+        reduce { subject.run [input_file, '-r', ([a_ext_file, b_ext_file].join ',')] }
+        expected_source <<~END
+        extension required
+        another extension required
+        #{the_expected_source.chomp}
+        END
       end
-      stdout_lines = $stdout.string.chomp.lines
-      (expect stdout_lines[0]).to include 'extension required'
-      (expect stdout_lines[1]).to include 'another extension required'
-      (expect stdout_lines[2..-1].join).to include 'just good old-fashioned paragraph text'
     end
 
     it 'should require libraries specified by multiple -r options' do
-      the_source_file = fixture_file 'parent-with-single-include.adoc'
-      with_tmp_file '.rb' do |a_ext_file|
-        with_tmp_file '.rb' do |b_ext_file|
-          a_ext_file.write %(puts 'extension required'\n)
-          b_ext_file.write %(puts 'another extension required'\n)
-          a_ext_file.flush
-          b_ext_file.flush
-          (expect subject.run [the_source_file, '-r', a_ext_file.path, '-r', b_ext_file.path]).to eql 0
-        end
+      run_scenario do
+        input_source the_input_source
+        a_ext_file = create_extension_file %(puts 'extension required'\n)
+        b_ext_file = create_extension_file %(puts 'another extension required'\n)
+        output_file $stdout
+        reduce { subject.run [input_file, '-r', a_ext_file, '-r', b_ext_file] }
+        expected_source <<~END
+        extension required
+        another extension required
+        #{the_expected_source.chomp}
+        END
       end
-      stdout_lines = $stdout.string.chomp.lines
-      (expect stdout_lines[0]).to include 'extension required'
-      (expect stdout_lines[1]).to include 'another extension required'
-      (expect stdout_lines[2..-1].join).to include 'just good old-fashioned paragraph text'
     end
 
     it 'should show error message if library specified by -r cannot be required' do
-      expected = %(asciidoctor-reducer: 'no-such-library' could not be required)
-      the_source_file = fixture_file 'parent-with-single-include.adoc'
-      (expect subject.run [the_source_file, '-r', 'no-such-library']).to eql 1
-      (expect $stderr.string.chomp).to start_with expected
+      expected_message = %(asciidoctor-reducer: 'no-such-library' could not be required)
+      run_scenario do
+        input_source the_input_source
+        output_file $stdout
+        reduce { subject.run [input_file, '-r', 'no-such-library'] }
+        verify do
+          (example.expect result).to example.be 1
+          (example.expect $stderr.string).to example.start_with expected_message
+          (example.expect $stdout.string).to example.be_empty
+        end
+      end
     end
   end
 
