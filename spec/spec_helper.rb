@@ -64,6 +64,10 @@ class ScenarioBuilder
     filename
   end
 
+  def create_extension_file source
+    create_file %w(ext- .rb), source
+  end
+
   def create_include_file source
     create_file %w(include- .adoc), source
   end
