@@ -203,7 +203,7 @@ describe Asciidoctor::Reducer do
     end
 
     it 'should not modify newlines when writing output to file at path on Windows' do
-      (scenario = create_scenario do
+      run_scenario do
         input_source the_input_source
         output_file create_output_file
         reduce_options to: output_file
@@ -212,8 +212,7 @@ describe Asciidoctor::Reducer do
           (File.read output_file, mode: 'rb').chomp
         end
         expected_source the_expected_source
-      end).run
-      (expect scenario.output_file).to be_a String
+      end
     end
 
     it 'should reduce input to managed File object specified by :to option' do
