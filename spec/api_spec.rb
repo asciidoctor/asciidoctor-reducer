@@ -215,6 +215,19 @@ describe Asciidoctor::Reducer do
       end
     end
 
+    it 'should not write newline to file if reduced result is empty' do
+      run_scenario do
+        input_source 'include::empty.adoc[]'
+        output_file create_output_file
+        reduce_options to: output_file
+        reduce do
+          subject.reduce_file input_file, reduce_options
+          (File.read output_file, mode: 'rb').chomp
+        end
+        expected_source ''
+      end
+    end
+
     it 'should reduce input to managed File object specified by :to option' do
       with_tmp_file tmpdir: output_dir do |the_output_file|
         run_scenario do
