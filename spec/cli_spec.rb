@@ -53,18 +53,20 @@ describe Asciidoctor::Reducer::Cli do
 
   context 'signals', unless: windows? do
     it 'should handle HUP signal gracefully' do
-      the_source_file = fixture_file 'parent-with-single-include.adoc'
-      the_ext_file = fixture_file 'signal.rb'
-      out, err, res = run_command asciidoctor_reducer_bin, '-r', the_ext_file, the_source_file, '-a', 'signal=HUP'
+      out, err, res = run_scenario do
+        input_source the_input_source
+        reduce { run_command asciidoctor_reducer_bin, '-r', (fixture_file 'signal.rb'), input_file, '-a', 'signal=HUP' }
+      end
       (expect res.exitstatus).to (be 1).or (be 129)
       (expect out).to be_empty
       (expect err).to be_empty
     end
 
     it 'should handle INT signal gracefully and append line feed' do
-      the_source_file = fixture_file 'parent-with-single-include.adoc'
-      the_ext_file = fixture_file 'signal.rb'
-      out, err, res = run_command asciidoctor_reducer_bin, '-r', the_ext_file, the_source_file, '-a', 'signal=INT'
+      out, err, res = run_scenario do
+        input_source the_input_source
+        reduce { run_command asciidoctor_reducer_bin, '-r', (fixture_file 'signal.rb'), input_file, '-a', 'signal=INT' }
+      end
       (expect res.exitstatus).to (be 2).or (be 130)
       (expect out).to be_empty
       if jruby?
@@ -75,9 +77,12 @@ describe Asciidoctor::Reducer::Cli do
     end
 
     it 'should handle KILL signal gracefully' do
-      the_source_file = fixture_file 'parent-with-single-include.adoc'
-      the_ext_file = fixture_file 'signal.rb'
-      out, err, res = run_command asciidoctor_reducer_bin, '-r', the_ext_file, the_source_file, '-a', 'signal=KILL'
+      out, err, res = run_scenario do
+        input_source the_input_source
+        reduce do
+          run_command asciidoctor_reducer_bin, '-r', (fixture_file 'signal.rb'), input_file, '-a', 'signal=KILL'
+        end
+      end
       (expect res.exitstatus).to be_nil
       (expect res.success?).to be_falsey
       (expect res.termsig).to eql 9
@@ -139,13 +144,14 @@ describe Asciidoctor::Reducer::Cli do
     end
 
     it 'should exit with status code 1 when value of -o option is a directory' do
-      exit_code = run_scenario do
+      run_scenario do
         input_source the_input_source
+        output_file $stdout
         reduce { subject.run [input_file, '-o', Dir.tmpdir] }
+        expected_exit_status 1
+        expected_source ''
       end
-      (expect exit_code).to eql 1
-      message = $stderr.string.chomp.downcase
-      if message.include? 'permission'
+      if (message = $stderr.string.downcase).include? 'permission'
         (expect message).to include 'permission denied'
       else
         (expect message).to include 'is a directory'
@@ -349,8 +355,9 @@ describe Asciidoctor::Reducer::Cli do
         input_source the_input_source
         output_file $stdout
         reduce { subject.run [input_file, '-r', 'no-such-library'] }
+        expected_exit_status 1
         verify do
-          (example.expect result).to example.eql 1
+          (example.expect result).to example.eql expected_exit_status
           (example.expect $stderr.string).to example.start_with expected_message
           (example.expect $stdout.string).to example.be_empty
         end
@@ -421,40 +428,33 @@ describe Asciidoctor::Reducer::Cli do
 
   context 'error' do
     it 'should suggest --trace option if application ends in error' do
-      the_source_file = fixture_file 'parent-with-single-include.adoc'
-      ext_source = <<~'END'
-      Asciidoctor::Extensions.register do
-        tree_processor do
+      run_scenario do
+        input_source the_input_source
+        the_ext_file = create_extension_file 'Asciidoctor::Extensions.register { tree_processor {} }'
+        reduce { subject.run [input_file, '-r', the_ext_file] }
+        expected_exit_status 1
+        verify do
+          (example.expect result).to example.eql expected_exit_status
+          stderr_lines = $stderr.string.chomp.lines
+          (example.expect stderr_lines[0]).to example.include 'asciidoctor-reducer: FAILED: '
+          (example.expect stderr_lines[0]).to example.include 'No block specified to process tree processor extension'
+          (example.expect stderr_lines[-1]).to example.include 'Use --trace to show backtrace'
+          (example.expect $stdout.string).to example.be_empty
         end
       end
-      END
-      with_tmp_file '.rb' do |the_ext_file|
-        the_ext_file.write ext_source
-        the_ext_file.flush
-        (expect subject.run [the_source_file, '-r', the_ext_file.path]).to eql 1
-      end
-      stderr_lines = $stderr.string.chomp.lines
-      (expect stderr_lines[0]).to include 'asciidoctor-reducer: FAILED: '
-      (expect stderr_lines[0]).to include 'No block specified to process tree processor extension'
-      (expect stderr_lines[-1]).to include 'Use --trace to show backtrace'
     ensure
       Asciidoctor::Extensions.unregister_all
     end
 
     it 'should show backtrace of error if --trace option is specifed' do
-      the_source_file = fixture_file 'parent-with-single-include.adoc'
-      ext_source = <<~'END'
-      Asciidoctor::Extensions.register do
-        tree_processor do
+      run_scenario do
+        input_source the_input_source
+        the_ext_file = create_extension_file 'Asciidoctor::Extensions.register { tree_processor {} }'
+        reduce do
+          example.expect do
+            subject.run [input_file, '-r', the_ext_file, '--trace']
+          end.to example.raise_exception ArgumentError, %r/No block specified to process tree processor extension/
         end
-      end
-      END
-      with_tmp_file '.rb' do |the_ext_file|
-        the_ext_file.write ext_source
-        the_ext_file.flush
-        expect do
-          subject.run [the_source_file, '-r', the_ext_file.path, '--trace']
-        end.to raise_exception ArgumentError, %r/No block specified to process tree processor extension/
       end
     ensure
       Asciidoctor::Extensions.unregister_all

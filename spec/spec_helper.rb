@@ -40,6 +40,7 @@ class ScenarioBuilder
 
   def initialize example
     @example = example
+    @expected_exit_status = 0
     @expected_log_messages = @expected_source = @input_file = @input_source = @output_file = @result = @verify = nil
     @files = []
     @reduce = proc { reduce_file input_file, **@reduce_options }
@@ -80,6 +81,10 @@ class ScenarioBuilder
     (with_tmp_file %w(tmp- .adoc), tmpdir: output_dir).tap(&:close).path
   end
 
+  def expected_exit_status status = UNDEFINED
+    status == UNDEFINED ? @expected_exit_status : (@expected_exit_status = status)
+  end
+
   def expected_log_messages *argv
     @expected_log_messages = argv
   end
@@ -96,8 +101,7 @@ class ScenarioBuilder
       when ::String
         (@example.expect @result).to @example.eql @expected_source
       when ::Integer
-        # TODO allow exitstatus/exit_code to be specified
-        (@example.expect @result).to @example.eql 0
+        (@example.expect @result).to @example.eql @expected_exit_status
         verify_output_file = true if @output_file
       end
       if verify_output_file
