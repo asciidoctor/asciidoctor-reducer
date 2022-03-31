@@ -411,22 +411,55 @@ describe Asciidoctor::Reducer::Cli do
 
   context 'safe mode' do
     it 'should permit file to be included in parent directory of docdir using relative path' do
-      the_source_file = fixture_file 'subdir/with-parent-include.adoc'
-      (expect subject.run [the_source_file]).to eql 0
-      (expect $stdout.string.chomp).to include 'just good old-fashioned paragraph text'
+      run_scenario do
+        input_file create_file %w(subdir/main- .adoc), <<~'END'
+        before include
+
+        include::../multiple-paragraphs.adoc[]
+
+        after include
+        END
+        output_file $stdout
+        reduce { subject.run [input_file] }
+        expected_source the_expected_source
+      end
     end
 
     it 'should permit file to be included in parent directory of docdir using absolute path' do
-      the_source_file = fixture_file 'subdir/with-parent-include.adoc'
-      (expect subject.run [the_source_file, '-a', %(includedir=#{File.dirname File.dirname the_source_file})]).to eql 0
-      (expect $stdout.string.chomp).to include 'just good old-fashioned paragraph text'
+      run_scenario do
+        input_file create_file %w(subdir/main- .adoc), <<~END
+        before include
+
+        include::#{fixture_file 'multiple-paragraphs.adoc'}[]
+
+        after include
+        END
+        output_file $stdout
+        reduce { subject.run [input_file] }
+        expected_source the_expected_source
+      end
     end
 
     it 'should not permit file to be included in parent directory of docdir when safe mode is safe' do
-      the_source_file = fixture_file 'subdir/with-parent-include.adoc'
-      (expect subject.run [the_source_file, '-S', 'safe']).to eql 0
-      (expect $stdout.string.chomp).to include 'Unresolved directive'
-      (expect $stderr.string.chomp).to include 'illegal reference to ancestor of jail'
+      run_scenario do
+        input_file create_file %w(subdir/main- .adoc), <<~END
+        before include
+
+        include::../multiple-paragraphs.adoc[]
+
+        after include
+        END
+        output_file $stdout
+        reduce { subject.run [input_file, '-S', 'safe'] }
+        expected_source <<~END
+        before include
+
+        Unresolved directive in #{input_file_basename} - include::../multiple-paragraphs.adoc[]
+
+        after include
+        END
+      end
+      (expect $stderr.string).to include 'illegal reference to ancestor of jail'
     end
   end
 
