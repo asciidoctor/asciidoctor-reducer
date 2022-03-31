@@ -120,8 +120,8 @@ class ScenarioBuilder
     @expected_source
   end
 
-  def input_file
-    @input_file ||= (create_input_file @input_source)
+  def input_file file = UNDEFINED
+    file == UNDEFINED ? (@input_file ||= (create_input_file @input_source)) : (@input_file = file)
   end
 
   def input_file_basename suffix = nil
