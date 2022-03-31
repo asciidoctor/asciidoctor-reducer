@@ -99,7 +99,7 @@ describe Asciidoctor::Reducer::Cli do
     it 'should display error message and return non-zero exit status when invalid option is specified' do
       (expect subject.run %w(--invalid)).to eql 1
       (expect $stderr.string.chomp).to eql 'asciidoctor-reducer: invalid option: --invalid'
-      (expect $stdout.string.chomp).to start_with 'Usage: asciidoctor-reducer'
+      (expect $stdout.string).to start_with 'Usage: asciidoctor-reducer '
     end
 
     it 'should display program name and version when -v option is specified' do
@@ -114,8 +114,8 @@ describe Asciidoctor::Reducer::Cli do
 
     it 'should display help text when -h option is specified' do
       (expect subject.run %w(-h)).to eql 0
-      stdout = $stdout.string.chomp
-      (expect stdout).to start_with 'Usage: asciidoctor-reducer'
+      stdout = $stdout.string
+      (expect stdout).to start_with 'Usage: asciidoctor-reducer '
       (expect stdout).to include 'Reduces a composite AsciiDoc document'
       (expect stdout).to include '-h, --help'
     end
@@ -285,7 +285,7 @@ describe Asciidoctor::Reducer::Cli do
         after include
         END
       end
-      (expect $stderr.string.chomp).to include 'optional include dropped'
+      (expect $stderr.string).to include 'optional include dropped'
     end
 
     it 'should suppress log messages when -q option is specified' do
@@ -374,14 +374,14 @@ describe Asciidoctor::Reducer::Cli do
       expected = 'asciidoctor-reducer: Please specify an AsciiDoc file to reduce.'
       (expect subject.run []).to eql 1
       (expect $stderr.string.chomp).to eql expected
-      (expect $stdout.string.chomp).to start_with 'Usage: asciidoctor-reducer'
+      (expect $stdout.string).to start_with 'Usage: asciidoctor-reducer '
     end
 
     it 'should show error message and usage and return non-zero exit status when more than one argument is given' do
       expected = 'asciidoctor-reducer: extra arguments detected (unparsed arguments: bar.adoc)'
       (expect subject.run %w(foo.adoc bar.adoc)).to eql 1
       (expect $stderr.string.chomp).to eql expected
-      (expect $stdout.string.chomp).to start_with 'Usage: asciidoctor-reducer'
+      (expect $stdout.string).to start_with 'Usage: asciidoctor-reducer '
     end
 
     it 'should write to stdout when -o option is not specified' do
