@@ -412,7 +412,7 @@ describe Asciidoctor::Reducer::Cli do
   context 'safe mode' do
     it 'should permit file to be included in parent directory of docdir using relative path' do
       run_scenario do
-        input_file create_file %w(subdir/main- .adoc), <<~'END'
+        input_file create_input_file <<~'END', subdir: 'subdir'
         before include
 
         include::../multiple-paragraphs.adoc[]
@@ -427,7 +427,7 @@ describe Asciidoctor::Reducer::Cli do
 
     it 'should permit file to be included in parent directory of docdir using absolute path' do
       run_scenario do
-        input_file create_file %w(subdir/main- .adoc), <<~END
+        input_file create_input_file <<~END, subdir: 'subdir'
         before include
 
         include::#{fixture_file 'multiple-paragraphs.adoc'}[]
@@ -442,7 +442,7 @@ describe Asciidoctor::Reducer::Cli do
 
     it 'should not permit file to be included in parent directory of docdir when safe mode is safe' do
       run_scenario do
-        input_file create_file %w(subdir/main- .adoc), <<~END
+        input_file create_input_file <<~END, subdir: 'subdir'
         before include
 
         include::../multiple-paragraphs.adoc[]

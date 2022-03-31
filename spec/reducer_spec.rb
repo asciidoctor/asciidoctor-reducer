@@ -195,9 +195,9 @@ describe Asciidoctor::Reducer do
 
   it 'should resolve nested include relative to include file' do
     doc = run_scenario do
-      relative_include_file = create_file %w(subdir/include- .adoc), 'contents of relative include'
+      relative_include_file = create_include_file 'contents of relative include', subdir: 'subdir'
 
-      include_file = create_file %w(subdir/include- .adoc), <<~END
+      include_file = create_include_file <<~END, subdir: 'subdir'
       before relative include
 
       include::#{File.basename relative_include_file}[]

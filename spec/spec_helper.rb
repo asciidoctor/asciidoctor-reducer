@@ -69,12 +69,12 @@ class ScenarioBuilder
     create_file %w(ext- .rb), source
   end
 
-  def create_include_file source
-    create_file %w(include- .adoc), source
+  def create_include_file source, subdir: nil
+    create_file [subdir ? (File.join subdir, 'include-') : 'include-', '.adoc'], source
   end
 
-  def create_input_file source
-    create_file %w(main- .adoc), source
+  def create_input_file source, subdir: nil
+    create_file [subdir ? (File.join subdir, 'main-') : 'main-', '.adoc'], source
   end
 
   def create_output_file
