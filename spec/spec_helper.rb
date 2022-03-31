@@ -306,7 +306,16 @@ RSpec.configure do |config|
   end
 
   def with_tmp_file basename = '.adoc', tmpdir: fixtures_dir, newline: :universal, &block
-    basename = %W(tmp- #{basename}) unless Array === basename
+    if Array === basename
+      if basename[0].include? '/'
+        prefix, ext = basename
+        subdir, _, prefix = prefix.rpartition '/'
+        tmpdir = fixture_file subdir
+        basename = [prefix, ext]
+      end
+    else
+      basename = ['tmp-', basename]
+    end
     Tempfile.create basename, tmpdir, encoding: 'UTF-8', newline: newline, &block
   end
 end
