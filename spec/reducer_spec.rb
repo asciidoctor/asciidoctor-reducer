@@ -295,10 +295,16 @@ describe Asciidoctor::Reducer do
 
   it 'should resolve include with multiline paragraph' do
     doc = run_scenario do
-      input_source <<~'END'
+      include_file = create_include_file <<~'END'
+      first line
+      second line
+      third line
+      END
+
+      input_source <<~END
       before include
 
-      include::multiline-paragraph.adoc[]
+      include::#{include_file}[]
 
       after include
       END
@@ -669,7 +675,7 @@ describe Asciidoctor::Reducer do
 
       include::single-line-paragraph.adoc[]
 
-      include::multiline-paragraph.adoc[]
+      include::multiple-paragraphs.adoc[]
 
       after includes
       END
@@ -681,7 +687,7 @@ describe Asciidoctor::Reducer do
 
       link:single-line-paragraph.adoc[role=include]
 
-      link:multiline-paragraph.adoc[role=include]
+      link:multiple-paragraphs.adoc[role=include]
 
       after includes
       END
