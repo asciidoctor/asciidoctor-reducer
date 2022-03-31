@@ -374,16 +374,27 @@ describe Asciidoctor::Reducer::Cli do
     end
 
     it 'should write to stdout when -o option is not specified' do
-      the_source_file = fixture_file 'parent-with-single-include.adoc'
-      (expect subject.run [the_source_file]).to eql 0
-      (expect $stdout.string.chomp).to include 'just good old-fashioned paragraph text'
+      run_scenario do
+        input_source the_input_source
+        output_file $stdout
+        reduce { subject.run [input_file] }
+        expected_source the_expected_source
+      end
     end
 
     it 'should read from stdin when argument is -' do
-      $stdin.write %(include::#{fixture_file 'no-includes.adoc'}[])
-      $stdin.rewind
-      (expect subject.run %w(-)).to eql 0
-      (expect $stdout.string.chomp).to include 'just good old-fashioned paragraph text'
+      run_scenario do
+        $stdin.string = <<~END
+        before include
+
+        include::#{fixture_file 'multiple-paragraphs.adoc'}[]
+
+        after include
+        END
+        output_file $stdout
+        reduce { subject.run %w(-) }
+        expected_source the_expected_source
+      end
     end
   end
 
