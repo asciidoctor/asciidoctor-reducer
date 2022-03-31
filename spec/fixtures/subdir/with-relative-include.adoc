@@ -1,5 +1,0 @@
-before relative include
-
-include::relative-include.adoc[]
-
-after relative include
