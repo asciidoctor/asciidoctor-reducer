@@ -171,8 +171,8 @@ RSpec.configure do |config|
     (Pathname.new output_dir).rmtree secure: true
   end
 
-  def bin_script name, opts = {}
-    bin_path = Gem.bin_path (opts.fetch :gem, 'asciidoctor-reducer'), name
+  def bin_script name, gem_name: 'asciidoctor-reducer'
+    bin_path = Gem.bin_path gem_name, name
     if (defined? DeepCover) && !(DeepCover.const_defined? :TAKEOVER_IS_ON)
       [Gem.ruby, '-rdeep_cover', bin_path]
     elsif Gem.win_platform?
@@ -201,8 +201,8 @@ RSpec.configure do |config|
     File.join __dir__, 'fixtures'
   end
 
-  def fixture_file path, opts = {}
-    if opts[:relative]
+  def fixture_file path, relative: false
+    if relative
       (((Pathname.new fixtures_dir) / path).relative_path_from Pathname.new Dir.pwd).to_s
     else
       File.join fixtures_dir, path
