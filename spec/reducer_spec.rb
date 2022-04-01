@@ -962,7 +962,7 @@ describe Asciidoctor::Reducer do
       after include
       END
 
-      reduce_options safe: :secure, extensions: proc { include_processor { process { next } } }
+      reduce_options safe: :secure, sourcemap: true, extensions: proc { include_processor { process { next } } }
 
       reduce { Asciidoctor.load_file input_file, reduce_options }
 
