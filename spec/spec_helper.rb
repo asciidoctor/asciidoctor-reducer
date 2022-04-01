@@ -218,7 +218,8 @@ RSpec.configure do |config|
   end
 
   def reduce_file input_file, opts = {}
-    opts[:sourcemap] == false ? (opts.delete :sourcemap) : (opts[:sourcemap] = true)
+    opts = { sourcemap: true }.merge opts.to_h
+    opts.delete :sourcemap if opts[:sourcemap] == :unset
     Asciidoctor::Reducer.reduce_file input_file, opts
   end
 

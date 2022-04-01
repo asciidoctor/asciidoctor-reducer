@@ -52,7 +52,7 @@ describe Asciidoctor::Reducer do
       not a single one
       END
 
-      reduce_options sourcemap: false
+      reduce_options sourcemap: :unset
 
       expected_source input_source
     end
@@ -103,7 +103,7 @@ describe Asciidoctor::Reducer do
       after include
       END
 
-      reduce_options sourcemap: false
+      reduce_options sourcemap: :unset
 
       expected_source <<~'END'
       before include
@@ -944,7 +944,7 @@ describe Asciidoctor::Reducer do
     doc = run_scenario do
       input_source 'include::empty.adoc[]'
 
-      reduce_options sourcemap: false
+      reduce_options sourcemap: :unset
 
       expected_source ''
     end
@@ -962,7 +962,7 @@ describe Asciidoctor::Reducer do
       after include
       END
 
-      reduce_options safe: :secure, sourcemap: true, extensions: proc { include_processor { process { next } } }
+      reduce_options safe: :secure, extensions: proc { include_processor { process { next } } }
 
       reduce { Asciidoctor.load_file input_file, reduce_options }
 
@@ -1640,7 +1640,7 @@ describe Asciidoctor::Reducer do
       |===
       END
 
-      reduce_options sourcemap: false, logger: nil, attributes: 'attribute-missing=warn'
+      reduce_options logger: nil, attributes: 'attribute-missing=warn'
 
       reduce(&->(s_reduce) { proc { s_reduce.call.tap { actual_logger = Asciidoctor::LoggerManager.logger } } }[reduce])
 
