@@ -118,9 +118,9 @@ class ScenarioBuilder < SimpleDelegator
   def run
     if @reduce
       if @expected_log_messages
-        (expect do
+        expect do
           @verify&.call if (@result = @reduce.call)
-        end).to log_messages(*@expected_log_messages)
+        end.to log_messages(*@expected_log_messages)
       elsif (@result = @reduce.call)
         @verify&.call
       end
