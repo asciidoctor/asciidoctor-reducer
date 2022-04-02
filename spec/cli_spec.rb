@@ -361,9 +361,9 @@ describe Asciidoctor::Reducer::Cli do
         reduce { subject.run [input_file, '-r', 'no-such-library'] }
         expected_exit_status 1
         verify do
-          (example.expect result).to example.eql expected_exit_status
-          (example.expect $stderr.string).to example.start_with expected_message
-          (example.expect $stdout.string).to example.be_empty
+          (expect result).to eql expected_exit_status
+          (expect $stderr.string).to start_with expected_message
+          (expect $stdout.string).to be_empty
         end
       end
     end
@@ -471,12 +471,12 @@ describe Asciidoctor::Reducer::Cli do
         reduce { subject.run [input_file, '-r', the_ext_file] }
         expected_exit_status 1
         verify do
-          (example.expect result).to example.eql expected_exit_status
+          (expect result).to eql expected_exit_status
           stderr_lines = $stderr.string.chomp.lines
-          (example.expect stderr_lines[0]).to example.include 'asciidoctor-reducer: FAILED: '
-          (example.expect stderr_lines[0]).to example.include 'No block specified to process tree processor extension'
-          (example.expect stderr_lines[-1]).to example.include 'Use --trace to show backtrace'
-          (example.expect $stdout.string).to example.be_empty
+          (expect stderr_lines[0]).to include 'asciidoctor-reducer: FAILED: '
+          (expect stderr_lines[0]).to include 'No block specified to process tree processor extension'
+          (expect stderr_lines[-1]).to include 'Use --trace to show backtrace'
+          (expect $stdout.string).to be_empty
         end
       end
     ensure
@@ -488,9 +488,9 @@ describe Asciidoctor::Reducer::Cli do
         input_source the_input_source
         the_ext_file = create_extension_file 'Asciidoctor::Extensions.register { tree_processor {} }'
         reduce do
-          example.expect do
+          expect do
             subject.run [input_file, '-r', the_ext_file, '--trace']
-          end.to example.raise_exception ArgumentError, %r/No block specified to process tree processor extension/
+          end.to raise_exception ArgumentError, %r/No block specified to process tree processor extension/
         end
       end
     ensure

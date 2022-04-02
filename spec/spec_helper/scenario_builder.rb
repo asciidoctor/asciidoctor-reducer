@@ -1,21 +1,17 @@
 # frozen_string_literal: true
 
-require 'forwardable'
+require 'delegate'
 
-class ScenarioBuilder
-  extend ::Forwardable
-  def_delegators :@example, :described_class, :subject
-  def_delegators :@example, :asciidoctor_reducer_bin, :fixture_file, :fixtures_dir, :output_dir, :reduce_file,
-    :run_command, :the_expected_source, :the_input_source, :with_tmp_file
-
+class ScenarioBuilder < SimpleDelegator
   UNDEFINED = ::Object.new
   private_constant :UNDEFINED
 
-  attr_reader :example
   attr_reader :result
 
+  alias example __getobj__
+
   def initialize example
-    @example = example
+    super
     @expected_exit_status = 0
     @expected_log_messages = @expected_source = @input_file = @input_source = @output_file = @result = @verify = nil
     @files = []
@@ -71,12 +67,12 @@ class ScenarioBuilder
     verify do
       case @result
       when ::Asciidoctor::Document
-        (@example.expect @result).to @example.have_source @expected_source
+        (expect @result).to have_source @expected_source
         verify_output_file = true if @output_file
       when ::String
-        (@example.expect @result).to @example.eql @expected_source
+        (expect @result).to eql @expected_source
       when ::Integer
-        (@example.expect @result).to @example.eql @expected_exit_status
+        (expect @result).to eql @expected_exit_status
         verify_output_file = true if @output_file
       end
       if verify_output_file
@@ -89,7 +85,7 @@ class ScenarioBuilder
           actual_source = @output_file.read
           @output_file.rewind
         end
-        (@example.expect actual_source).to @example.eql @expected_source + (@expected_source.empty? ? '' : ?\n)
+        (expect actual_source).to eql @expected_source + (@expected_source.empty? ? '' : ?\n)
       end
     end
     @expected_source
@@ -122,16 +118,16 @@ class ScenarioBuilder
   def run
     if @reduce
       if @expected_log_messages
-        (@example.expect do
+        (expect do
           @verify&.call if (@result = @reduce.call)
-        end).to @example.log_messages(*@expected_log_messages)
+        end).to log_messages(*@expected_log_messages)
       elsif (@result = @reduce.call)
         @verify&.call
       end
     end
     @result
   ensure
-    @example = nil
+    __setobj__ nil
     @files.each {|it| ::File.unlink it }
     freeze
   end
