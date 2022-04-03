@@ -105,10 +105,6 @@ Lint/NoReturnInBeginEndBlocks:
   Enabled: true
 Lint/NumberedParameterAssignment:
   Enabled: true
-Style/NumberedParameters:
-  Enabled: true
-Style/NumberedParametersLimit:
-  Enabled: true
 Lint/OrAssignmentToConstant:
   Enabled: true
 Lint/OutOfRangeRegexpRef:
@@ -196,8 +192,12 @@ RSpec:
     ExampleGroups:
       Regular:
       - describe_method
+RSpec/BeEq:
+  Enabled: true
 RSpec/BeEql:
-  Enabled: false # NOTE can lead to cryptic error messages
+  Enabled: false # NOTE can lead to cryptic error messages when comparing integers
+RSpec/BeNil:
+  Enabled: true
 RSpec/BeforeAfterAll:
   Enabled: true
 RSpec/ContextWording:
@@ -364,11 +364,17 @@ Style/MutableConstant:
   Enabled: false # reason: freezing constants is pendantic
 Style/NegatedIfElseCondition:
   Enabled: true
+Style/NestedFileDirname:
+  Enabled: true
 Style/NestedParenthesizedCalls:
   Enabled: true
 Style/NestedTernaryOperator:
   Enabled: false # reason: a ternary is a ternary
 Style/NilLambda:
+  Enabled: true
+Style/NumberedParameters:
+  Enabled: true
+Style/NumberedParametersLimit:
   Enabled: true
 Style/NumericLiterals:
   Enabled: false # reason: makes large numbers unreadable and harder to copy
