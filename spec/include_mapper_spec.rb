@@ -113,11 +113,12 @@ describe Asciidoctor::Reducer::IncludeMapper do
     (expect doc.catalog[:includes]).to be_empty
   end
 
-  it 'should register include mapper extension globally when asciidoctor/reducer/include_mapper is required' do
+  it 'should register include mapper globally when asciidoctor/reducer/include_mapper is required' do
+    $".delete ::File.expand_path 'lib/asciidoctor/reducer/include_mapper.rb', (::File.dirname __dir__)
     groups_size = Asciidoctor::Extensions.groups.size
     (expect require 'asciidoctor/reducer/include_mapper').not_to be_nil
     (expect Asciidoctor::Extensions.groups.size).to be > groups_size
-    doc = run_scenario do
+    run_scenario do
       input_source <<~'END'
       before include
 
@@ -125,8 +126,51 @@ describe Asciidoctor::Reducer::IncludeMapper do
 
       after include
       END
+
+      expected_source <<~'END'
+      before include
+
+      no includes here
+
+      just good old-fashioned paragraph text
+
+      after include
+
+      //# includes=no-includes
+      END
     end
-    (expect doc.source_lines[-1]).to eql '//# includes=no-includes'
+  ensure
+    Asciidoctor::Extensions.unregister Asciidoctor::Extensions.groups.keys.last
+  end
+
+  it 'should not add mapping comment twice when include mapper is registered globally and sourcemap is enabled' do
+    $".delete ::File.expand_path 'lib/asciidoctor/reducer/include_mapper.rb', (::File.dirname __dir__)
+    groups_size = Asciidoctor::Extensions.groups.size
+    (expect require 'asciidoctor/reducer/include_mapper').not_to be_nil
+    (expect Asciidoctor::Extensions.groups.size).to be > groups_size
+    run_scenario do
+      input_source <<~'END'
+      before include
+
+      include::no-includes.adoc[]
+
+      after include
+      END
+
+      reduce_options sourcemap: true
+
+      expected_source <<~'END'
+      before include
+
+      no includes here
+
+      just good old-fashioned paragraph text
+
+      after include
+
+      //# includes=no-includes
+      END
+    end
   ensure
     Asciidoctor::Extensions.unregister Asciidoctor::Extensions.groups.keys.last
   end
