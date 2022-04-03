@@ -20,6 +20,7 @@ module RSpec::ExampleGroupHelpers
 end
 
 module RSpec::ExampleHelpers
+  ROOT_DIR = File.absolute_path (File.join __dir__, '..', '..')
   SPEC_DIR = File.absolute_path (File.join __dir__, '..')
 
   def asciidoctor_reducer_bin
@@ -88,6 +89,10 @@ module RSpec::ExampleHelpers
 
   def run_scenario &block
     create_scenario(&block).run
+  end
+
+  def unrequire name
+    $".delete File.expand_path %(lib/#{name}.rb), ROOT_DIR
   end
 
   def with_local_webserver host = resolve_localhost, port = 9876

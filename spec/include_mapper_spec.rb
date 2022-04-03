@@ -114,7 +114,7 @@ describe Asciidoctor::Reducer::IncludeMapper do
   end
 
   it 'should register include mapper globally when asciidoctor/reducer/include_mapper is required' do
-    $".delete ::File.expand_path 'lib/asciidoctor/reducer/include_mapper.rb', (::File.dirname __dir__)
+    unrequire 'asciidoctor/reducer/include_mapper'
     groups_size = Asciidoctor::Extensions.groups.size
     (expect require 'asciidoctor/reducer/include_mapper').not_to be_nil
     (expect Asciidoctor::Extensions.groups.size).to be > groups_size
@@ -144,7 +144,7 @@ describe Asciidoctor::Reducer::IncludeMapper do
   end
 
   it 'should not add mapping comment twice when include mapper is registered globally and sourcemap is enabled' do
-    $".delete ::File.expand_path 'lib/asciidoctor/reducer/include_mapper.rb', (::File.dirname __dir__)
+    unrequire 'asciidoctor/reducer/include_mapper'
     groups_size = Asciidoctor::Extensions.groups.size
     (expect require 'asciidoctor/reducer/include_mapper').not_to be_nil
     (expect Asciidoctor::Extensions.groups.size).to be > groups_size
