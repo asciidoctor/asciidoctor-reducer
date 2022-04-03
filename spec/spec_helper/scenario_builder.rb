@@ -8,8 +8,6 @@ class ScenarioBuilder < SimpleDelegator
 
   attr_reader :result
 
-  alias example __getobj__
-
   def initialize example
     super
     @expected_exit_status = 0
