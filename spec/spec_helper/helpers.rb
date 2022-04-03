@@ -61,12 +61,6 @@ module RSpec::ExampleHelpers
     (p = (Pathname.new SPEC_DIR) / 'output').mkpath || p.to_s
   end
 
-  def reduce_file input_file, opts = {}
-    opts = { sourcemap: true }.merge opts.to_h
-    opts.delete :sourcemap if opts[:sourcemap] == :unset
-    Asciidoctor::Reducer.reduce_file input_file, opts
-  end
-
   def resolve_localhost
     Socket.ip_address_list.find(&:ipv4?).ip_address
   end

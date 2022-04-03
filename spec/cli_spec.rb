@@ -442,7 +442,7 @@ describe Asciidoctor::Reducer::Cli do
 
     it 'should not permit file to be included in parent directory of docdir when safe mode is safe' do
       run_scenario do
-        input_file create_input_file <<~END, subdir: 'subdir'
+        input_file create_input_file <<~'END', subdir: 'subdir'
         before include
 
         include::../multiple-paragraphs.adoc[]

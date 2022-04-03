@@ -32,6 +32,8 @@ describe Asciidoctor::Reducer do
       not a single one
       END
 
+      reduce_options sourcemap: true
+
       expected_source input_source
     end).run
     (expect doc.options[:reduced]).to be_falsy
@@ -52,8 +54,6 @@ describe Asciidoctor::Reducer do
       not a single one
       END
 
-      reduce_options sourcemap: :unset
-
       expected_source input_source
     end
     (expect doc.options[:reduced]).to be_falsy
@@ -70,6 +70,8 @@ describe Asciidoctor::Reducer do
 
       after include
       END
+
+      reduce_options sourcemap: true
 
       expected_source <<~'END'
       before include
@@ -103,8 +105,6 @@ describe Asciidoctor::Reducer do
       after include
       END
 
-      reduce_options sourcemap: :unset
-
       expected_source <<~'END'
       before include
 
@@ -131,7 +131,7 @@ describe Asciidoctor::Reducer do
       after include
       END
 
-      reduce_options sourcemap: false, extensions: (proc do
+      reduce_options extensions: (proc do
         tree_processor do
           prefer
           process do |doc|
@@ -174,6 +174,8 @@ describe Asciidoctor::Reducer do
       after include
       END
 
+      reduce_options sourcemap: true
+
       expected_source <<~'END'
       before include
 
@@ -213,6 +215,8 @@ describe Asciidoctor::Reducer do
       after include
       END
 
+      reduce_options sourcemap: true
+
       expected_source <<~'END'
       before include
 
@@ -239,6 +243,8 @@ describe Asciidoctor::Reducer do
       after include
       END
 
+      reduce_options sourcemap: true
+
       expected_source <<~'END'
       before include
 
@@ -261,6 +267,8 @@ describe Asciidoctor::Reducer do
       after include
       END
 
+      reduce_options sourcemap: true
+
       expected_source input_source
     end
     (expect doc.blocks).to have_size 3
@@ -274,6 +282,8 @@ describe Asciidoctor::Reducer do
 
       after include
       END
+
+      reduce_options sourcemap: true
 
       expected_source <<~'END'
       single line paragraph
@@ -292,6 +302,8 @@ describe Asciidoctor::Reducer do
 
       include::single-line-paragraph.adoc[]
       END
+
+      reduce_options sourcemap: true
 
       expected_source <<~'END'
       before include
@@ -319,6 +331,8 @@ describe Asciidoctor::Reducer do
       after include
       END
 
+      reduce_options sourcemap: true
+
       expected_source <<~'END'
       before include
 
@@ -342,6 +356,8 @@ describe Asciidoctor::Reducer do
 
       after include
       END
+
+      reduce_options sourcemap: true
 
       expected_source <<~'END'
       before include
@@ -369,6 +385,8 @@ describe Asciidoctor::Reducer do
       after include
       END
 
+      reduce_options sourcemap: true
+
       expected_source <<~'END'
       before include
 
@@ -395,6 +413,8 @@ describe Asciidoctor::Reducer do
 
       after
       END
+
+      reduce_options sourcemap: true
 
       expected_source <<~'END'
       before
@@ -432,6 +452,8 @@ describe Asciidoctor::Reducer do
       == Chapter B
       END
 
+      reduce_options sourcemap: true
+
       expected_source <<~'END'
       = Document Title
 
@@ -456,6 +478,8 @@ describe Asciidoctor::Reducer do
 
       after include
       END
+
+      reduce_options sourcemap: true
 
       expected_source <<~END
       before include
@@ -485,6 +509,8 @@ describe Asciidoctor::Reducer do
 
       after includes
       END
+
+      reduce_options sourcemap: true
 
       expected_source <<~END
       before includes
@@ -516,6 +542,8 @@ describe Asciidoctor::Reducer do
       after includes
       END
 
+      reduce_options sourcemap: true
+
       expected_source <<~END
       before includes
 
@@ -546,7 +574,9 @@ describe Asciidoctor::Reducer do
       after includes
       END
 
-      expected_source <<~END
+      reduce_options sourcemap: true
+
+      expected_source <<~'END'
       before includes
 
 
@@ -573,6 +603,8 @@ describe Asciidoctor::Reducer do
 
       after include
       END
+
+      reduce_options sourcemap: true
 
       expected_source <<~'END'
       before include
@@ -606,6 +638,8 @@ describe Asciidoctor::Reducer do
       after top-level include
       END
 
+      reduce_options sourcemap: true
+
       expected_source <<~END
       before top-level include
 
@@ -635,6 +669,8 @@ describe Asciidoctor::Reducer do
       after include
       END
 
+      reduce_options sourcemap: true
+
       expected_source <<~END
       before include
 
@@ -661,7 +697,7 @@ describe Asciidoctor::Reducer do
       after include
       END
 
-      reduce_options safe: :server
+      reduce_options safe: :server, sourcemap: true
 
       expected_source <<~'END'
       before include
@@ -690,7 +726,7 @@ describe Asciidoctor::Reducer do
       after includes
       END
 
-      reduce_options safe: :secure
+      reduce_options safe: :secure, sourcemap: true
 
       expected_source <<~'END'
       before includes
@@ -715,6 +751,8 @@ describe Asciidoctor::Reducer do
 
       after include
       END
+
+      reduce_options sourcemap: true
 
       expected_source <<~'END'
       before include
@@ -795,7 +833,7 @@ describe Asciidoctor::Reducer do
       after includes
       END
 
-      reduce_options extensions: proc { include_processor { process { next } } }
+      reduce_options sourcemap: true, extensions: proc { include_processor { process { next } } }
 
       expected_source <<~'END'
       before includes
@@ -820,7 +858,7 @@ describe Asciidoctor::Reducer do
       after includes
       END
 
-      reduce_options safe: :secure, extensions: proc { include_processor { process { next } } }
+      reduce_options safe: :secure, sourcemap: true, extensions: proc { include_processor { process { next } } }
 
       expected_source <<~'END'
       before includes
@@ -841,6 +879,8 @@ describe Asciidoctor::Reducer do
       include::empty.adoc[]
       after include
       END
+
+      reduce_options sourcemap: true
 
       expected_source <<~'END'
       before include
@@ -864,6 +904,8 @@ describe Asciidoctor::Reducer do
 
       after includes
       END
+
+      reduce_options sourcemap: true
 
       expected_source <<~'END'
       before includes
@@ -896,6 +938,8 @@ describe Asciidoctor::Reducer do
       after top-level include
       END
 
+      reduce_options sourcemap: true
+
       expected_source <<~'END'
       before top-level include
 
@@ -918,6 +962,8 @@ describe Asciidoctor::Reducer do
       include::empty.adoc[]
       END
 
+      reduce_options sourcemap: true
+
       expected_source 'before include'
     end
     (expect doc.blocks).to have_size 1
@@ -933,8 +979,6 @@ describe Asciidoctor::Reducer do
       include::empty.adoc[]
       END
 
-      reduce_options sourcemap: false
-
       expected_source 'before include'
     end
     (expect doc.blocks).to have_size 1
@@ -943,8 +987,6 @@ describe Asciidoctor::Reducer do
   it 'should not crash if reduced document is empty' do
     doc = run_scenario do
       input_source 'include::empty.adoc[]'
-
-      reduce_options sourcemap: :unset
 
       expected_source ''
     end
@@ -989,7 +1031,7 @@ describe Asciidoctor::Reducer do
       after include
       END
 
-      reduce_options extensions: (proc do
+      reduce_options sourcemap: true, extensions: (proc do
         include_processor do
           process do |_, reader, target, attrs|
             reader.push_include ['pushed first', '', 'pushed last'], target, target, 1, attrs
@@ -1021,7 +1063,7 @@ describe Asciidoctor::Reducer do
       after include
       END
 
-      reduce_options safe: :secure, extensions: (proc do
+      reduce_options safe: :secure, sourcemap: true, extensions: (proc do
         include_processor do
           process do |_, reader, target, attrs|
             reader.push_include ['pushed first', '', 'pushed last'], target, target, 1, attrs
@@ -1053,7 +1095,7 @@ describe Asciidoctor::Reducer do
       after include
       END
 
-      reduce_options extensions: (proc do
+      reduce_options sourcemap: true, extensions: (proc do
         tree_processor do
           prefer
           process do |interim_doc|
@@ -1109,6 +1151,8 @@ describe Asciidoctor::Reducer do
       after include
       END
 
+      reduce_options sourcemap: true
+
       expected_source <<~'END'
       before include
 
@@ -1132,6 +1176,8 @@ describe Asciidoctor::Reducer do
 
       after include
       END
+
+      reduce_options sourcemap: true
 
       expected_source <<~'END'
       before include
@@ -1168,6 +1214,8 @@ describe Asciidoctor::Reducer do
       after include
       END
 
+      reduce_options sourcemap: true
+
       expected_source <<~'END'
       before include
 
@@ -1194,6 +1242,8 @@ describe Asciidoctor::Reducer do
 
       == Another Section
       END
+
+      reduce_options sourcemap: true
 
       expected_source <<~'END'
       == Section
@@ -1225,6 +1275,8 @@ describe Asciidoctor::Reducer do
       :!leveloffset:
       == Another Section
       END
+
+      reduce_options sourcemap: true
 
       expected_source <<~'END'
       == Section
@@ -1258,6 +1310,8 @@ describe Asciidoctor::Reducer do
       after include
       END
 
+      reduce_options sourcemap: true
+
       expected_source <<~'END'
       = Document Title
       :sectnums:
@@ -1287,6 +1341,8 @@ describe Asciidoctor::Reducer do
       include::{chaptersdir}/ch1.adoc[]
       END
 
+      reduce_options sourcemap: true
+
       expected_source <<~'END'
       = Book Title
       :chaptersdir: chapters
@@ -1315,6 +1371,8 @@ describe Asciidoctor::Reducer do
       :includesdir: appendices
       include::{includesdir}/appx1.adoc[]
       END
+
+      reduce_options sourcemap: true
 
       expected_source <<~'END'
       = Book Title
@@ -1348,6 +1406,8 @@ describe Asciidoctor::Reducer do
       include::{chaptersdir}/ch1.adoc[]
       END
 
+      reduce_options sourcemap: true
+
       expected_source <<~'END'
       = Book Title
       :chaptersdir: chapters
@@ -1370,7 +1430,7 @@ describe Asciidoctor::Reducer do
       include::{chaptersdir}/ch1.adoc[]
       END
 
-      reduce_options attributes: 'chaptersdir=chapters'
+      reduce_options attributes: 'chaptersdir=chapters', sourcemap: true
 
       expected_source <<~'END'
       = Book Title
@@ -1395,7 +1455,7 @@ describe Asciidoctor::Reducer do
       after include
       END
 
-      reduce_options attributes: 'tag=body'
+      reduce_options attributes: 'tag=body', sourcemap: true
 
       expected_source <<~'END'
       before include
@@ -1419,7 +1479,7 @@ describe Asciidoctor::Reducer do
       include::{chaptersdir}/ch1.adoc[]
       END
 
-      reduce_options attributes: 'attribute-missing=drop-line'
+      reduce_options attributes: 'attribute-missing=drop-line', sourcemap: true
 
       expected_source '= Book Title'
 
@@ -1441,7 +1501,7 @@ describe Asciidoctor::Reducer do
       after include
       END
 
-      reduce_options attributes: { 'flag' => '' }
+      reduce_options attributes: { 'flag' => '' }, sourcemap: true
 
       expected_source <<~'END'
       before include
@@ -1466,6 +1526,8 @@ describe Asciidoctor::Reducer do
       after include
       END
 
+      reduce_options sourcemap: true
+
       expected_source <<~'END'
       before include
 
@@ -1487,7 +1549,7 @@ describe Asciidoctor::Reducer do
       include::{chaptersdir}/ch1.adoc[]
       END
 
-      reduce_options attributes: { 'chaptersdir' => 'chapters' }
+      reduce_options attributes: { 'chaptersdir' => 'chapters' }, sourcemap: true
 
       expected_source <<~'END'
       = Book Title
@@ -1524,7 +1586,7 @@ describe Asciidoctor::Reducer do
       after include
       END
 
-      reduce_options attributes: { 'flag' => '' }
+      reduce_options attributes: { 'flag' => '' }, sourcemap: true
 
       expected_source <<~'END'
       before include
@@ -1559,6 +1621,8 @@ describe Asciidoctor::Reducer do
       after include
       END
 
+      reduce_options sourcemap: true
+
       expected_source <<~'END'
       :flag:
 
@@ -1586,6 +1650,8 @@ describe Asciidoctor::Reducer do
       after include
       END
 
+      reduce_options sourcemap: true
+
       expected_source <<~'END'
       before include
 
@@ -1609,7 +1675,7 @@ describe Asciidoctor::Reducer do
       after include
       END
 
-      reduce_options preserve_conditionals: true
+      reduce_options preserve_conditionals: true, sourcemap: true
 
       expected_source input_source
     end
@@ -1621,7 +1687,7 @@ describe Asciidoctor::Reducer do
     doc = run_scenario do
       input_source 'ifdef::asciidoctor-version[text]'
 
-      reduce_options preserve_conditionals: true
+      reduce_options preserve_conditionals: true, sourcemap: true
 
       expected_source input_source
     end

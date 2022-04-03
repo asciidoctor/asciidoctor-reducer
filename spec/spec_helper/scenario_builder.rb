@@ -15,7 +15,7 @@ class ScenarioBuilder < SimpleDelegator
     @expected_exit_status = 0
     @expected_log_messages = @expected_source = @input_file = @input_source = @output_file = @result = @verify = nil
     @files = []
-    @reduce = proc { reduce_file input_file, **@reduce_options }
+    @reduce = proc { ::Asciidoctor::Reducer.reduce_file input_file, **reduce_options }
     @reduce_options = {}
   end
 
