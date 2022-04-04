@@ -15,8 +15,8 @@ endif::[]
 :url-rvm: https://rvm.io
 :url-repo: https://github.com/asciidoctor/{project-handle}
 
-{project-name} is a tool that reduces a composite AsciiDoc document containing includes to a single AsciiDoc document by expanding any includes reachable from the parent document.
-The tool also applies preprocessor conditionals (unless the option to preserve them is specified), leaving behind only the enabled lines.
+{project-name} is a tool that reduces an AsciiDoc document that contains includes to a single AsciiDoc document by expanding any includes reachable from the parent document.
+The tool also applies preprocessor conditionals (unless the option to preserve them is specified), leaving behind only the selected lines.
 If the document does not contain any preprocessor directives, the tool returns the original source.
 
 == Prerequisites
