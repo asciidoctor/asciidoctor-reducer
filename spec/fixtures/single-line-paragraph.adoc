@@ -1,1 +1,1 @@
-single line paragraph
+single-line paragraph

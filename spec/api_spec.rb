@@ -72,7 +72,7 @@ describe Asciidoctor::Reducer do
         expected_source <<~'END'
         primary content
 
-        single line paragraph
+        single-line paragraph
         END
       end
       (expect doc.options[:sourcemap]).to be true
@@ -92,7 +92,7 @@ describe Asciidoctor::Reducer do
         END
         reduce_options attributes: { 'docdir' => fixtures_dir }
         reduce { subject.call input_source, reduce_options }
-        expected_source 'single line paragraph'
+        expected_source 'single-line paragraph'
       end
       (expect doc.options[:safe]).to eql :safe
       (expect doc.safe).to eql Asciidoctor::SafeMode::SAFE
@@ -152,7 +152,7 @@ describe Asciidoctor::Reducer do
         expected_source <<~'END'
         primary content
 
-        single line paragraph
+        single-line paragraph
         END
       end
       (expect doc.options[:sourcemap]).to be true
@@ -173,7 +173,7 @@ describe Asciidoctor::Reducer do
         reduce_options attributes: { 'flag' => '' }
         reduce { subject.call input_file, reduce_options }
         expected_source <<~'END'
-        single line paragraph
+        single-line paragraph
         conditional content
         END
       end

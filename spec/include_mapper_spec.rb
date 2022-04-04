@@ -72,7 +72,7 @@ describe Asciidoctor::Reducer::IncludeMapper do
 
       no includes here
 
-      just good old-fashioned paragraph text
+      just regular paragraph text
 
       after nested include
 
@@ -101,7 +101,7 @@ describe Asciidoctor::Reducer::IncludeMapper do
       expected_source <<~'END'
       beginning
 
-      single line paragraph
+      single-line paragraph
 
       Start of body.
 
@@ -170,7 +170,7 @@ describe Asciidoctor::Reducer::IncludeMapper do
 
       no includes here
 
-      just good old-fashioned paragraph text
+      just regular paragraph text
 
       after include
 
@@ -202,7 +202,7 @@ describe Asciidoctor::Reducer::IncludeMapper do
 
       no includes here
 
-      just good old-fashioned paragraph text
+      just regular paragraph text
 
       after include
 

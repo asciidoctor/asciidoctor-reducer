@@ -53,7 +53,7 @@ describe Asciidoctor::Reducer::Extensions do
         reduce_options safe: :safe, extension_registry: registry
         reduce { Asciidoctor.load_file input_file, reduce_options }
         expected_source <<~'END'
-        single line paragraph
+        single-line paragraph
         // looks good!
         END
       end
@@ -77,7 +77,7 @@ describe Asciidoctor::Reducer::Extensions do
         reduce_options safe: :safe, extension_registry: registry
         reduce { Asciidoctor.load_file input_file, reduce_options }
         expected_source <<~'END'
-        single line paragraph
+        single-line paragraph
         // looks good!
         END
       end

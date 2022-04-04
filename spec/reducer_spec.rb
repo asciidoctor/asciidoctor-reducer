@@ -78,7 +78,7 @@ describe Asciidoctor::Reducer do
 
       no includes here
 
-      just good old-fashioned paragraph text
+      just regular paragraph text
 
       after include
       END
@@ -110,7 +110,7 @@ describe Asciidoctor::Reducer do
 
       no includes here
 
-      just good old-fashioned paragraph text
+      just regular paragraph text
 
       after include
       END
@@ -146,7 +146,7 @@ describe Asciidoctor::Reducer do
 
       no includes here
 
-      just good old-fashioned paragraph text
+      just regular paragraph text
 
       after include
       END
@@ -183,7 +183,7 @@ describe Asciidoctor::Reducer do
 
       no includes here
 
-      just good old-fashioned paragraph text
+      just regular paragraph text
 
       after nested include
 
@@ -233,7 +233,7 @@ describe Asciidoctor::Reducer do
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9]
   end
 
-  it 'should resolve include with single line paragraph' do
+  it 'should resolve include with single-line paragraph' do
     doc = run_scenario do
       input_source <<~'END'
       before include
@@ -248,7 +248,7 @@ describe Asciidoctor::Reducer do
       expected_source <<~'END'
       before include
 
-      single line paragraph
+      single-line paragraph
 
       after include
       END
@@ -286,7 +286,7 @@ describe Asciidoctor::Reducer do
       reduce_options sourcemap: true
 
       expected_source <<~'END'
-      single line paragraph
+      single-line paragraph
 
       after include
       END
@@ -308,7 +308,7 @@ describe Asciidoctor::Reducer do
       expected_source <<~'END'
       before include
 
-      single line paragraph
+      single-line paragraph
       END
     end
     (expect doc.blocks).to have_size 2
@@ -390,8 +390,8 @@ describe Asciidoctor::Reducer do
       expected_source <<~'END'
       before include
 
-      single line paragraph
-      single line paragraph
+      single-line paragraph
+      single-line paragraph
 
       after include
       END
@@ -423,7 +423,7 @@ describe Asciidoctor::Reducer do
 
       no includes here
 
-      just good old-fashioned paragraph text
+      just regular paragraph text
 
       after nested include
 
@@ -431,7 +431,7 @@ describe Asciidoctor::Reducer do
 
       no includes here
 
-      just good old-fashioned paragraph text
+      just regular paragraph text
 
       after
       END
@@ -457,7 +457,7 @@ describe Asciidoctor::Reducer do
       expected_source <<~'END'
       = Document Title
 
-      single line paragraph
+      single-line paragraph
 
       == Chapter A
 
@@ -519,7 +519,7 @@ describe Asciidoctor::Reducer do
 
       between includes
 
-      single line paragraph
+      single-line paragraph
 
       after includes
       END
@@ -548,7 +548,7 @@ describe Asciidoctor::Reducer do
       before includes
 
       Unresolved directive in #{input_file_basename} - include::no-such-file.adoc[]
-      single line paragraph
+      single-line paragraph
 
       after includes
       END
@@ -582,7 +582,7 @@ describe Asciidoctor::Reducer do
 
       between includes
 
-      single line paragraph
+      single-line paragraph
 
       after includes
       END
@@ -702,7 +702,7 @@ describe Asciidoctor::Reducer do
       expected_source <<~'END'
       before include
 
-      single line paragraph
+      single-line paragraph
 
       after include
       END
@@ -784,7 +784,7 @@ describe Asciidoctor::Reducer do
 
         no includes here
 
-        just good old-fashioned paragraph text
+        just regular paragraph text
 
         after include
         END
@@ -812,7 +812,7 @@ describe Asciidoctor::Reducer do
 
         no includes here
 
-        just good old-fashioned paragraph text
+        just regular paragraph text
 
         after nested include
 
@@ -913,7 +913,7 @@ describe Asciidoctor::Reducer do
 
       between includes
 
-      single line paragraph
+      single-line paragraph
 
       after includes
       END
@@ -1320,7 +1320,7 @@ describe Asciidoctor::Reducer do
 
       before include
 
-      single line paragraph
+      single-line paragraph
 
       after include
       END
@@ -1595,7 +1595,7 @@ describe Asciidoctor::Reducer do
 
       no includes here
 
-      just good old-fashioned paragraph text
+      just regular paragraph text
 
       after nested include
 
@@ -1628,7 +1628,7 @@ describe Asciidoctor::Reducer do
 
       before include
 
-      single line paragraph
+      single-line paragraph
 
       after include
       END
@@ -1731,7 +1731,7 @@ describe Asciidoctor::Reducer do
       expected_source <<~'END'
       before include
 
-      single line paragraph
+      single-line paragraph
 
       --
       after include
