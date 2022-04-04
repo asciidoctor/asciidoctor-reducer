@@ -1521,10 +1521,17 @@ describe Asciidoctor::Reducer do
 
   it 'should drop lines containing preprocessor directive when condition resolves to true' do
     doc = run_scenario do
-      input_source <<~'END'
+      include_file = create_include_file <<~'END'
+      primary content
+      ifdef::flag[]
+      conditional content
+      endif::[]
+      END
+
+      input_source <<~END
       before include
 
-      include::preprocessor-conditional.adoc[]
+      include::#{File.basename include_file}[]
 
       after include
       END
@@ -1546,10 +1553,17 @@ describe Asciidoctor::Reducer do
 
   it 'should drop lines from start to end preprocessor directive when condition resolves to false' do
     doc = run_scenario do
-      input_source <<~'END'
+      include_file = create_include_file <<~'END'
+      primary content
+      ifdef::flag[]
+      conditional content
+      endif::[]
+      END
+
+      input_source <<~END
       before include
 
-      include::preprocessor-conditional.adoc[]
+      include::#{File.basename include_file}[]
 
       after include
       END
