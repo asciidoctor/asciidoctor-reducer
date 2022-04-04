@@ -59,7 +59,7 @@ module RSpec::ExampleHelpers
   end
 
   def output_dir
-    (p = (Pathname.new SPEC_DIR) / 'output').mkpath || p.to_s
+    ((Pathname.new SPEC_DIR) / 'output').tap(&:mkpath).to_s
   end
 
   def resolve_localhost
