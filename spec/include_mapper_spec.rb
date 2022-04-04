@@ -123,11 +123,11 @@ describe Asciidoctor::Reducer::IncludeMapper do
     [#sectid]
     == Target Section
 
-    //# includes=include-with-include,no-includes
+    //# includes=single-line-paragraph,no-includes
     END
     includes = doc.catalog[:includes]
     (expect includes).to have_size 2
-    (expect includes['include-with-include']).to be true
+    (expect includes['single-line-paragraph']).to be true
     (expect includes['no-includes']).to be true
     (expect result.string).to include '<a href="#sectid">Target Section</a>'
   end

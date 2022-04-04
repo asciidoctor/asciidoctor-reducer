@@ -402,10 +402,18 @@ describe Asciidoctor::Reducer do
 
   it 'should resolve include that follows include with nested include' do
     doc = run_scenario do
-      input_source <<~'END'
+      include_file = create_include_file <<~'END'
+      before nested include
+
+      include::no-includes.adoc[]
+
+      after nested include
+      END
+
+      input_source <<~END
       before
 
-      include::include-with-include.adoc[]
+      include::#{File.basename include_file}[]
 
       then
 
@@ -795,10 +803,18 @@ describe Asciidoctor::Reducer do
   it 'should reduce remote include with include if allow-uri-read is set' do
     with_local_webserver do |base_url|
       run_scenario do
+        include_file = create_include_file <<~'END'
+        before nested include
+
+        include::no-includes.adoc[]
+
+        after nested include
+        END
+
         input_source <<~END
         before include
 
-        include::#{base_url}/include-with-include.adoc[]
+        include::#{base_url}/#{File.basename include_file}[]
 
         after include
         END
