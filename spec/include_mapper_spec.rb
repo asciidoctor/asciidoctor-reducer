@@ -5,7 +5,7 @@ require 'asciidoctor/reducer/include_mapper/extension'
 describe Asciidoctor::Reducer::IncludeMapper do
   it 'should not add include mapping comment if document has no includes' do
     ext_class = described_class
-    doc = run_scenario do
+    run_scenario do
       input_source <<~'END'
       no includes here
 
@@ -13,13 +13,14 @@ describe Asciidoctor::Reducer::IncludeMapper do
       END
 
       reduce_options extensions: proc { tree_processor ext_class unless document.options[:reduced] }
+
+      expected_source input_source
     end
-    (expect doc.source_lines[-1]).to eql 'not a single one'
   end
 
   it 'should not add include mapping comment if document only has partial includes' do
     ext_class = described_class
-    doc = run_scenario do
+    run_scenario do
       input_source <<~'END'
       before include
 
@@ -29,14 +30,23 @@ describe Asciidoctor::Reducer::IncludeMapper do
       END
 
       reduce_options extensions: proc { tree_processor ext_class unless document.options[:reduced] }
+
+      expected_source <<~'END'
+      before include
+
+      Start of body.
+
+      End of body.
+
+      after include
+      END
     end
-    (expect doc.source_lines[-1]).to eql 'after include'
   end
 
   it 'should add include mapping comment to bottom of reduced file' do
     ext_class = described_class
     include_file = nil
-    doc = run_scenario do
+    run_scenario do
       include_file = create_include_file <<~'END'
       before nested include
 
@@ -54,13 +64,28 @@ describe Asciidoctor::Reducer::IncludeMapper do
       END
 
       reduce_options extensions: proc { tree_processor ext_class unless document.options[:reduced] }
+
+      expected_source <<~END
+      before include
+
+      before nested include
+
+      no includes here
+
+      just good old-fashioned paragraph text
+
+      after nested include
+
+      after include
+
+      //# includes=#{File.basename include_file, '.adoc'},no-includes
+      END
     end
-    (expect doc.source_lines[-1]).to eql %(//# includes=#{File.basename include_file, '.adoc'},no-includes)
   end
 
   it 'should only add entries to include mapping comment that are included fully' do
     ext_class = described_class
-    doc = run_scenario do
+    run_scenario do
       input_source <<~'END'
       beginning
 
@@ -72,8 +97,21 @@ describe Asciidoctor::Reducer::IncludeMapper do
       END
 
       reduce_options extensions: proc { tree_processor ext_class unless document.options[:reduced] }
+
+      expected_source <<~'END'
+      beginning
+
+      single line paragraph
+
+      Start of body.
+
+      End of body.
+
+      end
+
+      //# includes=single-line-paragraph
+      END
     end
-    (expect doc.source_lines[-1]).to eql '//# includes=single-line-paragraph'
   end
 
   it 'should load includes from mapping comment' do
