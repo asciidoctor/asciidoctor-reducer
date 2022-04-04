@@ -1251,10 +1251,16 @@ describe Asciidoctor::Reducer do
 
   it 'should resolve include with leveloffset' do
     doc = run_scenario do
-      input_source <<~'END'
+      include_file = create_include_file <<~'END'
+      == Subsection
+
+      === Nested Subsection
+      END
+
+      input_source <<~END
       == Section
 
-      include::subsections.adoc[leveloffset=+1]
+      include::#{File.basename include_file}[leveloffset=+1]
 
       == Another Section
       END
@@ -1282,11 +1288,17 @@ describe Asciidoctor::Reducer do
 
   it 'should resolve include between leveloffset attribute entries' do
     doc = run_scenario do
-      input_source <<~'END'
+      include_file = create_include_file <<~'END'
+      == Subsection
+
+      === Nested Subsection
+      END
+
+      input_source <<~END
       == Section
 
       :leveloffset: +1
-      include::subsections.adoc[]
+      include::#{File.basename include_file}[]
 
       :!leveloffset:
       == Another Section
