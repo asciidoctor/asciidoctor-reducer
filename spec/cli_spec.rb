@@ -49,6 +49,42 @@ describe Asciidoctor::Reducer::Cli do
       (expect res.exitstatus).to eql 0
       (expect out.chomp).to eql %(asciidoctor-reducer #{Asciidoctor::Reducer::VERSION})
     end
+
+    it 'should convert a document at the specified relative path' do
+      out, _, res = run_command asciidoctor_reducer_bin, (fixture_file 'book.adoc', relative: true)
+      (expect res.exitstatus).to eql 0
+      expected_source = <<~'END'.chomp
+      = Book Title
+
+      == Chapter One
+
+      content
+
+      [appendix]
+      == Installation
+
+      content
+      END
+      (expect out.chomp).to eql expected_source
+    end
+
+    it 'should convert a document at the specified absolute path' do
+      out, _, res = run_command asciidoctor_reducer_bin, (fixture_file 'book.adoc')
+      (expect res.exitstatus).to eql 0
+      expected_source = <<~'END'.chomp
+      = Book Title
+
+      == Chapter One
+
+      content
+
+      [appendix]
+      == Installation
+
+      content
+      END
+      (expect out.chomp).to eql expected_source
+    end
   end
 
   context 'signals', unless: windows? do

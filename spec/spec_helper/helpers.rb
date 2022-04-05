@@ -72,18 +72,16 @@ module RSpec::ExampleHelpers
   end
 
   def run_command cmd, *args
-    Dir.chdir SPEC_DIR do
-      if Array === cmd
-        args.unshift(*cmd)
-        cmd = args.shift
-      end
-      kw_args = Hash === args[-1] ? args.pop : {}
-      env_override = kw_args[:env] || {}
-      if (out = kw_args[:out])
-        Open3.pipeline_w([env_override, cmd, *args, out: out]) {} # rubocop:disable Lint/EmptyBlock
-      else
-        Open3.capture3 env_override, cmd, *args
-      end
+    if Array === cmd
+      args.unshift(*cmd)
+      cmd = args.shift
+    end
+    kw_args = Hash === args[-1] ? args.pop : {}
+    env_override = kw_args[:env] || {}
+    if (out = kw_args[:out])
+      Open3.pipeline_w([env_override, cmd, *args, out: out]) {} # rubocop:disable Lint/EmptyBlock
+    else
+      Open3.capture3 env_override, cmd, *args
     end
   end
 
