@@ -89,11 +89,10 @@ describe Asciidoctor::Reducer::Cli do
 
   context 'signals', unless: windows? do
     it 'should handle HUP signal gracefully' do
+      signal = 'signal=HUP'
       out, err, res = run_scenario do
         input_source the_input_source
-        reduce do
-          run_command asciidoctor_reducer_bin, '-r', (fixture_file 'send_signal.rb'), input_file, '-a', 'signal=HUP'
-        end
+        reduce { run_command asciidoctor_reducer_bin, '-r', (fixture_file 'send_signal.rb'), input_file, '-a', signal }
       end
       (expect res.exitstatus).to (be 1).or (be 129)
       (expect out).to be_empty
@@ -101,11 +100,10 @@ describe Asciidoctor::Reducer::Cli do
     end
 
     it 'should handle INT signal gracefully and append line feed' do
+      signal = 'signal=INT'
       out, err, res = run_scenario do
         input_source the_input_source
-        reduce do
-          run_command asciidoctor_reducer_bin, '-r', (fixture_file 'send_signal.rb'), input_file, '-a', 'signal=INT'
-        end
+        reduce { run_command asciidoctor_reducer_bin, '-r', (fixture_file 'send_signal.rb'), input_file, '-a', signal }
       end
       (expect res.exitstatus).to (be 2).or (be 130)
       (expect out).to be_empty
@@ -117,11 +115,10 @@ describe Asciidoctor::Reducer::Cli do
     end
 
     it 'should handle KILL signal gracefully' do
+      signal = 'signal=KILL'
       out, err, res = run_scenario do
         input_source the_input_source
-        reduce do
-          run_command asciidoctor_reducer_bin, '-r', (fixture_file 'send_signal.rb'), input_file, '-a', 'signal=KILL'
-        end
+        reduce { run_command asciidoctor_reducer_bin, '-r', (fixture_file 'send_signal.rb'), input_file, '-a', signal }
       end
       (expect res.exitstatus).to be_nil
       (expect res.success?).to be_falsey
