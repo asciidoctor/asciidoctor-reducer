@@ -24,7 +24,7 @@ describe Asciidoctor::Reducer::IncludeMapper do
       input_source <<~'END'
       before include
 
-      include::include-with-tag.adoc[tag=body]
+      include::with-include-tag.adoc[tag=body]
 
       after include
       END
@@ -91,7 +91,7 @@ describe Asciidoctor::Reducer::IncludeMapper do
 
       include::single-line-paragraph.adoc[]
 
-      include::include-with-tag.adoc[tag=body]
+      include::with-include-tag.adoc[tag=body]
 
       end
       END

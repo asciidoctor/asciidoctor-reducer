@@ -1162,7 +1162,7 @@ describe Asciidoctor::Reducer do
       input_source <<~'END'
       before include
 
-      include::include-with-tag.adoc[tag=body]
+      include::with-include-tag.adoc[tag=body]
 
       after include
       END
@@ -1188,7 +1188,7 @@ describe Asciidoctor::Reducer do
       input_source <<~'END'
       before include
 
-      include::include-with-tags.adoc[tags=beginning;end]
+      include::with-include-tags.adoc[tags=beginning;end]
 
       after include
       END
@@ -1478,7 +1478,7 @@ describe Asciidoctor::Reducer do
       input_source <<~'END'
       before include
 
-      include::include-with-tag.adoc[tag={tag}]
+      include::with-include-tag.adoc[tag={tag}]
 
       after include
       END
