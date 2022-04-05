@@ -181,6 +181,25 @@ describe Asciidoctor::Reducer do
       (expect doc.safe).to eql Asciidoctor::SafeMode::SAFE
     end
 
+    it 'should reduce file at specified relative path' do
+      run_scenario do
+        input_source <<~'END'
+        primary content
+        ifdef::flag[]
+        conditional content
+        endif::[]
+
+        include::single-line-paragraph.adoc[]
+        END
+        reduce { subject.call (fixture_file input_file_basename, relative: true), reduce_options }
+        expected_source <<~'END'
+        primary content
+
+        single-line paragraph
+        END
+      end
+    end
+
     it 'should convert CRLF newlines in input file to LF newlines in output file' do
       run_scenario do
         output_file create_output_file
