@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
 describe Asciidoctor::Reducer::Cli do
-  # NOTE override subject to return class object; RSpec returns instance of class by default
-  subject { described_class }
-
   before do
     @old_stdin, $stdin = $stdin, StringIO.new
     @old_stdout, $stdout = $stdout, StringIO.new # rubocop:disable RSpec/ExpectOutput

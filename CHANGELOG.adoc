@@ -17,6 +17,7 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 
 * Rename x_include_replacements attr on reader to include_replacements since it's public
 * Don't pass `:to` option to `Asciidoctor.load_file`
+* Make `Asciidoctor::Reducer::Cli` a module instead of a class
 
 === Fixed
 
