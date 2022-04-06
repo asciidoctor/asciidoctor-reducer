@@ -13,7 +13,6 @@ describe Asciidoctor::Reducer::IncludeMapper do
       END
 
       reduce_options extensions: proc { tree_processor ext_class unless document.options[:reduced] }
-
       expected_source input_source
     end
   end
@@ -30,7 +29,6 @@ describe Asciidoctor::Reducer::IncludeMapper do
       END
 
       reduce_options extensions: proc { tree_processor ext_class unless document.options[:reduced] }
-
       expected_source <<~'END'
       before include
 
@@ -64,7 +62,6 @@ describe Asciidoctor::Reducer::IncludeMapper do
       END
 
       reduce_options extensions: proc { tree_processor ext_class unless document.options[:reduced] }
-
       expected_source <<~END
       before include
 
@@ -97,7 +94,6 @@ describe Asciidoctor::Reducer::IncludeMapper do
       END
 
       reduce_options extensions: proc { tree_processor ext_class unless document.options[:reduced] }
-
       expected_source <<~'END'
       beginning
 
@@ -125,6 +121,7 @@ describe Asciidoctor::Reducer::IncludeMapper do
 
     //# includes=single-line-paragraph,no-includes
     END
+
     includes = doc.catalog[:includes]
     (expect includes).to have_size 2
     (expect includes['single-line-paragraph']).to be true
@@ -141,6 +138,7 @@ describe Asciidoctor::Reducer::IncludeMapper do
     [#sectid]
     == Target Section
     END
+
     (expect doc.catalog[:includes]).to be_empty
     (expect result.string).to include '<a href="no-includes.html#sectid">no-includes.html</a>'
   end
@@ -196,7 +194,6 @@ describe Asciidoctor::Reducer::IncludeMapper do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~'END'
       before include
 

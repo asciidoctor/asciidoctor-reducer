@@ -39,6 +39,7 @@ describe Asciidoctor::Reducer do
         conditional content
         endif::[]
         END
+
         reduce { subject.call input_source }
         expected_source 'primary content'
       end
@@ -52,6 +53,7 @@ describe Asciidoctor::Reducer do
         conditional content
         endif::[]
         END
+
         reduce { subject.call input_source, nil }
         expected_source 'primary content'
       end
@@ -67,6 +69,7 @@ describe Asciidoctor::Reducer do
 
         include::single-line-paragraph.adoc[]
         END
+
         reduce_options safe: :unsafe, sourcemap: true, attributes: { 'docdir' => fixtures_dir }
         reduce { subject.call input_source, reduce_options }
         expected_source <<~'END'
@@ -90,10 +93,12 @@ describe Asciidoctor::Reducer do
         conditional content
         endif::[]
         END
+
         reduce_options attributes: { 'docdir' => fixtures_dir }
         reduce { subject.call input_source, reduce_options }
         expected_source 'single-line paragraph'
       end
+
       (expect doc.options[:safe]).to eql :safe
       (expect doc.safe).to eql Asciidoctor::SafeMode::SAFE
     end
@@ -104,6 +109,7 @@ describe Asciidoctor::Reducer do
         reduce { File.open(input_file, mode: 'rb:UTF-8') {|f| subject.call f } }
         expected_source the_expected_source
       end).run
+
       (expect doc.attr 'docname').to eql (scenario.input_file_basename '.adoc')
       (expect doc.attr 'docfile').to eql scenario.input_file
       (expect doc.attr 'docdir').to eql (File.dirname scenario.input_file)
@@ -119,6 +125,7 @@ describe Asciidoctor::Reducer do
         conditional content
         endif::[]
         END
+
         reduce { subject.call input_file }
         expected_source 'primary content'
       end
@@ -132,6 +139,7 @@ describe Asciidoctor::Reducer do
         conditional content
         endif::[]
         END
+
         reduce { subject.call input_file, nil }
         expected_source 'primary content'
       end
@@ -147,6 +155,7 @@ describe Asciidoctor::Reducer do
 
         include::single-line-paragraph.adoc[]
         END
+
         reduce_options safe: :unsafe, sourcemap: true
         reduce { subject.call input_file, reduce_options }
         expected_source <<~'END'
@@ -155,6 +164,7 @@ describe Asciidoctor::Reducer do
         single-line paragraph
         END
       end
+
       (expect doc.options[:sourcemap]).to be true
       (expect doc.sourcemap).to be true
       (expect doc.options[:safe]).to be :unsafe
@@ -170,6 +180,7 @@ describe Asciidoctor::Reducer do
         conditional content
         endif::[]
         END
+
         reduce_options attributes: { 'flag' => '' }
         reduce { subject.call input_file, reduce_options }
         expected_source <<~'END'
@@ -177,6 +188,7 @@ describe Asciidoctor::Reducer do
         conditional content
         END
       end
+
       (expect doc.options[:safe]).to eql :safe
       (expect doc.safe).to eql Asciidoctor::SafeMode::SAFE
     end
@@ -191,6 +203,7 @@ describe Asciidoctor::Reducer do
 
         include::single-line-paragraph.adoc[]
         END
+
         reduce { subject.call (fixture_file input_file_basename, relative: true), reduce_options }
         expected_source <<~'END'
         primary content
@@ -230,6 +243,7 @@ describe Asciidoctor::Reducer do
           subject.reduce_file input_file, reduce_options
           (File.read output_file, mode: 'rb').chomp
         end
+
         expected_source the_expected_source
       end
     end
@@ -243,6 +257,7 @@ describe Asciidoctor::Reducer do
           subject.reduce_file input_file, reduce_options
           (File.read output_file, mode: 'rb').chomp
         end
+
         expected_source ''
       end
     end
@@ -319,6 +334,7 @@ describe Asciidoctor::Reducer do
           @string = string
         end
       end.new
+
       run_scenario do
         input_source the_input_source
         output_file to
@@ -363,6 +379,7 @@ describe Asciidoctor::Reducer do
         reduce { subject.reduce_file input_file, reduce_options }
         expected_source the_expected_source
       end
+
       (expect doc.options).not_to have_key :to
     end
 
@@ -374,6 +391,7 @@ describe Asciidoctor::Reducer do
         reduce { subject.reduce input_source, reduce_options }
         expected_source the_expected_source
       end
+
       (expect doc.options).not_to have_key :to
     end
   end
@@ -411,6 +429,7 @@ describe Asciidoctor::Reducer do
         reduce_options sourcemap: true, extension_registry: extension_registry
         expected_source the_expected_source
       end
+
       (expect extension_calls).to eql [false, true]
       (expect extension_registry.groups[:reducer]).not_to be_nil
     end
@@ -427,6 +446,7 @@ describe Asciidoctor::Reducer do
           reduce_options sourcemap: true, extensions: extensions
           expected_source the_expected_source
         end
+
         (expect extension_calls).to eql [false, true]
       end
 
@@ -435,6 +455,7 @@ describe Asciidoctor::Reducer do
           input_source the_input_source
           expected_source the_expected_source
         end
+
         (expect doc.options).not_to have_key :extension_registry
       end
 
@@ -445,6 +466,7 @@ describe Asciidoctor::Reducer do
           reduce_options sourcemap: true, extension_registry: extension_registry
           expected_source the_expected_source
         end
+
         (expect extension_calls).to eql [false, true]
         (expect extension_registry.groups[:reducer]).to be_nil
       end
@@ -457,6 +479,7 @@ describe Asciidoctor::Reducer do
           reduce { Asciidoctor.load_file input_file, reduce_options }
           expected_source the_expected_source
         end
+
         (expect extension_calls).to eql [false, true]
         (expect extension_registry.groups[:reducer]).to be_nil
       end

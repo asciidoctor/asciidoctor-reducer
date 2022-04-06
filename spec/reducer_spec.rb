@@ -33,9 +33,9 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source input_source
     end).run
+
     (expect doc.options[:reduced]).to be_falsy
     (expect doc.blocks).to have_size 2
     (expect doc.sourcemap).to be true
@@ -56,6 +56,7 @@ describe Asciidoctor::Reducer do
 
       expected_source input_source
     end
+
     (expect doc.options[:reduced]).to be_falsy
     (expect doc.sourcemap).to be_falsy
     (expect doc.blocks[0].source_location).to be_nil
@@ -72,7 +73,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~'END'
       before include
 
@@ -83,6 +83,7 @@ describe Asciidoctor::Reducer do
       after include
       END
     end).run
+
     (expect doc.options[:reduced]).to be true
     (expect doc.blocks).to have_size 4
     (expect doc.sourcemap).to be true
@@ -115,6 +116,7 @@ describe Asciidoctor::Reducer do
       after include
       END
     end
+
     (expect doc.options[:reduced]).to be_falsy
     (expect doc.sourcemap).to be_falsy
     (expect doc.blocks[0].source_location).to be_nil
@@ -151,6 +153,7 @@ describe Asciidoctor::Reducer do
       after include
       END
     end
+
     (expect docs).to have_size 1
     (expect docs[0].object_id).to eql reduced_doc.object_id
     (expect reduced_doc.catalog[:includes]['no-includes']).to be true
@@ -175,7 +178,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~'END'
       before include
 
@@ -190,6 +192,7 @@ describe Asciidoctor::Reducer do
       after include
       END
     end).run
+
     (expect doc.blocks).to have_size 6
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9, 11]
     (expect (doc.blocks.map {|it| it.file }).uniq).to eql [scenario.input_file]
@@ -198,7 +201,6 @@ describe Asciidoctor::Reducer do
   it 'should resolve nested include relative to include file' do
     doc = run_scenario do
       relative_include_file = create_include_file 'contents of relative include', subdir: 'subdir'
-
       include_file = create_include_file <<~END, subdir: 'subdir'
       before relative include
 
@@ -216,7 +218,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~'END'
       before include
 
@@ -229,6 +230,7 @@ describe Asciidoctor::Reducer do
       after include
       END
     end
+
     (expect doc.blocks).to have_size 5
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9]
   end
@@ -244,7 +246,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~'END'
       before include
 
@@ -253,6 +254,7 @@ describe Asciidoctor::Reducer do
       after include
       END
     end
+
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
@@ -268,9 +270,9 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source input_source
     end
+
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
@@ -284,13 +286,13 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~'END'
       single-line paragraph
 
       after include
       END
     end
+
     (expect doc.blocks).to have_size 2
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3]
   end
@@ -304,13 +306,13 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~'END'
       before include
 
       single-line paragraph
       END
     end
+
     (expect doc.blocks).to have_size 2
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3]
   end
@@ -332,7 +334,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~'END'
       before include
 
@@ -343,6 +344,7 @@ describe Asciidoctor::Reducer do
       after include
       END
     end
+
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 7]
   end
@@ -358,7 +360,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~'END'
       before include
 
@@ -370,6 +371,7 @@ describe Asciidoctor::Reducer do
       after include
       END
     end
+
     (expect doc.blocks).to have_size 4
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 8]
   end
@@ -386,7 +388,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~'END'
       before include
 
@@ -396,6 +397,7 @@ describe Asciidoctor::Reducer do
       after include
       END
     end
+
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 6]
   end
@@ -423,7 +425,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~'END'
       before
 
@@ -444,6 +445,7 @@ describe Asciidoctor::Reducer do
       after
       END
     end
+
     (expect doc.blocks).to have_size 9
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9, 11, 13, 15, 17]
   end
@@ -461,7 +463,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~'END'
       = Document Title
 
@@ -472,6 +473,7 @@ describe Asciidoctor::Reducer do
       == Chapter B
       END
     end
+
     blocks = doc.find_by {|it| it.context != :document }
     (expect blocks).to have_size 5
     (expect (blocks.map {|it| it.lineno })).to eql [1, 3, 3, 5, 7]
@@ -488,7 +490,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~END
       before include
 
@@ -499,6 +500,7 @@ describe Asciidoctor::Reducer do
 
       expected_log_messages [{ severity: :ERROR, message: '~include file not found:', last: true }]
     end
+
     (expect doc.blocks).to have_size 3
     (expect doc.blocks[1].source).to start_with 'Unresolved directive'
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
@@ -519,7 +521,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~END
       before includes
 
@@ -534,6 +535,7 @@ describe Asciidoctor::Reducer do
 
       expected_log_messages [{ severity: :ERROR, message: '~include file not found:', last: true }]
     end
+
     (expect doc.blocks).to have_size 5
     (expect doc.blocks[1].source).to start_with 'Unresolved directive'
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9]
@@ -551,7 +553,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~END
       before includes
 
@@ -563,6 +564,7 @@ describe Asciidoctor::Reducer do
 
       expected_log_messages [{ severity: :ERROR, message: '~include file not found:', last: true }]
     end
+
     (expect doc.blocks).to have_size 3
     (expect doc.blocks[1].source).to start_with 'Unresolved directive'
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 6]
@@ -583,7 +585,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~'END'
       before includes
 
@@ -598,6 +599,7 @@ describe Asciidoctor::Reducer do
       expected_log_messages [{ severity: :INFO, message: '~optional include dropped', last: true }],
         using_log_level: :INFO
     end
+
     (expect doc.blocks).to have_size 4
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 4, 6, 8]
   end
@@ -613,7 +615,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~'END'
       before include
 
@@ -624,6 +625,7 @@ describe Asciidoctor::Reducer do
       expected_log_messages [{ severity: :INFO, message: '~optional include dropped', last: true }],
         using_log_level: :INFO
     end
+
     (expect doc.blocks).to have_size 2
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 4]
   end
@@ -647,7 +649,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~END
       before top-level include
 
@@ -662,6 +663,7 @@ describe Asciidoctor::Reducer do
 
       expected_log_messages [{ severity: :ERROR, message: '~include file not found:', last: true }]
     end
+
     (expect doc.blocks).to have_size 5
     (expect doc.blocks[2].source).to start_with 'Unresolved directive'
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9]
@@ -678,7 +680,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~END
       before include
 
@@ -691,6 +692,7 @@ describe Asciidoctor::Reducer do
         { severity: :WARN, message: '~include dropped because resolved target is blank:', last: true },
       ]
     end
+
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
@@ -706,7 +708,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options safe: :server, sourcemap: true
-
       expected_source <<~'END'
       before include
 
@@ -715,6 +716,7 @@ describe Asciidoctor::Reducer do
       after include
       END
     end).run
+
     (expect doc.attr 'docname').to eql (scenario.input_file_basename '.adoc')
     (expect doc.attr 'docfile').to eql scenario.input_file_basename
     (expect doc.attr 'docdir').to be_empty
@@ -735,7 +737,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options safe: :secure, sourcemap: true
-
       expected_source <<~'END'
       before includes
 
@@ -746,6 +747,7 @@ describe Asciidoctor::Reducer do
       after includes
       END
     end
+
     (expect doc.blocks).to have_size 4
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
   end
@@ -761,7 +763,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~'END'
       before include
 
@@ -770,6 +771,7 @@ describe Asciidoctor::Reducer do
       after include
       END
     end
+
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
@@ -786,7 +788,6 @@ describe Asciidoctor::Reducer do
         END
 
         reduce_options attributes: 'allow-uri-read'
-
         expected_source <<~'END'
         before include
 
@@ -820,7 +821,6 @@ describe Asciidoctor::Reducer do
         END
 
         reduce_options attributes: 'allow-uri-read'
-
         expected_source <<~'END'
         before include
 
@@ -850,7 +850,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true, extensions: proc { include_processor { process { next } } }
-
       expected_source <<~'END'
       before includes
 
@@ -859,6 +858,7 @@ describe Asciidoctor::Reducer do
       after includes
       END
     end
+
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
@@ -875,7 +875,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options safe: :secure, sourcemap: true, extensions: proc { include_processor { process { next } } }
-
       expected_source <<~'END'
       before includes
 
@@ -884,6 +883,7 @@ describe Asciidoctor::Reducer do
       after includes
       END
     end
+
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
@@ -897,12 +897,12 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~'END'
       before include
       after include
       END
     end
+
     (expect doc.blocks).to have_size 1
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1]
   end
@@ -922,7 +922,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~'END'
       before includes
 
@@ -934,6 +933,7 @@ describe Asciidoctor::Reducer do
       after includes
       END
     end
+
     (expect doc.blocks).to have_size 4
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 4, 6, 8]
   end
@@ -955,7 +955,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~'END'
       before top-level include
 
@@ -965,6 +964,7 @@ describe Asciidoctor::Reducer do
       after top-level include
       END
     end
+
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 6]
   end
@@ -979,9 +979,9 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source 'before include'
     end
+
     (expect doc.blocks).to have_size 1
     (expect doc.blocks[0].lineno).to eql 1
   end
@@ -997,15 +997,16 @@ describe Asciidoctor::Reducer do
 
       expected_source 'before include'
     end
+
     (expect doc.blocks).to have_size 1
   end
 
   it 'should not crash if reduced document is empty' do
     doc = run_scenario do
       input_source 'include::empty.adoc[]'
-
       expected_source ''
     end
+
     (expect doc.blocks).to be_empty
   end
 
@@ -1021,9 +1022,7 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options safe: :secure, sourcemap: true, extensions: proc { include_processor { process { next } } }
-
       reduce { Asciidoctor.load_file input_file, reduce_options }
-
       expected_source <<~'END'
       before include
 
@@ -1031,6 +1030,7 @@ describe Asciidoctor::Reducer do
       after include
       END
     end
+
     (expect doc.blocks).to have_size 2
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 4]
   ensure
@@ -1065,6 +1065,7 @@ describe Asciidoctor::Reducer do
       after include
       END
     end
+
     (expect doc.blocks).to have_size 4
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
   end
@@ -1097,6 +1098,7 @@ describe Asciidoctor::Reducer do
       after include
       END
     end
+
     (expect doc.blocks).to have_size 4
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
   end
@@ -1131,6 +1133,7 @@ describe Asciidoctor::Reducer do
       after include
       END
     end
+
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
@@ -1154,6 +1157,7 @@ describe Asciidoctor::Reducer do
         end
       end)
     end
+
     (expect captured_interim_doc).to be doc
   end
 
@@ -1168,7 +1172,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~'END'
       before include
 
@@ -1179,6 +1182,7 @@ describe Asciidoctor::Reducer do
       after include
       END
     end
+
     (expect doc.blocks).to have_size 4
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
   end
@@ -1194,7 +1198,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~'END'
       before include
 
@@ -1204,6 +1207,7 @@ describe Asciidoctor::Reducer do
       after include
       END
     end
+
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 6]
   end
@@ -1231,7 +1235,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~'END'
       before include
 
@@ -1245,6 +1248,7 @@ describe Asciidoctor::Reducer do
       after include
       END
     end
+
     (expect doc.blocks).to have_size 5
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 8, 10]
   end
@@ -1266,7 +1270,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~'END'
       == Section
 
@@ -1281,6 +1284,7 @@ describe Asciidoctor::Reducer do
       == Another Section
       END
     end
+
     blocks = doc.find_by context: :section
     (expect blocks).to have_size 4
     (expect (blocks.map {|it| it.lineno })).to eql [1, 5, 7, 11]
@@ -1305,7 +1309,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~'END'
       == Section
 
@@ -1318,6 +1321,7 @@ describe Asciidoctor::Reducer do
       == Another Section
       END
     end
+
     blocks = doc.find_by {|it| it.context != :document }
     (expect blocks).to have_size 4
     (expect (blocks.map {|it| it.lineno })).to eql [1, 4, 6, 9]
@@ -1339,7 +1343,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~'END'
       = Document Title
       :sectnums:
@@ -1353,6 +1356,7 @@ describe Asciidoctor::Reducer do
       after include
       END
     end
+
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [6, 8, 10]
     (expect (doc.attr? 'sectnums')).to be true
@@ -1370,7 +1374,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~'END'
       = Book Title
       :chaptersdir: chapters
@@ -1380,6 +1383,7 @@ describe Asciidoctor::Reducer do
       content
       END
     end
+
     blocks = doc.find_by {|it| it.context != :document }
     (expect blocks).to have_size 3
     (expect (blocks.map {|it| it.lineno })).to eql [1, 4, 6]
@@ -1401,7 +1405,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~'END'
       = Book Title
       :doctype: book
@@ -1420,6 +1423,7 @@ describe Asciidoctor::Reducer do
       content
       END
     end
+
     blocks = doc.find_by {|it| it.context != :document }
     (expect blocks).to have_size 7
     (expect (blocks.map {|it| it.lineno })).to eql [1, 4, 4, 7, 9, 13, 15]
@@ -1435,7 +1439,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~'END'
       = Book Title
       :chaptersdir: chapters
@@ -1445,6 +1448,7 @@ describe Asciidoctor::Reducer do
       content
       END
     end
+
     blocks = doc.find_by {|it| it.context != :document }
     (expect blocks).to have_size 3
     (expect (blocks.map {|it| it.lineno })).to eql [1, 4, 6]
@@ -1459,7 +1463,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options attributes: 'chaptersdir=chapters', sourcemap: true
-
       expected_source <<~'END'
       = Book Title
 
@@ -1468,6 +1471,7 @@ describe Asciidoctor::Reducer do
       content
       END
     end
+
     blocks = doc.find_by {|it| it.context != :document }
     (expect blocks).to have_size 3
     (expect (blocks.map {|it| it.lineno })).to eql [1, 3, 5]
@@ -1484,7 +1488,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options attributes: 'tag=body', sourcemap: true
-
       expected_source <<~'END'
       before include
 
@@ -1495,6 +1498,7 @@ describe Asciidoctor::Reducer do
       after include
       END
     end
+
     (expect doc.blocks).to have_size 4
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
   end
@@ -1508,14 +1512,13 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options attributes: 'attribute-missing=drop-line', sourcemap: true
-
       expected_source '= Book Title'
-
       expected_log_messages [
         { severity: :INFO, message: '~dropping line' },
         { severity: :INFO, message: '~include dropped due to missing attribute:', last: true },
       ], using_log_level: :INFO
     end
+
     (expect doc.lineno).to eql 1
   end
 
@@ -1537,7 +1540,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options attributes: { 'flag' => '' }, sourcemap: true
-
       expected_source <<~'END'
       before include
 
@@ -1547,6 +1549,7 @@ describe Asciidoctor::Reducer do
       after include
       END
     end
+
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 6]
   end
@@ -1569,7 +1572,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~'END'
       before include
 
@@ -1578,6 +1580,7 @@ describe Asciidoctor::Reducer do
       after include
       END
     end
+
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
@@ -1592,7 +1595,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options attributes: { 'chaptersdir' => 'chapters' }, sourcemap: true
-
       expected_source <<~'END'
       = Book Title
 
@@ -1601,6 +1603,7 @@ describe Asciidoctor::Reducer do
       content
       END
     end
+
     blocks = doc.find_by {|it| it.context != :document }
     (expect blocks).to have_size 3
     (expect (blocks.map {|it| it.lineno })).to eql [1, 3, 5]
@@ -1629,7 +1632,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options attributes: { 'flag' => '' }, sourcemap: true
-
       expected_source <<~'END'
       before include
 
@@ -1644,6 +1646,7 @@ describe Asciidoctor::Reducer do
       after include
       END
     end
+
     blocks = doc.blocks
     (expect blocks).to have_size 6
     (expect (blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9, 11]
@@ -1664,7 +1667,6 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~'END'
       :flag:
 
@@ -1675,6 +1677,7 @@ describe Asciidoctor::Reducer do
       after include
       END
     end
+
     (expect doc.blocks).to have_size 3
     (expect (doc.blocks.map {|it| it.lineno })).to eql [3, 5, 7]
   end
@@ -1693,13 +1696,13 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options sourcemap: true
-
       expected_source <<~'END'
       before include
 
       after include
       END
     end
+
     (expect doc.blocks).to have_size 2
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3]
   end
@@ -1718,9 +1721,9 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options preserve_conditionals: true, sourcemap: true
-
       expected_source input_source
     end
+
     (expect doc.blocks).to have_size 2
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 8]
   end
@@ -1728,11 +1731,10 @@ describe Asciidoctor::Reducer do
   it 'should keep single line preprocessor conditional if :preserve_conditionals option is set and no includes' do
     doc = run_scenario do
       input_source 'ifdef::asciidoctor-version[text]'
-
       reduce_options preserve_conditionals: true, sourcemap: true
-
       expected_source input_source
     end
+
     (expect doc.blocks).to have_size 1
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1]
   end
@@ -1749,13 +1751,11 @@ describe Asciidoctor::Reducer do
       END
 
       reduce_options logger: nil, attributes: 'attribute-missing=warn'
-
       reduce(&->(s_reduce) { proc { s_reduce.call.tap { actual_logger = Asciidoctor::LoggerManager.logger } } }[reduce])
-
       expected_source input_source
-
       expected_log_messages nil
     end
+
     (expect actual_logger).to be_a Asciidoctor::NullLogger
   end
 

@@ -62,6 +62,7 @@ describe Asciidoctor::Reducer::Cli do
 
       content
       END
+
       (expect out.chomp).to eql expected_source
     end
 
@@ -80,6 +81,7 @@ describe Asciidoctor::Reducer::Cli do
 
       content
       END
+
       (expect out.chomp).to eql expected_source
     end
   end
@@ -91,6 +93,7 @@ describe Asciidoctor::Reducer::Cli do
         input_source the_input_source
         reduce { run_command asciidoctor_reducer_bin, '-r', (fixture_file 'send_signal.rb'), input_file, '-a', signal }
       end
+
       (expect res.exitstatus).to (be 1).or (be 129)
       (expect out).to be_empty
       (expect err).to be_empty
@@ -102,6 +105,7 @@ describe Asciidoctor::Reducer::Cli do
         input_source the_input_source
         reduce { run_command asciidoctor_reducer_bin, '-r', (fixture_file 'send_signal.rb'), input_file, '-a', signal }
       end
+
       (expect res.exitstatus).to (be 2).or (be 130)
       (expect out).to be_empty
       if jruby?
@@ -117,6 +121,7 @@ describe Asciidoctor::Reducer::Cli do
         input_source the_input_source
         reduce { run_command asciidoctor_reducer_bin, '-r', (fixture_file 'send_signal.rb'), input_file, '-a', signal }
       end
+
       (expect res.exitstatus).to be_nil
       (expect res.success?).to be_falsey
       (expect res.termsig).to eql 9
@@ -185,6 +190,7 @@ describe Asciidoctor::Reducer::Cli do
         expected_exit_status 1
         expected_source ''
       end
+
       if (message = $stderr.string.downcase).include? 'permission'
         (expect message).to include 'permission denied'
       else
@@ -201,9 +207,7 @@ describe Asciidoctor::Reducer::Cli do
         END
 
         output_file $stdout
-
         reduce { subject.run [input_file, '-a', 'chaptersdir=chapters', '-a', 'doctitle=Untitled'] }
-
         expected_source <<~'END'
         = Book Title
 
@@ -226,9 +230,7 @@ describe Asciidoctor::Reducer::Cli do
         END
 
         output_file $stdout
-
         reduce { subject.run [input_file, '-a', 'flag'] }
-
         expected_source <<~'END'
         primary content
         conditional content
@@ -263,6 +265,7 @@ describe Asciidoctor::Reducer::Cli do
 
         after include
         END
+
         output_file $stdout
         reduce { subject.run [input_file, '--log-level', 'fatal'] }
         expected_source <<~END
@@ -273,6 +276,7 @@ describe Asciidoctor::Reducer::Cli do
         after include
         END
       end
+
       (expect $stderr.string.chomp).to be_empty
     end
 
@@ -285,6 +289,7 @@ describe Asciidoctor::Reducer::Cli do
 
         after include
         END
+
         output_file $stdout
         reduce { subject.run [input_file, '--log-level', 'warn'] }
         expected_source <<~'END'
@@ -294,6 +299,7 @@ describe Asciidoctor::Reducer::Cli do
         after include
         END
       end
+
       (expect $stderr.string.chomp).to be_empty
     end
 
@@ -306,6 +312,7 @@ describe Asciidoctor::Reducer::Cli do
 
         after include
         END
+
         output_file $stdout
         reduce { subject.run [input_file, '--log-level', 'info'] }
         expected_source <<~'END'
@@ -315,6 +322,7 @@ describe Asciidoctor::Reducer::Cli do
         after include
         END
       end
+
       (expect $stderr.string).to include 'optional include dropped'
     end
 
@@ -327,6 +335,7 @@ describe Asciidoctor::Reducer::Cli do
 
         after include
         END
+
         output_file $stdout
         reduce { subject.run [input_file, '-q'] }
         expected_source <<~END
@@ -337,6 +346,7 @@ describe Asciidoctor::Reducer::Cli do
         after include
         END
       end
+
       (expect $stderr.string.chomp).to be_empty
     end
 
@@ -432,6 +442,7 @@ describe Asciidoctor::Reducer::Cli do
 
         after include
         END
+
         output_file $stdout
         reduce { subject.run %w(-) }
         expected_source the_expected_source
@@ -449,6 +460,7 @@ describe Asciidoctor::Reducer::Cli do
 
         after include
         END
+
         output_file $stdout
         reduce { subject.run [input_file] }
         expected_source the_expected_source
@@ -464,6 +476,7 @@ describe Asciidoctor::Reducer::Cli do
 
         after include
         END
+
         output_file $stdout
         reduce { subject.run [input_file] }
         expected_source the_expected_source
@@ -479,6 +492,7 @@ describe Asciidoctor::Reducer::Cli do
 
         after include
         END
+
         output_file $stdout
         reduce { subject.run [input_file, '-S', 'safe'] }
         expected_source <<~END
@@ -489,6 +503,7 @@ describe Asciidoctor::Reducer::Cli do
         after include
         END
       end
+
       (expect $stderr.string).to include 'illegal reference to ancestor of jail'
     end
   end

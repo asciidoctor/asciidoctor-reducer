@@ -43,6 +43,7 @@ describe Asciidoctor::Reducer::Extensions do
           end
         end
       end
+
       registry = subject.call seed_registry
       (expect registry).not_to be_nil
       (expect registry.groups.keys).to have_size 2
@@ -68,6 +69,7 @@ describe Asciidoctor::Reducer::Extensions do
           end
         end
       end
+
       registry = subject.call seed_registry_proc
       (expect registry).not_to be_nil
       (expect registry.groups.keys).to have_size 2
