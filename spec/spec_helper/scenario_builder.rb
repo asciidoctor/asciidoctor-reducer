@@ -11,7 +11,7 @@ class ScenarioBuilder < SimpleDelegator
   def initialize example
     super
     @expected_exit_status = 0
-    @expected_log_messages = @expected_source = @input_file = @input_source = @output_file = @result = @verify = nil
+    @expected_log_messages = @expected_source = @include_source = @input_source = @output_file = @result = @verify = nil
     @files = []
     @reduce = proc { ::Asciidoctor::Reducer.reduce_file input_file, **reduce_options }
     @reduce_options = {}
@@ -90,6 +90,18 @@ class ScenarioBuilder < SimpleDelegator
       end
     end
     @expected_source
+  end
+
+  def include_file file = UNDEFINED, **kwargs
+    file == UNDEFINED ? (@include_file ||= (create_include_file @include_source, **kwargs)) : (@include_file = file)
+  end
+
+  def include_file_basename suffix = nil
+    suffix ? (::File.basename include_file, suffix) : (::File.basename include_file)
+  end
+
+  def include_source source = UNDEFINED
+    source == UNDEFINED ? @include_source : (@include_source = source.chomp)
   end
 
   def input_file file = UNDEFINED

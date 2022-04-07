@@ -161,7 +161,7 @@ describe Asciidoctor::Reducer do
 
   it 'should resolve top-level include with nested include' do
     doc = (scenario = create_scenario do
-      include_file = create_include_file <<~'END'
+      include_source <<~'END'
       before nested include
 
       include::no-includes.adoc[]
@@ -172,7 +172,7 @@ describe Asciidoctor::Reducer do
       input_source <<~END
       before include
 
-      include::#{include_file}[]
+      include::#{include_file_basename}[]
 
       after include
       END
@@ -200,11 +200,10 @@ describe Asciidoctor::Reducer do
 
   it 'should resolve nested include relative to include file' do
     doc = run_scenario do
-      relative_include_file = create_include_file 'contents of relative include', subdir: 'subdir'
-      include_file = create_include_file <<~END, subdir: 'subdir'
+      include_source <<~END
       before relative include
 
-      include::#{File.basename relative_include_file}[]
+      include::#{File.basename (create_include_file 'contents of relative include', subdir: 'subdir')}[]
 
       after relative include
       END
@@ -212,7 +211,7 @@ describe Asciidoctor::Reducer do
       input_source <<~END
       before include
 
-      include::subdir/#{File.basename include_file}[]
+      include::subdir/#{File.basename (include_file subdir: 'subdir')}[]
 
       after include
       END
@@ -319,7 +318,7 @@ describe Asciidoctor::Reducer do
 
   it 'should resolve include with multiline paragraph' do
     doc = run_scenario do
-      include_file = create_include_file <<~'END'
+      include_source <<~'END'
       first line
       second line
       third line
@@ -328,7 +327,7 @@ describe Asciidoctor::Reducer do
       input_source <<~END
       before include
 
-      include::#{include_file}[]
+      include::#{include_file_basename}[]
 
       after include
       END
@@ -404,7 +403,7 @@ describe Asciidoctor::Reducer do
 
   it 'should resolve include that follows include with nested include' do
     doc = run_scenario do
-      include_file = create_include_file <<~'END'
+      include_source <<~'END'
       before nested include
 
       include::no-includes.adoc[]
@@ -415,7 +414,7 @@ describe Asciidoctor::Reducer do
       input_source <<~END
       before
 
-      include::#{File.basename include_file}[]
+      include::#{include_file_basename}[]
 
       then
 
@@ -632,7 +631,7 @@ describe Asciidoctor::Reducer do
 
   it 'should flag nested include that cannot be resolved as an unresolved directive' do
     doc = run_scenario do
-      include_file = create_include_file <<~'END'
+      include_source <<~'END'
       before include
 
       include::no-such-file.adoc[]
@@ -643,7 +642,7 @@ describe Asciidoctor::Reducer do
       input_source <<~END
       before top-level include
 
-      include::#{include_file}[]
+      include::#{include_file_basename}[]
 
       after top-level include
       END
@@ -654,7 +653,7 @@ describe Asciidoctor::Reducer do
 
       before include
 
-      Unresolved directive in #{File.basename include_file} - include::no-such-file.adoc[]
+      Unresolved directive in #{include_file_basename} - include::no-such-file.adoc[]
 
       after include
 
@@ -804,7 +803,7 @@ describe Asciidoctor::Reducer do
   it 'should reduce remote include with include if allow-uri-read is set' do
     with_local_webserver do |base_url|
       run_scenario do
-        include_file = create_include_file <<~'END'
+        include_source <<~'END'
         before nested include
 
         include::no-includes.adoc[]
@@ -815,7 +814,7 @@ describe Asciidoctor::Reducer do
         input_source <<~END
         before include
 
-        include::#{base_url}/#{File.basename include_file}[]
+        include::#{base_url}/#{include_file_basename}[]
 
         after include
         END
@@ -940,7 +939,7 @@ describe Asciidoctor::Reducer do
 
   it 'should skip nested empty include' do
     doc = run_scenario do
-      include_file = create_include_file <<~'END'
+      include_source <<~'END'
       before include
       include::empty.adoc[]
       after include
@@ -949,7 +948,7 @@ describe Asciidoctor::Reducer do
       input_source <<~END
       before top-level include
 
-      include::#{include_file}[]
+      include::#{include_file_basename}[]
 
       after top-level include
       END
@@ -1214,7 +1213,7 @@ describe Asciidoctor::Reducer do
 
   it 'should resolve include with lines' do
     doc = run_scenario do
-      include_file = create_include_file <<~'END'
+      include_source <<~'END'
       first paragraph, first line
       first paragraph, second line
 
@@ -1229,7 +1228,7 @@ describe Asciidoctor::Reducer do
       input_source <<~END
       before include
 
-      include::#{include_file}[lines=2..7]
+      include::#{include_file_basename}[lines=2..7]
 
       after include
       END
@@ -1255,7 +1254,7 @@ describe Asciidoctor::Reducer do
 
   it 'should resolve include with leveloffset' do
     doc = run_scenario do
-      include_file = create_include_file <<~'END'
+      include_source <<~'END'
       == Subsection
 
       === Nested Subsection
@@ -1264,7 +1263,7 @@ describe Asciidoctor::Reducer do
       input_source <<~END
       == Section
 
-      include::#{File.basename include_file}[leveloffset=+1]
+      include::#{include_file_basename}[leveloffset=+1]
 
       == Another Section
       END
@@ -1292,7 +1291,7 @@ describe Asciidoctor::Reducer do
 
   it 'should resolve include between leveloffset attribute entries' do
     doc = run_scenario do
-      include_file = create_include_file <<~'END'
+      include_source <<~'END'
       == Subsection
 
       === Nested Subsection
@@ -1302,7 +1301,7 @@ describe Asciidoctor::Reducer do
       == Section
 
       :leveloffset: +1
-      include::#{File.basename include_file}[]
+      include::#{include_file_basename}[]
 
       :!leveloffset:
       == Another Section
@@ -1524,7 +1523,7 @@ describe Asciidoctor::Reducer do
 
   it 'should drop lines containing preprocessor directive when condition resolves to true' do
     doc = run_scenario do
-      include_file = create_include_file <<~'END'
+      include_source <<~'END'
       primary content
       ifdef::flag[]
       conditional content
@@ -1534,7 +1533,7 @@ describe Asciidoctor::Reducer do
       input_source <<~END
       before include
 
-      include::#{File.basename include_file}[]
+      include::#{include_file_basename}[]
 
       after include
       END
@@ -1556,7 +1555,7 @@ describe Asciidoctor::Reducer do
 
   it 'should drop lines from start to end preprocessor directive when condition resolves to false' do
     doc = run_scenario do
-      include_file = create_include_file <<~'END'
+      include_source <<~'END'
       primary content
       ifdef::flag[]
       conditional content
@@ -1566,7 +1565,7 @@ describe Asciidoctor::Reducer do
       input_source <<~END
       before include
 
-      include::#{File.basename include_file}[]
+      include::#{include_file_basename}[]
 
       after include
       END
@@ -1611,7 +1610,7 @@ describe Asciidoctor::Reducer do
 
   it 'should reduce preprocessor conditional following a nested include' do
     doc = run_scenario do
-      include_file = create_include_file <<~'END'
+      include_source <<~'END'
       ifdef::flag[]
       before nested include
       endif::[]
@@ -1626,7 +1625,7 @@ describe Asciidoctor::Reducer do
       input_source <<~END
       before include
 
-      include::#{include_file}[]
+      include::#{include_file_basename}[]
 
       after include
       END

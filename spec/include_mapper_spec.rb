@@ -43,9 +43,8 @@ describe Asciidoctor::Reducer::IncludeMapper do
 
   it 'should add include mapping comment to bottom of reduced file' do
     ext_class = described_class
-    include_file = nil
     run_scenario do
-      include_file = create_include_file <<~'END'
+      include_source <<~'END'
       before nested include
 
       include::no-includes.adoc[]
@@ -56,7 +55,7 @@ describe Asciidoctor::Reducer::IncludeMapper do
       input_source <<~END
       before include
 
-      include::#{include_file}[]
+      include::#{include_file_basename}[]
 
       after include
       END
@@ -75,7 +74,7 @@ describe Asciidoctor::Reducer::IncludeMapper do
 
       after include
 
-      //# includes=#{File.basename include_file, '.adoc'},no-includes
+      //# includes=#{include_file_basename '.adoc'},no-includes
       END
     end
   end
