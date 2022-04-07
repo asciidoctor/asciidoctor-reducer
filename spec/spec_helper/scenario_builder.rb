@@ -20,6 +20,9 @@ class ScenarioBuilder < SimpleDelegator
   def build &block
     instance_exec(&block)
     self
+  rescue
+    finalize
+    raise
   end
 
   def create_file filename, contents, newline: :universal
@@ -125,12 +128,18 @@ class ScenarioBuilder < SimpleDelegator
     end
     @result
   ensure
-    __setobj__ nil
-    @files.each {|it| ::File.unlink it }
+    finalize
     freeze
   end
 
   def verify &block
     @verify = block
+  end
+
+  private
+
+  def finalize
+    __setobj__ nil
+    @files.reject! {|it| ::File.unlink it }
   end
 end
