@@ -159,7 +159,7 @@ describe Asciidoctor::Reducer do
     (expect reduced_doc.catalog[:includes]['no-includes']).to be true
   end
 
-  it 'should resolve top-level include with nested include' do
+  it 'should resolve top-level relative include with nested include' do
     doc = (scenario = create_scenario do
       include_source <<~'END'
       before nested include
@@ -173,6 +173,45 @@ describe Asciidoctor::Reducer do
       before include
 
       include::#{include_file_basename}[]
+
+      after include
+      END
+
+      reduce_options sourcemap: true
+      expected_source <<~'END'
+      before include
+
+      before nested include
+
+      no includes here
+
+      just regular paragraph text
+
+      after nested include
+
+      after include
+      END
+    end).run
+
+    (expect doc.blocks).to have_size 6
+    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9, 11]
+    (expect (doc.blocks.map {|it| it.file }).uniq).to eql [scenario.input_file]
+  end
+
+  it 'should resolve top-level absolute include with nested include' do
+    doc = (scenario = create_scenario do
+      include_source <<~'END'
+      before nested include
+
+      include::no-includes.adoc[]
+
+      after nested include
+      END
+
+      input_source <<~END
+      before include
+
+      include::#{include_file}[]
 
       after include
       END
