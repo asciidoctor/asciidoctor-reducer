@@ -173,9 +173,9 @@ describe Asciidoctor::Reducer::IncludeMapper do
 
       //# includes=no-includes
       END
+
+      finally { Asciidoctor::Extensions.unregister Asciidoctor::Extensions.groups.keys.last }
     end
-  ensure
-    Asciidoctor::Extensions.unregister Asciidoctor::Extensions.groups.keys.last
   end
 
   it 'should not add mapping comment twice when include mapper is registered globally and sourcemap is enabled' do
@@ -204,8 +204,8 @@ describe Asciidoctor::Reducer::IncludeMapper do
 
       //# includes=no-includes
       END
+
+      finally { Asciidoctor::Extensions.unregister Asciidoctor::Extensions.groups.keys.last }
     end
-  ensure
-    Asciidoctor::Extensions.unregister Asciidoctor::Extensions.groups.keys.last
   end
 end

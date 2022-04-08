@@ -1028,12 +1028,12 @@ describe Asciidoctor::Reducer do
 
       after include
       END
+
+      finally { described_class::Extensions.unregister }
     end
 
     (expect doc.blocks).to have_size 2
     (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 4]
-  ensure
-    described_class::Extensions.unregister
   end
 
   it 'should include lines pushed by custom include processor' do

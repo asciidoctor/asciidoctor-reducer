@@ -11,8 +11,9 @@ class ScenarioBuilder < SimpleDelegator
   def initialize example
     super
     @expected_exit_status = 0
-    @expected_log_messages = @expected_source = @include_source = @input_source = @output_file = @result = @verify = nil
+    @expected_log_messages = @expected_source = @include_source = @input_source = @output_file = @result = nil
     @files = []
+    @finally = @verify = nil
     @reduce = proc { ::Asciidoctor::Reducer.reduce_file input_file, **reduce_options }
     @reduce_options = {}
   end
@@ -20,9 +21,8 @@ class ScenarioBuilder < SimpleDelegator
   def build &block
     instance_exec(&block)
     self
-  rescue
-    finalize
-    raise
+  ensure
+    finalize if $!
   end
 
   def create_file filename, contents, newline: :universal
@@ -92,6 +92,10 @@ class ScenarioBuilder < SimpleDelegator
     @expected_source
   end
 
+  def finally &block
+    @finally = block
+  end
+
   def include_file file = UNDEFINED, **kwargs
     file == UNDEFINED ? (@include_file ||= (create_include_file @include_source, **kwargs)) : (@include_file = file)
   end
@@ -151,7 +155,8 @@ class ScenarioBuilder < SimpleDelegator
   private
 
   def finalize
-    __setobj__ nil
+    @finally&.call
     @files.reject! {|it| ::File.unlink it }
+    __setobj__ nil
   end
 end

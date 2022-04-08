@@ -523,9 +523,8 @@ describe Asciidoctor::Reducer::Cli do
           (expect stderr_lines[-1]).to include 'Use --trace to show backtrace'
           (expect $stdout.string).to be_empty
         end
+        finally { Asciidoctor::Extensions.unregister_all }
       end
-    ensure
-      Asciidoctor::Extensions.unregister_all
     end
 
     it 'should show backtrace of error if --trace option is specifed' do
@@ -537,9 +536,8 @@ describe Asciidoctor::Reducer::Cli do
             subject.run [input_file, '-r', the_ext_file, '--trace']
           end.to raise_exception ArgumentError, %r/No block specified to process tree processor extension/
         end
+        finally { Asciidoctor::Extensions.unregister_all }
       end
-    ensure
-      Asciidoctor::Extensions.unregister_all
     end
   end
 end
