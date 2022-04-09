@@ -94,7 +94,7 @@ describe Asciidoctor::Reducer do
         endif::[]
         END
 
-        reduce_options attributes: { 'docdir' => fixtures_dir }
+        chdir fixtures_dir
         reduce { subject.call input_source, reduce_options }
         expected_source 'single-line paragraph'
       end
@@ -365,7 +365,8 @@ describe Asciidoctor::Reducer do
     it 'should allow :to option to be used with reduce method' do
       run_scenario do
         output_file create_output_file
-        reduce_options to: output_file, attributes: { 'docdir' => fixtures_dir }
+        chdir fixtures_dir
+        reduce_options to: output_file
         reduce { subject.reduce the_input_source, reduce_options }
         expected_source the_expected_source
       end
@@ -387,7 +388,8 @@ describe Asciidoctor::Reducer do
       doc = run_scenario do
         input_source the_input_source
         output_file create_output_file
-        reduce_options to: output_file, attributes: { 'docdir' => fixtures_dir }
+        chdir fixtures_dir
+        reduce_options to: output_file
         reduce { subject.reduce input_source, reduce_options }
         expected_source the_expected_source
       end

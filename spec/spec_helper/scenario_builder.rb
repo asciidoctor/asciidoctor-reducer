@@ -10,6 +10,7 @@ class ScenarioBuilder < SimpleDelegator
 
   def initialize example
     super
+    @chdir = ::Dir.pwd
     @expected_exit_status = 0
     @expected_log_messages = @expected_source = @include_source = @input_source = @output_file = @result = nil
     @files = []
@@ -23,6 +24,10 @@ class ScenarioBuilder < SimpleDelegator
     self
   ensure
     finalize if $!
+  end
+
+  def chdir dir
+    @chdir = dir
   end
 
   def create_file filename, contents, newline: :universal
@@ -134,12 +139,14 @@ class ScenarioBuilder < SimpleDelegator
 
   def run
     if @reduce
-      if @expected_log_messages
-        expect do
-          @verify&.call if (@result = @reduce.call)
-        end.to log_messages(*@expected_log_messages)
-      elsif (@result = @reduce.call)
-        @verify&.call
+      ::Dir.chdir @chdir do
+        if @expected_log_messages
+          expect do
+            @verify&.call if (@result = @reduce.call)
+          end.to log_messages(*@expected_log_messages)
+        elsif (@result = @reduce.call)
+          @verify&.call
+        end
       end
     end
     @result
