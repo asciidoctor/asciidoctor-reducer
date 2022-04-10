@@ -142,11 +142,11 @@ class ScenarioBuilder < SimpleDelegator
         if @expected_log_messages
           expect do
             if (@result = @reduce.call)
-              @verify&.call
+              @verify&.call @result
             end
           end.to log_messages(*@expected_log_messages)
         elsif (@result = @reduce.call)
-          @verify&.call
+          @verify&.call @result
         end
       end
     end

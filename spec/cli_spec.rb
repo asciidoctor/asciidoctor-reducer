@@ -400,8 +400,8 @@ describe Asciidoctor::Reducer::Cli do
         output_file $stdout
         reduce { subject.run [input_file, '-r', 'no-such-library'] }
         expected_exit_status 1
-        verify do
-          (expect result).to eql expected_exit_status
+        verify do |exit_status|
+          (expect exit_status).to eql expected_exit_status
           (expect $stderr.string).to start_with expected_message
           (expect $stdout.string).to be_empty
         end
@@ -515,8 +515,8 @@ describe Asciidoctor::Reducer::Cli do
         the_ext_file = create_extension_file 'Asciidoctor::Extensions.register { tree_processor {} }'
         reduce { subject.run [input_file, '-r', the_ext_file] }
         expected_exit_status 1
-        verify do
-          (expect result).to eql expected_exit_status
+        verify do |exit_status|
+          (expect exit_status).to eql expected_exit_status
           stderr_lines = $stderr.string.chomp.lines
           (expect stderr_lines[0]).to include 'asciidoctor-reducer: FAILED: '
           (expect stderr_lines[0]).to include 'No block specified to process tree processor extension'
