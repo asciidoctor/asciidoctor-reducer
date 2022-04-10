@@ -4,7 +4,6 @@ require 'delegate'
 
 class ScenarioBuilder < SimpleDelegator
   UNDEFINED = ::Object.new
-  private_constant :UNDEFINED
 
   attr_reader :result
 
@@ -142,7 +141,9 @@ class ScenarioBuilder < SimpleDelegator
       ::Dir.chdir @chdir do
         if @expected_log_messages
           expect do
-            @verify&.call if (@result = @reduce.call)
+            if (@result = @reduce.call)
+              @verify&.call
+            end
           end.to log_messages(*@expected_log_messages)
         elsif (@result = @reduce.call)
           @verify&.call
@@ -166,4 +167,6 @@ class ScenarioBuilder < SimpleDelegator
     @files.reject! {|it| ::File.unlink it }
     __setobj__ nil
   end
+
+  private_constant :UNDEFINED
 end
