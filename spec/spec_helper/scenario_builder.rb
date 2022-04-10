@@ -130,7 +130,14 @@ class ScenarioBuilder < SimpleDelegator
   end
 
   def reduce value = UNDEFINED, &block
-    value == UNDEFINED ? (block_given? ? (@reduce = block) : @reduce) : (@reduce = !!value)
+    case value
+    when UNDEFINED
+      block_given? ? (@reduce = block) : @reduce
+    when ::Proc
+      @reduce = proc {|delegate| proc { value.call delegate } }[@reduce]
+    else
+      @reduce = nil
+    end
   end
 
   def reduce_options opts = UNDEFINED
