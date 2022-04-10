@@ -80,6 +80,8 @@ class ScenarioBuilder < SimpleDelegator
       when ::Integer
         (expect @result).to eql @expected_exit_status
         verify_output_file = true if @output_file
+      else
+        (expect @result).to (satisfy 'be an Asciidoctor::Document, String, or Integer', &(proc { false }))
       end
       if verify_output_file
         if ::String === @output_file
