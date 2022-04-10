@@ -59,7 +59,9 @@ class ScenarioBuilder < SimpleDelegator
   end
 
   def expected_exit_status status = UNDEFINED
-    status == UNDEFINED ? @expected_exit_status : (@expected_exit_status = status)
+    return @expected_exit_status if status == UNDEFINED
+    verify { (expect @result).to eql @expected_exit_status } unless @verify
+    @expected_exit_status = status
   end
 
   def expected_log_messages *argv
@@ -68,7 +70,6 @@ class ScenarioBuilder < SimpleDelegator
 
   def expected_source source = UNDEFINED
     return @expected_source if source == UNDEFINED
-    @expected_source = source.chomp
     verify do
       case @result
       when ::Asciidoctor::Document
@@ -93,7 +94,7 @@ class ScenarioBuilder < SimpleDelegator
         (expect actual_source).to eql @expected_source + (@expected_source.empty? ? '' : ?\n)
       end
     end
-    @expected_source
+    @expected_source = source.chomp
   end
 
   def finally &block
@@ -156,8 +157,15 @@ class ScenarioBuilder < SimpleDelegator
     freeze
   end
 
-  def verify &block
-    @verify = block
+  def verify value = UNDEFINED, &block
+    case value
+    when UNDEFINED
+      block_given? ? (@verify = block) : @verify
+    when ::Proc
+      @verify = value.curry[@verify]
+    else
+      @verify = nil
+    end
   end
 
   private

@@ -25,7 +25,7 @@ describe Asciidoctor::Reducer do
   end
 
   it 'should load document with no includes' do
-    doc = (scenario = create_scenario do
+    run_scenario do
       input_source <<~'END'
       no includes to be found here
 
@@ -34,20 +34,21 @@ describe Asciidoctor::Reducer do
 
       reduce_options sourcemap: true
       expected_source input_source
-    end).run
-
-    (expect doc.options[:reduced]).to be_falsy
-    (expect doc.blocks).to have_size 2
-    (expect doc.sourcemap).to be true
-    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3]
-    input_file = scenario.input_file
-    (expect doc.attr 'docname').to eql (scenario.input_file_basename '.adoc')
-    (expect doc.attr 'docfile').to eql input_file
-    (expect doc.attr 'docdir').to eql (File.dirname input_file)
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        (expect doc.options[:reduced]).to be_falsy
+        (expect doc.blocks).to have_size 2
+        (expect doc.sourcemap).to be true
+        (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3]
+        (expect doc.attr 'docname').to eql (input_file_basename '.adoc')
+        (expect doc.attr 'docfile').to eql input_file
+        (expect doc.attr 'docdir').to eql (File.dirname input_file)
+      end)
+    end
   end
 
   it 'should not enable sourcemap on document with no includes' do
-    doc = run_scenario do
+    run_scenario do
       input_source <<~'END'
       no includes to be found here
 
@@ -55,15 +56,17 @@ describe Asciidoctor::Reducer do
       END
 
       expected_source input_source
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        (expect doc.options[:reduced]).to be_falsy
+        (expect doc.sourcemap).to be_falsy
+        (expect doc.blocks[0].source_location).to be_nil
+      end)
     end
-
-    (expect doc.options[:reduced]).to be_falsy
-    (expect doc.sourcemap).to be_falsy
-    (expect doc.blocks[0].source_location).to be_nil
   end
 
   it 'should resolve top-level include with no nested includes' do
-    doc = (scenario = create_scenario do
+    run_scenario do
       input_source <<~'END'
       before include
 
@@ -82,18 +85,20 @@ describe Asciidoctor::Reducer do
 
       after include
       END
-    end).run
 
-    (expect doc.options[:reduced]).to be true
-    (expect doc.blocks).to have_size 4
-    (expect doc.sourcemap).to be true
-    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
-    input_file = scenario.input_file
-    (expect (doc.blocks.map {|it| it.file }).uniq).to eql [input_file]
-    (expect doc.attr 'docname').to eql (scenario.input_file_basename '.adoc')
-    (expect doc.attr 'docfile').to eql input_file
-    (expect doc.attr 'docdir').to eql (File.dirname input_file)
-    (expect doc.catalog[:includes]['no-includes']).to be true
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        (expect doc.options[:reduced]).to be true
+        (expect doc.blocks).to have_size 4
+        (expect doc.sourcemap).to be true
+        (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
+        (expect (doc.blocks.map {|it| it.file }).uniq).to eql [input_file]
+        (expect doc.attr 'docname').to eql (input_file_basename '.adoc')
+        (expect doc.attr 'docfile').to eql input_file
+        (expect doc.attr 'docdir').to eql (File.dirname input_file)
+        (expect doc.catalog[:includes]['no-includes']).to be true
+      end)
+    end
   end
 
   it 'should not enable sourcemap on reduced document' do
