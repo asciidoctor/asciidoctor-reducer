@@ -48,41 +48,53 @@ describe Asciidoctor::Reducer::Cli do
     end
 
     it 'should convert a document at the specified relative path' do
-      out, _, res = run_command asciidoctor_reducer_bin, (fixture_file 'book.adoc', relative: true)
-      (expect res.exitstatus).to eql 0
-      expected_source = <<~'END'.chomp
-      = Book Title
+      run_scenario do
+        input_file fixture_file 'book.adoc', relative: true
+        output_file $stdout
+        reduce do
+          out, _, res = run_command asciidoctor_reducer_bin, input_file
+          $stdout.write out
+          res.exitstatus
+        end
 
-      == Chapter One
+        expected_source <<~'END'
+        = Book Title
 
-      content
+        == Chapter One
 
-      [appendix]
-      == Installation
+        content
 
-      content
-      END
+        [appendix]
+        == Installation
 
-      (expect out.chomp).to eql expected_source
+        content
+        END
+      end
     end
 
     it 'should convert a document at the specified absolute path' do
-      out, _, res = run_command asciidoctor_reducer_bin, (fixture_file 'book.adoc')
-      (expect res.exitstatus).to eql 0
-      expected_source = <<~'END'.chomp
-      = Book Title
+      run_scenario do
+        input_file fixture_file 'book.adoc'
+        output_file $stdout
+        reduce do
+          out, _, res = run_command asciidoctor_reducer_bin, input_file
+          $stdout.write out
+          res.exitstatus
+        end
 
-      == Chapter One
+        expected_source <<~'END'
+        = Book Title
 
-      content
+        == Chapter One
 
-      [appendix]
-      == Installation
+        content
 
-      content
-      END
+        [appendix]
+        == Installation
 
-      (expect out.chomp).to eql expected_source
+        content
+        END
+      end
     end
   end
 
@@ -187,8 +199,8 @@ describe Asciidoctor::Reducer::Cli do
         input_source the_input_source
         output_file $stdout
         reduce { subject.run [input_file, '-o', Dir.tmpdir] }
-        expected_exit_status 1
         expected_source ''
+        expected_exit_status 1
       end
 
       if (message = $stderr.string.downcase).include? 'permission'
