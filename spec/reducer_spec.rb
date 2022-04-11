@@ -65,7 +65,7 @@ describe Asciidoctor::Reducer do
     end
   end
 
-  it 'should resolve top-level include with no nested includes' do
+  it 'should resolve top-level include with no nested includes in input file' do
     run_scenario do
       input_source <<~'END'
       before include
@@ -96,6 +96,45 @@ describe Asciidoctor::Reducer do
         (expect doc.attr 'docname').to eql (input_file_basename '.adoc')
         (expect doc.attr 'docfile').to eql input_file
         (expect doc.attr 'docdir').to eql (File.dirname input_file)
+        (expect doc.catalog[:includes]['no-includes']).to be true
+      end)
+    end
+  end
+
+  it 'should resolve top-level include with no nested includes in input string' do
+    run_scenario do
+      input_source <<~'END'
+      before include
+
+      include::no-includes.adoc[]
+
+      after include
+      END
+
+      chdir fixtures_dir
+      reduce_options sourcemap: true
+      reduce { described_class.reduce input_source, **reduce_options }
+      expected_source <<~'END'
+      before include
+
+      no includes here
+
+      just regular paragraph text
+
+      after include
+      END
+
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        (expect doc.options[:reduced]).to be true
+        (expect doc.blocks).to have_size 4
+        (expect doc.sourcemap).to be true
+        (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
+        (expect (doc.blocks.map {|it| it.file }).uniq).to eql [nil]
+        (expect (doc.blocks.map {|it| it.source_location.path }).uniq).to eql ['<stdin>']
+        (expect doc.attr 'docname').to be_nil
+        (expect doc.attr 'docfile').to be_nil
+        (expect doc.attr 'docdir').to eql fixtures_dir
         (expect doc.catalog[:includes]['no-includes']).to be true
       end)
     end
