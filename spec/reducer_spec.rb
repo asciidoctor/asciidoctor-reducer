@@ -141,7 +141,7 @@ describe Asciidoctor::Reducer do
   end
 
   it 'should not enable sourcemap on reduced document' do
-    doc = run_scenario do
+    run_scenario do
       input_source <<~'END'
       before include
 
@@ -159,16 +159,19 @@ describe Asciidoctor::Reducer do
 
       after include
       END
-    end
 
-    (expect doc.options[:reduced]).to be_falsy
-    (expect doc.sourcemap).to be_falsy
-    (expect doc.blocks[0].source_location).to be_nil
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        (expect doc.options[:reduced]).to be_falsy
+        (expect doc.sourcemap).to be_falsy
+        (expect doc.blocks[0].source_location).to be_nil
+      end)
+    end
   end
 
   it 'should not reload document with includes if sourcemap is not enabled' do
     docs = []
-    reduced_doc = run_scenario do
+    run_scenario do
       input_source <<~'END'
       before include
 
@@ -196,15 +199,18 @@ describe Asciidoctor::Reducer do
 
       after include
       END
-    end
 
-    (expect docs).to have_size 1
-    (expect docs[0].object_id).to eql reduced_doc.object_id
-    (expect reduced_doc.catalog[:includes]['no-includes']).to be true
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        (expect docs).to have_size 1
+        (expect docs[0].object_id).to eql doc.object_id
+        (expect doc.catalog[:includes]['no-includes']).to be true
+      end)
+    end
   end
 
   it 'should resolve top-level relative include with nested include' do
-    doc = (scenario = create_scenario do
+    run_scenario do
       include_source <<~'END'
       before nested include
 
@@ -235,15 +241,18 @@ describe Asciidoctor::Reducer do
 
       after include
       END
-    end).run
 
-    (expect doc.blocks).to have_size 6
-    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9, 11]
-    (expect (doc.blocks.map {|it| it.file }).uniq).to eql [scenario.input_file]
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        (expect doc.blocks).to have_size 6
+        (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9, 11]
+        (expect (doc.blocks.map {|it| it.file }).uniq).to eql [input_file]
+      end)
+    end
   end
 
   it 'should resolve top-level absolute include with nested include' do
-    doc = (scenario = create_scenario do
+    run_scenario do
       include_source <<~'END'
       before nested include
 
@@ -274,15 +283,18 @@ describe Asciidoctor::Reducer do
 
       after include
       END
-    end).run
 
-    (expect doc.blocks).to have_size 6
-    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9, 11]
-    (expect (doc.blocks.map {|it| it.file }).uniq).to eql [scenario.input_file]
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        (expect doc.blocks).to have_size 6
+        (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9, 11]
+        (expect (doc.blocks.map {|it| it.file }).uniq).to eql [input_file]
+      end)
+    end
   end
 
   it 'should resolve nested include relative to include file' do
-    doc = run_scenario do
+    run_scenario do
       include_source <<~END
       before relative include
 
@@ -311,14 +323,17 @@ describe Asciidoctor::Reducer do
 
       after include
       END
-    end
 
-    (expect doc.blocks).to have_size 5
-    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9]
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        (expect doc.blocks).to have_size 5
+        (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9]
+      end)
+    end
   end
 
   it 'should resolve include with single-line paragraph' do
-    doc = run_scenario do
+    run_scenario do
       input_source <<~'END'
       before include
 
@@ -335,14 +350,17 @@ describe Asciidoctor::Reducer do
 
       after include
       END
-    end
 
-    (expect doc.blocks).to have_size 3
-    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        (expect doc.blocks).to have_size 3
+        (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
+      end)
+    end
   end
 
   it 'should skip escaped include' do
-    doc = run_scenario do
+    run_scenario do
       input_source <<~'END'
       before include
 
@@ -353,14 +371,16 @@ describe Asciidoctor::Reducer do
 
       reduce_options sourcemap: true
       expected_source input_source
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        (expect doc.blocks).to have_size 3
+        (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
+      end)
     end
-
-    (expect doc.blocks).to have_size 3
-    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
 
   it 'should resolve include at start of document' do
-    doc = run_scenario do
+    run_scenario do
       input_source <<~'END'
       include::single-line-paragraph.adoc[]
 
@@ -373,14 +393,17 @@ describe Asciidoctor::Reducer do
 
       after include
       END
-    end
 
-    (expect doc.blocks).to have_size 2
-    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3]
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        (expect doc.blocks).to have_size 2
+        (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3]
+      end)
+    end
   end
 
   it 'should resolve include at end of document' do
-    doc = run_scenario do
+    run_scenario do
       input_source <<~'END'
       before include
 
@@ -393,14 +416,17 @@ describe Asciidoctor::Reducer do
 
       single-line paragraph
       END
-    end
 
-    (expect doc.blocks).to have_size 2
-    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3]
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        (expect doc.blocks).to have_size 2
+        (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3]
+      end)
+    end
   end
 
   it 'should resolve include with multiline paragraph' do
-    doc = run_scenario do
+    run_scenario do
       include_source <<~'END'
       first line
       second line
@@ -425,14 +451,17 @@ describe Asciidoctor::Reducer do
 
       after include
       END
-    end
 
-    (expect doc.blocks).to have_size 3
-    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 7]
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        (expect doc.blocks).to have_size 3
+        (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 7]
+      end)
+    end
   end
 
   it 'should resolve include with multiple paragraphs' do
-    doc = run_scenario do
+    run_scenario do
       input_source <<~'END'
       before include
 
@@ -452,14 +481,17 @@ describe Asciidoctor::Reducer do
 
       after include
       END
-    end
 
-    (expect doc.blocks).to have_size 4
-    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 8]
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        (expect doc.blocks).to have_size 4
+        (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 8]
+      end)
+    end
   end
 
   it 'should resolve adjacent includes' do
-    doc = run_scenario do
+    run_scenario do
       input_source <<~'END'
       before include
 
@@ -478,14 +510,17 @@ describe Asciidoctor::Reducer do
 
       after include
       END
-    end
 
-    (expect doc.blocks).to have_size 3
-    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 6]
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        (expect doc.blocks).to have_size 3
+        (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 6]
+      end)
+    end
   end
 
   it 'should resolve include that follows include with nested include' do
-    doc = run_scenario do
+    run_scenario do
       include_source <<~'END'
       before nested include
 
@@ -526,14 +561,17 @@ describe Asciidoctor::Reducer do
 
       after
       END
-    end
 
-    (expect doc.blocks).to have_size 9
-    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9, 11, 13, 15, 17]
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        (expect doc.blocks).to have_size 9
+        (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9, 11, 13, 15, 17]
+      end)
+    end
   end
 
   it 'should assign same line number to preamble and its paragraph' do
-    doc = run_scenario do
+    run_scenario do
       input_source <<~'END'
       = Document Title
 
@@ -554,15 +592,18 @@ describe Asciidoctor::Reducer do
 
       == Chapter B
       END
-    end
 
-    blocks = doc.find_by {|it| it.context != :document }
-    (expect blocks).to have_size 5
-    (expect (blocks.map {|it| it.lineno })).to eql [1, 3, 3, 5, 7]
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        blocks = doc.find_by {|it| it.context != :document }
+        (expect blocks).to have_size 5
+        (expect (blocks.map {|it| it.lineno })).to eql [1, 3, 3, 5, 7]
+      end)
+    end
   end
 
   it 'should flag top-level include that cannot be resolved as an unresolved directive' do
-    doc = run_scenario do
+    run_scenario do
       input_source <<~'END'
       before include
 
@@ -581,15 +622,17 @@ describe Asciidoctor::Reducer do
       END
 
       expected_log_messages [{ severity: :ERROR, message: '~include file not found:', last: true }]
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        (expect doc.blocks).to have_size 3
+        (expect doc.blocks[1].source).to start_with 'Unresolved directive'
+        (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
+      end)
     end
-
-    (expect doc.blocks).to have_size 3
-    (expect doc.blocks[1].source).to start_with 'Unresolved directive'
-    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
 
   it 'should resolve include that follows unresolved include' do
-    doc = run_scenario do
+    run_scenario do
       input_source <<~'END'
       before includes
 
@@ -616,15 +659,17 @@ describe Asciidoctor::Reducer do
       END
 
       expected_log_messages [{ severity: :ERROR, message: '~include file not found:', last: true }]
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        (expect doc.blocks).to have_size 5
+        (expect doc.blocks[1].source).to start_with 'Unresolved directive'
+        (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9]
+      end)
     end
-
-    (expect doc.blocks).to have_size 5
-    (expect doc.blocks[1].source).to start_with 'Unresolved directive'
-    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9]
   end
 
   it 'should resolve include directly adjacent to unresolved include' do
-    doc = run_scenario do
+    run_scenario do
       input_source <<~'END'
       before includes
 
@@ -645,15 +690,17 @@ describe Asciidoctor::Reducer do
       END
 
       expected_log_messages [{ severity: :ERROR, message: '~include file not found:', last: true }]
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        (expect doc.blocks).to have_size 3
+        (expect doc.blocks[1].source).to start_with 'Unresolved directive'
+        (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 6]
+      end)
     end
-
-    (expect doc.blocks).to have_size 3
-    (expect doc.blocks[1].source).to start_with 'Unresolved directive'
-    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 6]
   end
 
   it 'should resolve include after unresolved optional include' do
-    doc = run_scenario do
+    run_scenario do
       input_source <<~'END'
       before includes
 
@@ -680,14 +727,16 @@ describe Asciidoctor::Reducer do
 
       expected_log_messages [{ severity: :INFO, message: '~optional include dropped', last: true }],
         using_log_level: :INFO
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        (expect doc.blocks).to have_size 4
+        (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 4, 6, 8]
+      end)
     end
-
-    (expect doc.blocks).to have_size 4
-    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 4, 6, 8]
   end
 
   it 'should skip optional top-level include that cannot be resolved' do
-    doc = run_scenario do
+    run_scenario do
       input_source <<~'END'
       before include
 
@@ -706,14 +755,16 @@ describe Asciidoctor::Reducer do
 
       expected_log_messages [{ severity: :INFO, message: '~optional include dropped', last: true }],
         using_log_level: :INFO
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        (expect doc.blocks).to have_size 2
+        (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 4]
+      end)
     end
-
-    (expect doc.blocks).to have_size 2
-    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 4]
   end
 
   it 'should flag nested include that cannot be resolved as an unresolved directive' do
-    doc = run_scenario do
+    run_scenario do
       include_source <<~'END'
       before include
 
@@ -744,15 +795,17 @@ describe Asciidoctor::Reducer do
       END
 
       expected_log_messages [{ severity: :ERROR, message: '~include file not found:', last: true }]
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        (expect doc.blocks).to have_size 5
+        (expect doc.blocks[2].source).to start_with 'Unresolved directive'
+        (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9]
+      end)
     end
-
-    (expect doc.blocks).to have_size 5
-    (expect doc.blocks[2].source).to start_with 'Unresolved directive'
-    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7, 9]
   end
 
   it 'should flag include as an unresolved directive if target is empty' do
-    doc = run_scenario do
+    run_scenario do
       input_source <<~'END'
       before include
 
@@ -773,14 +826,16 @@ describe Asciidoctor::Reducer do
       expected_log_messages [
         { severity: :WARN, message: '~include dropped because resolved target is blank:', last: true },
       ]
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        (expect doc.blocks).to have_size 3
+        (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
+      end)
     end
-
-    (expect doc.blocks).to have_size 3
-    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
   end
 
   it 'should reduce includes when safe mode is server' do
-    doc = (scenario = create_scenario do
+    run_scenario do
       input_source <<~'END'
       before include
 
@@ -797,17 +852,20 @@ describe Asciidoctor::Reducer do
 
       after include
       END
-    end).run
 
-    (expect doc.attr 'docname').to eql (scenario.input_file_basename '.adoc')
-    (expect doc.attr 'docfile').to eql scenario.input_file_basename
-    (expect doc.attr 'docdir').to be_empty
-    (expect doc.blocks).to have_size 3
-    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        (expect doc.attr 'docname').to eql (input_file_basename '.adoc')
+        (expect doc.attr 'docfile').to eql input_file_basename
+        (expect doc.attr 'docdir').to be_empty
+        (expect doc.blocks).to have_size 3
+        (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
+      end)
+    end
   end
 
   it 'should replace includes with links if safe mode is secure' do
-    doc = run_scenario do
+    run_scenario do
       input_source <<~'END'
       before includes
 
@@ -828,14 +886,17 @@ describe Asciidoctor::Reducer do
 
       after includes
       END
-    end
 
-    (expect doc.blocks).to have_size 4
-    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        (expect doc.blocks).to have_size 4
+        (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5, 7]
+      end)
+    end
   end
 
   it 'should replace include with link if target is URL and allow-uri-read is not set' do
-    doc = run_scenario do
+    run_scenario do
       input_source <<~'END'
       before include
 
@@ -852,10 +913,13 @@ describe Asciidoctor::Reducer do
 
       after include
       END
-    end
 
-    (expect doc.blocks).to have_size 3
-    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        (expect doc.blocks).to have_size 3
+        (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
+      end)
+    end
   end
 
   it 'should reduce remote include if allow-uri-read is set' do
@@ -921,7 +985,7 @@ describe Asciidoctor::Reducer do
   end
 
   it 'should not process link macro following include skipped by include processor when safe mode is not secure' do
-    doc = run_scenario do
+    run_scenario do
       input_source <<~'END'
       before includes
 
@@ -939,10 +1003,13 @@ describe Asciidoctor::Reducer do
 
       after includes
       END
-    end
 
-    (expect doc.blocks).to have_size 3
-    (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        (expect doc.blocks).to have_size 3
+        (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3, 5]
+      end)
+    end
   end
 
   it 'should not process link macro following include skipped by include processor when safe mode is secure' do
