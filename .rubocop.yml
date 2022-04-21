@@ -435,7 +435,7 @@ Style/SingleArgumentDig:
 Style/SlicingWithRange:
   Enabled: true
 Style/SoleNestedConditional:
-  Enabled: false # FIXME reenable to catch some helpful fixes, but causes RuboCop to crash
+  Enabled: true
 Style/SpecialGlobalVars:
   EnforcedStyle: use_perl_names
 Style/StderrPuts:
