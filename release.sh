@@ -36,6 +36,10 @@ chmod 600 $HOME/.gem/credentials
   git push origin $(git describe --tags --exact-match)
   gem push $RELEASE_NAME-$RELEASE_VERSION.gem
   git push origin $RELEASE_BRANCH
+  sed -i 3d README.adoc
+  sed -i "$(grep -m 1 -n '^== ' CHANGELOG.adoc | cut -f1 -d:)i == Unreleased\n\n_No changes since previous release._\n" CHANGELOG.adoc
+  git commit -a -m 'begin development on next version [no ci]'
+  git push origin $RELEASE_BRANCH
 )
 
 exit_code=$?
