@@ -4,12 +4,11 @@ if [ -z $RELEASE_RUBYGEMS_API_KEY ]; then
   echo No API key specified for publishing to rubygems.org. Stopping release.
   exit 1
 fi
-
 RELEASE_BRANCH=$GITHUB_REF_NAME
 if [ -z $RELEASE_USER ]; then
   export RELEASE_USER=$GITHUB_ACTOR
 fi
-RELEASE_GIT_NAME=$(curl -s https://api.github.com/users/${RELEASE_USER} | jq -r .name)
+RELEASE_GIT_NAME=$(curl -s https://api.github.com/users/$RELEASE_USER | jq -r .name)
 RELEASE_GIT_EMAIL=$RELEASE_USER@users.noreply.github.com
 GEMSPEC=$(ls -1 *.gemspec | head -1)
 RELEASE_NAME=$(ruby -e "print (Gem::Specification.load '$GEMSPEC').name")
@@ -31,14 +30,12 @@ chmod 600 $HOME/.gem/credentials
 (
   set -e
   ruby tasks/version.rb
-  git commit -a -m "v$RELEASE_VERSION [no ci]"
+  git commit -a -m "release v$RELEASE_VERSION [no ci]"
   git tag -m v$RELEASE_VERSION v$RELEASE_VERSION
   gem build $GEMSPEC
-  echo $RELEASE_GIT_NAME
-  git show $(git describe --tags --exact-match)
-  #git push origin $(git describe --tags --exact-match)
-  #gem push $RELEASE_NAME-$RELEASE_VERSION.gem
-  #git push origin $RELEASE_BRANCH
+  git push origin $(git describe --tags --exact-match)
+  gem push $RELEASE_NAME-$RELEASE_VERSION.gem
+  git push origin $RELEASE_BRANCH
 )
 
 exit_code=$?
