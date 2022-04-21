@@ -6,13 +6,16 @@ if [ -z $RELEASE_RUBYGEMS_API_KEY ]; then
 fi
 
 RELEASE_BRANCH=$GITHUB_REF_NAME
-RELEASE_GIT_NAME=$(curl -s https://api.github.com/users/${RELEASE_USER:=$GITHUB_ACTOR} | jq -r .name)
+if [ -z $RELEASE_USER ]; then
+  export RELEASE_USER=$GITHUB_ACTOR
+fi
+RELEASE_GIT_NAME=$(curl -s https://api.github.com/users/${RELEASE_USER} | jq -r .name)
 RELEASE_GIT_EMAIL=$RELEASE_USER@users.noreply.github.com
 GEMSPEC=$(ls -1 *.gemspec | head -1)
 RELEASE_NAME=$(ruby -e "print (Gem::Specification.load '$GEMSPEC').name")
 # RELEASE_VERSION must be an exact version number or else it defaults to the next patch release
 if [ -z $RELEASE_VERSION ]; then
-  RELEASE_VERSION=$(ruby -e "print (Gem::Specification.load '$GEMSPEC').version.segments.tap {|s| s.size == 4 ? s.pop : s[-1] += 1 }.join(?.)")
+  export RELEASE_VERSION=$(ruby -e "print (Gem::Specification.load '$GEMSPEC').version.segments.tap {|s| s.size == 4 ? s.pop : s[-1] += 1 }.join(?.)")
 fi
 
 # configure git to push changes
@@ -31,6 +34,7 @@ chmod 600 $HOME/.gem/credentials
   git commit -a -m "v$RELEASE_VERSION [no ci]"
   git tag -m v$RELEASE_VERSION v$RELEASE_VERSION
   gem build $GEMSPEC
+  echo $RELEASE_GIT_NAME
   git show $(git describe --tags --exact-match)
   #git push origin $(git describe --tags --exact-match)
   #gem push $RELEASE_NAME-$RELEASE_VERSION.gem
