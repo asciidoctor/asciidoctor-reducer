@@ -115,6 +115,8 @@ Lint/RaiseException:
   Enabled: true
 Lint/RedundantDirGlobSort:
   Enabled: true
+Lint/RefinementImportMethods:
+  Enabled: true
 Lint/RequireRelativeSelfPath:
   Enabled: true
 Lint/SelfAssignment:
@@ -184,7 +186,7 @@ Naming/InclusiveLanguage:
 Naming/MethodParameterName:
   Enabled: true
 Naming/PredicateName:
-  Enabled: false # FIXME consider reenabling later (might impact API)
+  Enabled: true
 Naming/VariableNumber:
   Enabled: false # reason: this is just nitpicky
 RSpec:
@@ -231,8 +233,12 @@ RSpec/Rails/AvoidSetupHook:
   Enabled: false
 RSpec/SubjectDeclaration:
   Enabled: true
+RSpec/VerifiedDoubleReference:
+  Enabled: true
 RSpec/VoidExpect:
   Enabled: false
+Security/CompoundHash:
+  Enabled: true
 Security/IoMethods:
   Enabled: true
 Security/Open:
@@ -299,6 +305,8 @@ Style/ExplicitBlockArgument:
   Enabled: false # reason: yield is fine
 Style/ExponentialNotation:
   Enabled: true
+Style/FetchEnvVar:
+  Enabled: false # reason: why?
 Style/FileRead:
   Enabled: true
 Style/FileWrite:
@@ -344,7 +352,7 @@ Style/InfiniteLoop:
 Style/KeywordParametersOrder:
   Enabled: true
 Style/MapToHash:
-  Enabled: true
+  Enabled: false # reason: not supported in JRuby < 9.3
 Style/MethodCallWithArgsParentheses:
   Enabled: true
   EnforcedStyle: omit_parentheses
@@ -380,6 +388,8 @@ Style/NumericLiterals:
   Enabled: false # reason: makes large numbers unreadable and harder to copy
 Style/NumericPredicate:
   EnforcedStyle: comparison
+Style/ObjectThen:
+  Enabled: true
 Style/OpenStructUse:
   Enabled: true
 Style/OptionalBooleanParameter:
@@ -407,8 +417,10 @@ Style/RedundantFetchBlock:
   Enabled: true
 Style/RedundantFileExtensionInRequire:
   Enabled: true
+Style/RedundantInitialize:
+  Enabled: true
 Style/RedundantPercentQ:
-  Enabled: false # reason: needed to escape strings with both single and double quotes
+  Enabled: true
 Style/RedundantRegexpCharacterClass:
   Enabled: true
 Style/RedundantRegexpEscape:
@@ -433,7 +445,7 @@ Style/SelectByRegexp:
 Style/SingleArgumentDig:
   Enabled: true
 Style/SlicingWithRange:
-  Enabled: true
+  Enabled: false # reason: not supported in JRuby < 9.3
 Style/SoleNestedConditional:
   Enabled: true
 Style/SpecialGlobalVars:
