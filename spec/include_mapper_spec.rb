@@ -17,7 +17,7 @@ describe Asciidoctor::Reducer::IncludeMapper do
     end
   end
 
-  it 'should not add include mapping comment if document only has partial includes' do
+  it 'should prefix name of partial includes with ~ in include mapping comment' do
     ext_class = described_class
     run_scenario do
       input_source <<~'END'
@@ -29,7 +29,7 @@ describe Asciidoctor::Reducer::IncludeMapper do
       END
 
       reduce_options extensions: proc { tree_processor ext_class unless document.options[:reduced] }
-      expected_source <<~'END'
+      expected_source <<~END
       before include
 
       Start of body.
@@ -37,6 +37,8 @@ describe Asciidoctor::Reducer::IncludeMapper do
       End of body.
 
       after include
+
+      //# includes=~with-include-tag
       END
     end
   end
@@ -104,7 +106,7 @@ describe Asciidoctor::Reducer::IncludeMapper do
 
       end
 
-      //# includes=single-line-paragraph
+      //# includes=single-line-paragraph,~with-include-tag
       END
     end
   end
@@ -118,13 +120,14 @@ describe Asciidoctor::Reducer::IncludeMapper do
     [#sectid]
     == Target Section
 
-    //# includes=single-line-paragraph,no-includes
+    //# includes=single-line-paragraph,no-includes,~included-partially
     END
 
     includes = doc.catalog[:includes]
-    (expect includes).to have_size 2
+    (expect includes).to have_size 3
     (expect includes['single-line-paragraph']).to be true
     (expect includes['no-includes']).to be true
+    (expect includes['included-partially']).to be false
     (expect result.string).to include '<a href="#sectid">Target Section</a>'
   end
 
