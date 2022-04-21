@@ -4,11 +4,15 @@
 This document provides a high-level view of the changes to the Asciidoctor Reducer by release.
 For a detailed view of what has changed, refer to the {url-repo}/commits/main[commit history] on GitHub.
 
-== Unreleased
+== 1.0.0.alpha.10 (2022-04-21) - @mojavelinux
 
 === Changed
 
 * Set Ruby 2.7 as minimum Ruby version
+
+=== Details
+
+{url-repo}/releases/tag/v1.0.0.alpha.10[git tag] | {url-repo}/compare/v1.0.0.alpha.9\...v1.0.0.alpha.10[full diff]
 
 == 1.0.0.alpha.9 (2022-04-21) - @mojavelinux
 
