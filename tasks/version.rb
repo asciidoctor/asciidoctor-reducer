@@ -10,11 +10,14 @@ version_file = Dir['lib/**/version.rb'].first
 version_contents = (File.readlines version_file, mode: 'r:UTF-8').map do |l|
   (l.include? 'VERSION') ? (l.sub %r/'[^']+'/, %('#{release_version}')) : l
 end
-File.write version_file, version_contents.join, mode: 'w:UTF-8'
 
 readme_file = 'README.adoc'
-readme_contents = (File.readlines readme_file, mode: 'r:UTF-8').insert 2, %(v#{release_version}, #{release_date}\n)
-File.write readme_file, readme_contents.join, mode: 'w:UTF-8'
+readme_contents = File.readlines readme_file, mode: 'r:UTF-8'
+if readme_contents[2].start_with? 'v'
+  readme_contents[2] = %(v#{release_version}, #{release_date}\n)
+else
+  readme_contents.insert 2, %(v#{release_version}, #{release_date}\n)
+end
 
 changelog_file = 'CHANGELOG.adoc'
 changelog_contents = File.readlines changelog_file, mode: 'r:UTF-8'
@@ -22,9 +25,13 @@ last_release_idx = changelog_contents.index {|l| (l.start_with? '== ') && (%r/^=
 if last_release_idx
   previous_release_version = (changelog_contents[last_release_idx].match %r/\d\S+/)[0]
 else
-  lasat_release_idx = changelog_contents.length
+  last_release_idx = changelog_contents.length
 end
 unreleased_idx = changelog_contents.index {|l| (l.start_with? '== Unreleased') && l.rstrip == '== Unreleased' }
+unless unreleased_idx
+  warn 'Cannot find Unreleased section in CHANGELOG. Stopping release.'
+  exit 1
+end
 changelog_contents[unreleased_idx] = %(== #{release_version} (#{release_date}) - @#{release_user}\n)
 changelog_contents.insert last_release_idx, <<~END
 === Details
@@ -32,4 +39,7 @@ changelog_contents.insert last_release_idx, <<~END
 {url-repo}/releases/tag/v#{release_version}[git tag]#{previous_release_version ? %( | {url-repo}/compare/v#{previous_release_version}\\...v#{release_version}[full diff]) : ''}
 
 END
+
+File.write version_file, version_contents.join, mode: 'w:UTF-8'
+File.write readme_file, readme_contents.join, mode: 'w:UTF-8'
 File.write changelog_file, changelog_contents.join, mode: 'w:UTF-8'
