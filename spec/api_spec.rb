@@ -60,7 +60,7 @@ describe Asciidoctor::Reducer do
     end
 
     it 'should reduce input when options are specified' do
-      doc = run_scenario do
+      run_scenario do
         input_source <<~'END'
         primary content
         ifdef::flag[]
@@ -77,16 +77,20 @@ describe Asciidoctor::Reducer do
 
         single-line paragraph
         END
+
+        verify (proc do |delegate, doc|
+          delegate.call doc
+          (expect doc.options[:sourcemap]).to be true
+          (expect doc.sourcemap).to be true
+          (expect doc.options[:safe]).to be :unsafe
+          (expect doc.safe).to be Asciidoctor::SafeMode::UNSAFE
+          (expect doc.attr 'docdir').to eql fixtures_dir
+        end)
       end
-      (expect doc.options[:sourcemap]).to be true
-      (expect doc.sourcemap).to be true
-      (expect doc.options[:safe]).to be :unsafe
-      (expect doc.safe).to be Asciidoctor::SafeMode::UNSAFE
-      (expect doc.attr 'docdir').to eql fixtures_dir
     end
 
     it 'should set safe mode to :safe if not specified' do
-      doc = run_scenario do
+      run_scenario do
         input_source <<~'END'
         include::single-line-paragraph.adoc[]
         ifdef::flag[]
@@ -97,22 +101,26 @@ describe Asciidoctor::Reducer do
         chdir fixtures_dir
         reduce { subject.call input_source, reduce_options }
         expected_source 'single-line paragraph'
+        verify (proc do |delegate, doc|
+          delegate.call doc
+          (expect doc.options[:safe]).to eql :safe
+          (expect doc.safe).to eql Asciidoctor::SafeMode::SAFE
+        end)
       end
-
-      (expect doc.options[:safe]).to eql :safe
-      (expect doc.safe).to eql Asciidoctor::SafeMode::SAFE
     end
 
     it 'should reduce input specified as File object' do
-      doc = (scenario = create_scenario do
+      run_scenario do
         input_source the_input_source
         reduce { File.open(input_file, mode: 'rb:UTF-8') {|f| subject.call f } }
         expected_source the_expected_source
-      end).run
-
-      (expect doc.attr 'docname').to eql (scenario.input_file_basename '.adoc')
-      (expect doc.attr 'docfile').to eql scenario.input_file
-      (expect doc.attr 'docdir').to eql (File.dirname scenario.input_file)
+        verify (proc do |delegate, doc|
+          delegate.call doc
+          (expect doc.attr 'docname').to eql (input_file_basename '.adoc')
+          (expect doc.attr 'docfile').to eql input_file
+          (expect doc.attr 'docdir').to eql (File.dirname input_file)
+        end)
+      end
     end
   end
 
@@ -146,7 +154,7 @@ describe Asciidoctor::Reducer do
     end
 
     it 'should reduce input when options are specified' do
-      doc = run_scenario do
+      run_scenario do
         input_source <<~'END'
         primary content
         ifdef::flag[]
@@ -163,17 +171,20 @@ describe Asciidoctor::Reducer do
 
         single-line paragraph
         END
-      end
 
-      (expect doc.options[:sourcemap]).to be true
-      (expect doc.sourcemap).to be true
-      (expect doc.options[:safe]).to be :unsafe
-      (expect doc.safe).to be Asciidoctor::SafeMode::UNSAFE
-      (expect doc.attr 'docdir').to eql fixtures_dir
+        verify (proc do |delegate, doc|
+          delegate.call doc
+          (expect doc.options[:sourcemap]).to be true
+          (expect doc.sourcemap).to be true
+          (expect doc.options[:safe]).to be :unsafe
+          (expect doc.safe).to be Asciidoctor::SafeMode::UNSAFE
+          (expect doc.attr 'docdir').to eql fixtures_dir
+        end)
+      end
     end
 
     it 'should set safe mode to :safe if not specified' do
-      doc = run_scenario do
+      run_scenario do
         input_source <<~'END'
         include::single-line-paragraph.adoc[]
         ifdef::flag[]
@@ -187,10 +198,13 @@ describe Asciidoctor::Reducer do
         single-line paragraph
         conditional content
         END
-      end
 
-      (expect doc.options[:safe]).to eql :safe
-      (expect doc.safe).to eql Asciidoctor::SafeMode::SAFE
+        verify (proc do |delegate, doc|
+          delegate.call doc
+          (expect doc.options[:safe]).to eql :safe
+          (expect doc.safe).to eql Asciidoctor::SafeMode::SAFE
+        end)
+      end
     end
 
     it 'should reduce file at specified relative path' do
@@ -373,28 +387,32 @@ describe Asciidoctor::Reducer do
     end
 
     it 'should not pass :to option to Asciidoctor.load_file' do
-      doc = run_scenario do
+      run_scenario do
         input_source the_input_source
         output_file create_output_file
         reduce_options to: output_file
         reduce { subject.reduce_file input_file, reduce_options }
         expected_source the_expected_source
+        verify (proc do |delegate, doc|
+          delegate.call doc
+          (expect doc.options).not_to have_key :to
+        end)
       end
-
-      (expect doc.options).not_to have_key :to
     end
 
     it 'should not pass :to option to Asciidoctor.load' do
-      doc = run_scenario do
+      run_scenario do
         input_source the_input_source
         output_file create_output_file
         chdir fixtures_dir
         reduce_options to: output_file
         reduce { subject.reduce input_source, reduce_options }
         expected_source the_expected_source
+        verify (proc do |delegate, doc|
+          delegate.call doc
+          (expect doc.options).not_to have_key :to
+        end)
       end
-
-      (expect doc.options).not_to have_key :to
     end
   end
 
@@ -425,15 +443,17 @@ describe Asciidoctor::Reducer do
     end
 
     it 'should not register extensions in a custom extension registry again when reloading document' do
-      extension_registry = Asciidoctor::Extensions.create(&register_extension_call_tracer)
       run_scenario do
+        extension_registry = Asciidoctor::Extensions.create(&register_extension_call_tracer)
         input_source the_input_source
         reduce_options sourcemap: true, extension_registry: extension_registry
         expected_source the_expected_source
+        verify (proc do |delegate, doc|
+          delegate.call doc
+          (expect extension_calls).to eql [false, true]
+          (expect extension_registry.groups[:reducer]).not_to be_nil
+        end)
       end
-
-      (expect extension_calls).to eql [false, true]
-      (expect extension_registry.groups[:reducer]).not_to be_nil
     end
 
     context 'when registered globally' do
@@ -442,48 +462,56 @@ describe Asciidoctor::Reducer do
       after { described_class::Extensions.unregister }
 
       it 'should not register extension for call' do
-        extensions = register_extension_call_tracer
         run_scenario do
+          extensions = register_extension_call_tracer
           input_source the_input_source
           reduce_options sourcemap: true, extensions: extensions
           expected_source the_expected_source
+          verify (proc do |delegate, doc|
+            delegate.call doc
+            (expect extension_calls).to eql [false, true]
+          end)
         end
-
-        (expect extension_calls).to eql [false, true]
       end
 
       it 'should not pass :extension_registry option with nil value' do
-        doc = run_scenario do
+        run_scenario do
           input_source the_input_source
           expected_source the_expected_source
+          verify (proc do |delegate, doc|
+            delegate.call doc
+            (expect doc.options).not_to have_key :extension_registry
+          end)
         end
-
-        (expect doc.options).not_to have_key :extension_registry
       end
 
       it 'should not register extension for call with custom extension registry' do
-        extension_registry = Asciidoctor::Extensions.create(&register_extension_call_tracer)
         run_scenario do
+          extension_registry = Asciidoctor::Extensions.create(&register_extension_call_tracer)
           input_source the_input_source
           reduce_options sourcemap: true, extension_registry: extension_registry
           expected_source the_expected_source
+          verify (proc do |delegate, doc|
+            delegate.call doc
+            (expect extension_calls).to eql [false, true]
+            (expect extension_registry.groups[:reducer]).to be_nil
+          end)
         end
-
-        (expect extension_calls).to eql [false, true]
-        (expect extension_registry.groups[:reducer]).to be_nil
       end
 
       it 'should not register extension for call to Asciidoctor.load_file' do
-        extension_registry = Asciidoctor::Extensions.create(&register_extension_call_tracer)
         run_scenario do
+          extension_registry = Asciidoctor::Extensions.create(&register_extension_call_tracer)
           input_source the_input_source
           reduce_options safe: :safe, sourcemap: true, extension_registry: extension_registry
           reduce { Asciidoctor.load_file input_file, reduce_options }
           expected_source the_expected_source
+          verify (proc do |delegate, doc|
+            delegate.call doc
+            (expect extension_calls).to eql [false, true]
+            (expect extension_registry.groups[:reducer]).to be_nil
+          end)
         end
-
-        (expect extension_calls).to eql [false, true]
-        (expect extension_registry.groups[:reducer]).to be_nil
       end
     end
   end
