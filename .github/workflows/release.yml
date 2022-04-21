@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       release-version:
-        description: Enter the version to release (e.g., 1.0.1).
+        description: Enter version to release (e.g., 1.0.1).
         required: false
 jobs:
   activate:

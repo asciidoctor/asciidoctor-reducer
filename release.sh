@@ -15,10 +15,6 @@ if [ -z $RELEASE_VERSION ]; then
   RELEASE_VERSION=$(ruby -e "print (Gem::Specification.load '$GEMSPEC').version.segments.tap {|s| s.size == 4 ? s.pop : s[-1] += 1 }.join(?.)")
 fi
 
-# make sure release branch exists as a local branch
-git fetch origin
-git branch -f $RELEASE_BRANCH origin/$RELEASE_BRANCH
-
 # configure git to push changes
 git config --local user.name "$RELEASE_GIT_NAME"
 git config --local user.email "$RELEASE_GIT_EMAIL"
@@ -35,7 +31,7 @@ chmod 600 $HOME/.gem/credentials
   git commit -a -m "v$RELEASE_VERSION [no ci]"
   git tag -m v$RELEASE_VERSION v$RELEASE_VERSION
   gem build $GEMSPEC
-  git tag # let's see if we got this far
+  git show $(git describe --tags --exact-match)
   #git push origin $(git describe --tags --exact-match)
   #gem push $RELEASE_NAME-$RELEASE_VERSION.gem
   #git push origin $RELEASE_BRANCH
