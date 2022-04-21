@@ -22,7 +22,7 @@ If the document does not contain any preprocessor directives, the tool returns t
 == Prerequisites
 
 {project-name} is a Ruby application that you install using Ruby packaging.
-To install and run {project-name}, you need Ruby 2.5 or better.
+To install and run {project-name}, you need Ruby 2.7 or better.
 
 Run the following command to check which version of Ruby you have installed, if any:
 

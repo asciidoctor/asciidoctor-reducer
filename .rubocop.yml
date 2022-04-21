@@ -2,7 +2,7 @@ require:
 - rubocop-rake
 - rubocop-rspec
 AllCops:
-  TargetRubyVersion: 2.5
+  TargetRubyVersion: 2.7
 Gemspec/DateAssignment:
   Enabled: true
 Gemspec/RequireMFA:

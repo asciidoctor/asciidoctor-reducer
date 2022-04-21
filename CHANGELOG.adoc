@@ -6,7 +6,9 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 
 == Unreleased
 
-_No changes since previous release._
+=== Changed
+
+* Set Ruby 2.7 as minimum Ruby version
 
 == 1.0.0.alpha.9 (2022-04-21) - @mojavelinux
 
