@@ -65,7 +65,7 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 
 === Details
 
-{url-repo}/releases/tag/v1.0.0.alpha.8[git tag]
+{url-repo}/releases/tag/v1.0.0.alpha.8[git tag] | {url-repo}/compare/v1.0.0.alpha.7\...v1.0.0.alpha.8[full diff]
 
 == 1.0.0.alpha.7 (2022-02-14) - @mojavelinux
 
@@ -88,7 +88,7 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 
 === Details
 
-{url-repo}/releases/tag/v1.0.0.alpha.7[git tag]
+{url-repo}/releases/tag/v1.0.0.alpha.7[git tag] | {url-repo}/compare/v1.0.0.alpha.6\...v1.0.0.alpha.7[full diff]
 
 == 1.0.0.alpha.6 (2022-02-10) - @mojavelinux
 
@@ -112,7 +112,7 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 
 === Details
 
-{url-repo}/releases/tag/v1.0.0.alpha.6[git tag]
+{url-repo}/releases/tag/v1.0.0.alpha.6[git tag] | {url-repo}/compare/v1.0.0.alpha.5\...v1.0.0.alpha.6[full diff]
 
 == 1.0.0.alpha.5 (2022-02-06) - @mojavelinux
 
@@ -129,7 +129,7 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 
 === Details
 
-{url-repo}/releases/tag/v1.0.0.alpha.5[git tag]
+{url-repo}/releases/tag/v1.0.0.alpha.5[git tag] | {url-repo}/compare/v1.0.0.alpha.4\...v1.0.0.alpha.5[full diff]
 
 == 1.0.0.alpha.4 (2022-02-03) - @mojavelinux
 
@@ -139,7 +139,7 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 
 === Details
 
-{url-repo}/releases/tag/v1.0.0.alpha.4[git tag]
+{url-repo}/releases/tag/v1.0.0.alpha.4[git tag] | {url-repo}/compare/v1.0.0.alpha.3\...v1.0.0.alpha.4[full diff]
 
 == 1.0.0.alpha.3 (2022-02-02) - @mojavelinux
 
@@ -152,7 +152,7 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 
 === Details
 
-{url-repo}/releases/tag/v1.0.0.alpha.3[git tag]
+{url-repo}/releases/tag/v1.0.0.alpha.3[git tag] | {url-repo}/compare/v1.0.0.alpha.2\...v1.0.0.alpha.3[full diff]
 
 == 1.0.0.alpha.2 (2022-01-27) - @mojavelinux
 
@@ -175,7 +175,7 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 
 === Details
 
-{url-repo}/releases/tag/v1.0.0.alpha.2[git tag]
+{url-repo}/releases/tag/v1.0.0.alpha.2[git tag] | {url-repo}/compare/v1.0.0.alpha.1\...v1.0.0.alpha.2[full diff]
 
 == 1.0.0.alpha.1 (2022-01-12) - @mojavelinux
 
