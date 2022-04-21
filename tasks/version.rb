@@ -21,24 +21,27 @@ end
 
 changelog_file = 'CHANGELOG.adoc'
 changelog_contents = File.readlines changelog_file, mode: 'r:UTF-8'
-last_release_idx = changelog_contents.index {|l| (l.start_with? '== ') && (%r/^== \d/.match? l) }
-if last_release_idx
+if (last_release_idx = changelog_contents.index {|l| (l.start_with? '== ') && (%r/^== \d/.match? l) })
   previous_release_version = (changelog_contents[last_release_idx].match %r/\d\S+/)[0]
 else
   last_release_idx = changelog_contents.length
 end
-unreleased_idx = changelog_contents.index {|l| (l.start_with? '== Unreleased') && l.rstrip == '== Unreleased' }
-unless unreleased_idx
-  warn 'Cannot find Unreleased section in CHANGELOG. Stopping release.'
-  exit 1
-end
-changelog_contents[unreleased_idx] = %(== #{release_version} (#{release_date}) - @#{release_user}\n)
 changelog_contents.insert last_release_idx, <<~END
 === Details
 
 {url-repo}/releases/tag/v#{release_version}[git tag]#{previous_release_version ? %( | {url-repo}/compare/v#{previous_release_version}\\...v#{release_version}[full diff]) : ''}
 
 END
+if (unreleased_idx = changelog_contents.index {|l| (l.start_with? '== Unreleased') && l.rstrip == '== Unreleased' })
+  changelog_contents[unreleased_idx] = %(== #{release_version} (#{release_date}) - @#{release_user}\n)
+else
+  changelog_contents.insert last_release_idx, <<~END
+  == #{release_version} (#{release_date}) - @#{release_user}
+
+  _No changes since previous release._
+
+  END
+end
 
 File.write version_file, version_contents.join, mode: 'w:UTF-8'
 File.write readme_file, readme_contents.join, mode: 'w:UTF-8'
