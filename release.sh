@@ -30,8 +30,8 @@ chmod 600 $HOME/.gem/credentials
 (
   set -e
   ruby tasks/version.rb
-  git commit -a -m "release v$RELEASE_VERSION [no ci]"
-  git tag -m v$RELEASE_VERSION v$RELEASE_VERSION
+  git commit -a -m "release $RELEASE_VERSION [no ci]"
+  git tag -m "version $RELEASE_VERSION" v$RELEASE_VERSION
   gem build $GEMSPEC
   git push origin $(git describe --tags --exact-match)
   gem push $RELEASE_NAME-$RELEASE_VERSION.gem
