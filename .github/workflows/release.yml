@@ -1,18 +1,19 @@
 name: Release
 on:
-  push:
-    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      release-version:
+        description: Enter the version to release from this branch.
+        required: false
 jobs:
   activate:
-    if: github.repository_owner == 'asciidoctor'
     runs-on: ubuntu-latest
+    if: github.repository_owner == 'asciidoctor' && github.event_name == 'workflow_dispatch'
     steps:
-    - name: Proceed
-      run: echo ok go
-  build:
+    - run: echo ok go
+  perform:
     needs: activate
     runs-on: ubuntu-latest
-    environment: releases
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -31,7 +32,9 @@ jobs:
       run: bundle exec rake spec
     - name: Run linter
       run: bundle exec rake lint
+    - name: Setup release environment
+      run: |
+        echo RELEASE_VERSION=${{ github.event.inputs.release-version }} >> $GITHUB_ENV
+        echo RELEASE_RUBYGEMS_API_KEY=${{ secrets[format('RUBYGEMS_API_KEY_{0}', github.actor)] }} >> $GITHUB_ENV
     - name: Publish gem
-      uses: dawidd6/action-publish-gem@v1
-      with:
-        api_key: ${{ secrets.RUBYGEMS_API_KEY }}
+      run: ./release.sh
