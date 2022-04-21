@@ -14,7 +14,7 @@ GEMSPEC=$(ls -1 *.gemspec | head -1)
 RELEASE_NAME=$(ruby -e "print (Gem::Specification.load '$GEMSPEC').name")
 # RELEASE_VERSION must be an exact version number or else it defaults to the next patch release
 if [ -z $RELEASE_VERSION ]; then
-  export RELEASE_VERSION=$(ruby -e "print (Gem::Specification.load '$GEMSPEC').version.segments.tap {|s| s.size == 4 ? s.pop : s[-1] += 1 }.join(?.)")
+  export RELEASE_VERSION=$(ruby -e "print (Gem::Specification.load '$GEMSPEC').version.then { _1.prerelease? ? _1.release.to_s : (_1.segments.tap {|s| s[-1] += 1 }.join ?.) }")
 fi
 
 # configure git to push changes
