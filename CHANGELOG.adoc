@@ -1,7 +1,7 @@
 = Asciidoctor Reducer Changelog
 :url-repo: https://github.com/asciidoctor/asciidoctor-reducer
 
-This document provides a high-level view of the changes to the Asciidoctor Reducer by release.
+This document provides a curated view of the changes to Asciidoctor Reducer in each release.
 For a detailed view of what has changed, refer to the {url-repo}/commits/main[commit history] on GitHub.
 
 == 1.0.0-beta.1 (2022-04-21) - @mojavelinux
