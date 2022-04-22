@@ -60,7 +60,7 @@ class ScenarioBuilder < SimpleDelegator
 
   def expected_exit_status status = UNDEFINED
     return @expected_exit_status if status == UNDEFINED
-    verify { (expect @result).to eql @expected_exit_status } unless @verify
+    verify {|result_| (expect result_).to eql @expected_exit_status } unless @verify
     @expected_exit_status = status
   end
 
@@ -70,18 +70,18 @@ class ScenarioBuilder < SimpleDelegator
 
   def expected_source source = UNDEFINED
     return @expected_source if source == UNDEFINED
-    verify do
-      case @result
+    verify do |result_|
+      case result_
       when ::Asciidoctor::Document
-        (expect @result).to have_source @expected_source
+        (expect result_).to have_source @expected_source
         verify_output_file = true if @output_file
       when ::String
-        (expect @result).to eql @expected_source
+        (expect result_).to eql @expected_source
       when ::Integer
-        (expect @result).to eql @expected_exit_status
+        (expect result_).to eql @expected_exit_status
         verify_output_file = true if @output_file
       else
-        (expect @result).to (satisfy 'be an Asciidoctor::Document, String, or Integer', &(proc { false }))
+        (expect result_).to (satisfy 'be an Asciidoctor::Document, String, or Integer', &(proc { false }))
       end
       if verify_output_file
         if ::String === @output_file
