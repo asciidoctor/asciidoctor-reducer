@@ -24,9 +24,9 @@ describe Asciidoctor::Reducer do
     END
   end
 
-  context 'version' do
-    it 'should provide VERSION constant' do
-      (expect described_class::VERSION).to match %r/^\d+\.\d+\.\d+(\.\S+)?$/
+  context 'VERSION' do
+    it 'should define VERSION constant that adheres to semver' do
+      (expect described_class::VERSION).to match %r/^\d+\.\d+\.\d+(-\S+)?$/
     end
   end
 
