@@ -201,12 +201,14 @@ describe Asciidoctor::Reducer::Cli do
         reduce { subject.run [input_file, '-o', Dir.tmpdir] }
         expected_source ''
         expected_exit_status 1
-      end
-
-      if (message = $stderr.string.downcase).include? 'permission'
-        (expect message).to include 'permission denied'
-      else
-        (expect message).to include 'is a directory'
+        verify (proc do |delegate, exit_status|
+          delegate.call exit_status
+          if (message = $stderr.string.downcase).include? 'permission'
+            (expect message).to include 'permission denied'
+          else
+            (expect message).to include 'is a directory'
+          end
+        end)
       end
     end
 
@@ -287,9 +289,12 @@ describe Asciidoctor::Reducer::Cli do
 
         after include
         END
-      end
 
-      (expect $stderr.string.chomp).to be_empty
+        verify (proc do |delegate, exit_status|
+          delegate.call exit_status
+          (expect $stderr.string.chomp).to be_empty
+        end)
+      end
     end
 
     it 'should ignore --log-level option if value is warn' do
@@ -310,9 +315,12 @@ describe Asciidoctor::Reducer::Cli do
 
         after include
         END
-      end
 
-      (expect $stderr.string.chomp).to be_empty
+        verify (proc do |delegate, exit_status|
+          delegate.call exit_status
+          (expect $stderr.string.chomp).to be_empty
+        end)
+      end
     end
 
     it 'should set level on logger to lower value specified by --log-level option' do
@@ -333,9 +341,12 @@ describe Asciidoctor::Reducer::Cli do
 
         after include
         END
-      end
 
-      (expect $stderr.string).to include 'optional include dropped'
+        verify (proc do |delegate, exit_status|
+          delegate.call exit_status
+          (expect $stderr.string).to include 'optional include dropped'
+        end)
+      end
     end
 
     it 'should suppress log messages when -q option is specified' do
@@ -357,9 +368,12 @@ describe Asciidoctor::Reducer::Cli do
 
         after include
         END
-      end
 
-      (expect $stderr.string.chomp).to be_empty
+        verify (proc do |delegate, exit_status|
+          delegate.call exit_status
+          (expect $stderr.string.chomp).to be_empty
+        end)
+      end
     end
 
     it 'should require library specified by -r option' do
@@ -514,9 +528,12 @@ describe Asciidoctor::Reducer::Cli do
 
         after include
         END
-      end
 
-      (expect $stderr.string).to include 'illegal reference to ancestor of jail'
+        verify (proc do |delegate, exit_status|
+          delegate.call exit_status
+          (expect $stderr.string).to include 'illegal reference to ancestor of jail'
+        end)
+      end
     end
   end
 
