@@ -1,0 +1,10 @@
+--charset UTF-8
+--readme README.adoc
+--no-private
+--hide-api private
+--title "Asciidoctor Reducer API Docs"
+--output-dir rdoc
+lib/asciidoctor/**/*.rb
+-
+CHANGELOG.adoc
+LICENSE

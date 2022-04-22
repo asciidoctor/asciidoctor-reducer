@@ -7,6 +7,15 @@ module Asciidoctor::Reducer
   autoload :VERSION, (::File.join __dir__, 'version.rb')
 
   class << self
+    # Reduces the AsciiDoc source and either returns the reduced Asciidoctor::Document or writes the source to a file.
+    #
+    # This method accepts all the options supported by Asciidoctor.load.
+    #
+    # @param input [String, File, Pathname] the AsciiDoc source to reduce.
+    # @param opts [Hash] additional options to configure the behavior of the reducer.
+    # @option opts [File, Pathname, Class] :to (nil) the target to which to write the reduced source.
+    #
+    # @return [Asciidoctor::Document, nil] the reduced document object or nil if the :to option is specified.
     def reduce input, opts = {}
       opts = opts&.merge || {}
       if (extension_registry = Extensions.prepare_registry opts[:extension_registry] || opts[:extensions])
@@ -25,6 +34,15 @@ module Asciidoctor::Reducer
       write doc, to
     end
 
+    # Reduces the AsciiDoc file and either returns the reduced Asciidoctor::Document or writes the source to a file.
+    #
+    # This method accepts all the options supported by Asciidoctor.load.
+    #
+    # @param input_file [String] the path of the AsciiDoc file to reduce.
+    # @param opts [Hash] additional options to configure the behavior of the reducer.
+    # @option opts [File, Pathname, Class] :to (nil) the target to which to write the reduced source.
+    #
+    # @return [Asciidoctor::Document, nil] the reduced document object or nil if the :to option is specified.
     def reduce_file input_file, opts = {}
       reduce (::Pathname.new input_file), opts
     end
