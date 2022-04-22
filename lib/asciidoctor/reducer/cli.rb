@@ -14,7 +14,7 @@ module Asciidoctor::Reducer
           opts.banner = <<~END
           Usage: #{opts.program_name} [OPTION]... FILE
 
-          Reduces a composite AsciiDoc document containing includes and conditionals to a single AsciiDoc document.
+          #{::Gem.loaded_specs['asciidoctor-reducer'].summary}
 
           END
 
