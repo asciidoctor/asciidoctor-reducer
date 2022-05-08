@@ -19,7 +19,7 @@ module Asciidoctor::Reducer
           end
           target_lines[idx] = lines if target_lines
         end
-        source_lines = inc_replacements[0][:lines].flatten
+        reduced_source_lines = inc_replacements[0][:lines].flatten
         if doc.sourcemap
           logger = ::Asciidoctor::LoggerManager.logger
           opts = doc.options.merge logger: nil, parse: false, reduced: true
@@ -27,13 +27,13 @@ module Asciidoctor::Reducer
             opts[:extension_registry] = ::Asciidoctor::Extensions::Registry.new ext_reg.groups
           end
           includes = doc.catalog[:includes]
-          doc = ::Asciidoctor.load source_lines, opts
+          doc = ::Asciidoctor.load reduced_source_lines, opts
           doc.catalog[:includes] = includes
           doc.parse
           ::Asciidoctor::LoggerManager.logger = logger
         else
-          source_lines.pop while (source_lines[-1] || :eof).empty?
-          doc.reader.source_lines = source_lines
+          reduced_source_lines.pop while (reduced_source_lines[-1] || :eof).empty?
+          doc.reader.source_lines = reduced_source_lines
         end
       end
       doc
