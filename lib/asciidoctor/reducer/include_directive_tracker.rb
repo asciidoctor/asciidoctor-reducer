@@ -2,9 +2,8 @@
 
 module Asciidoctor::Reducer
   module IncludeDirectiveTracker
-    attr_reader :include_replacements
-
     def self.extended instance
+      instance.singleton_class.send :attr_reader, :include_replacements
       instance.instance_variable_set :@include_replacements, ([{}].extend CurrentPosition)
       instance.instance_variable_set :@x_reducer, {}
     end
@@ -54,9 +53,8 @@ module Asciidoctor::Reducer
   end
 
   module CurrentPosition
-    attr_reader :pointer
-
     def self.extended instance
+      instance.singleton_class.send :attr_reader, :pointer
       instance.to_end
     end
 
