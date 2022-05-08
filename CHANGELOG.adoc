@@ -9,6 +9,7 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 === Changed
 
 * Use summary from gemspec in help text for `asciidoctor-reducer` command
+* Consistently access `source_lines` from document; use `#replace` to update
 
 == 1.0.0 (2022-04-22) - @mojavelinux
 

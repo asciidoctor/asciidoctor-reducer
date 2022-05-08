@@ -33,7 +33,7 @@ module Asciidoctor::Reducer
           ::Asciidoctor::LoggerManager.logger = logger
         else
           reduced_source_lines.pop while reduced_source_lines[-1] == ''
-          doc.reader.source_lines = reduced_source_lines
+          doc.source_lines.replace reduced_source_lines
         end
       end
       doc

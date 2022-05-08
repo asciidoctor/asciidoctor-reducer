@@ -3,7 +3,6 @@
 module Asciidoctor::Reducer
   module IncludeDirectiveTracker
     attr_reader :include_replacements
-    attr_writer :source_lines
 
     def self.extended instance
       instance.instance_variable_set :@include_replacements, ([{}].extend CurrentPosition)
