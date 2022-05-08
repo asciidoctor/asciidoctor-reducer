@@ -32,7 +32,7 @@ module Asciidoctor::Reducer
           doc.parse
           ::Asciidoctor::LoggerManager.logger = logger
         else
-          reduced_source_lines.pop while (reduced_source_lines[-1] || :eof).empty?
+          reduced_source_lines.pop while reduced_source_lines[-1] == ''
           doc.reader.source_lines = reduced_source_lines
         end
       end
