@@ -5,20 +5,20 @@ module Asciidoctor::Reducer
     def preprocess_conditional_directive keyword, target, delimiter, text
       skip_active = @skipping
       depth = @conditional_stack.size
-      cond_lineno = @lineno
+      directive_lineno = @lineno
       result = super
       return result if @skipping && skip_active
       drop = @include_replacements.current[:drop] ||= []
       if (depth_change = @conditional_stack.size - depth) < 0
         if skip_active
-          drop.push(*(drop.pop..cond_lineno))
+          drop.push(*(drop.pop..directive_lineno))
         else
-          drop << cond_lineno
+          drop << directive_lineno
         end
-      elsif depth_change > 0 || cond_lineno == @lineno
-        drop << cond_lineno
+      elsif depth_change > 0 || directive_lineno == @lineno
+        drop << directive_lineno
       else
-        drop << [cond_lineno, text]
+        drop << [directive_lineno, text]
       end
       result
     end

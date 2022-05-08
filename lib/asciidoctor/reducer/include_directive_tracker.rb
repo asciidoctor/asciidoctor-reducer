@@ -11,14 +11,14 @@ module Asciidoctor::Reducer
     def preprocess_include_directive target, attrlist
       @x_reducer[:include_directive_line] = %(include::#{target}[#{attrlist}])
       @x_reducer[:include_pushed] = false
-      inc_lineno = @lineno # we're currently on the include line, which is 1-based
+      directive_lineno = @lineno # we're currently on the include line, which is 1-based
       result = super
       unless @x_reducer[:include_pushed]
         if ((ln = peek_line true)&.end_with? ']') && !(unresolved = ln.start_with? 'Unresolved directive in ') &&
-            inc_lineno == @lineno && (unresolved = ln.start_with? 'link:')
+            directive_lineno == @lineno && (unresolved = ln.start_with? 'link:')
           ln = %(#{ln.slice 0, (ln.length - 1)}role=include])
         end
-        push_include_replacement inc_lineno, (unresolved ? [ln] : []), unresolved
+        push_include_replacement directive_lineno, (unresolved ? [ln] : []), unresolved
       end
       @x_reducer.clear
       result
@@ -26,10 +26,10 @@ module Asciidoctor::Reducer
 
     def push_include data, file, path, lineno, attrs
       @x_reducer[:include_pushed] = true
-      inc_lineno = @lineno - 1 # we're below the include line, which is 1-based
+      directive_lineno = @lineno - 1 # we're below the include line, which is 1-based
       prev_inc_depth = @include_stack.size
       result = super
-      push_include_replacement inc_lineno, (@include_stack.size > prev_inc_depth ? lines : [])
+      push_include_replacement directive_lineno, (@include_stack.size > prev_inc_depth ? lines : [])
       result
     end
 
