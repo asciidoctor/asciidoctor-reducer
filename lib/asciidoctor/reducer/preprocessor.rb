@@ -7,7 +7,8 @@ module Asciidoctor::Reducer
   class Preprocessor < ::Asciidoctor::Extensions::Preprocessor
     def process doc, reader
       doc.options[:preserve_conditionals] ?
-        (reader.extend IncludeDirectiveTracker) : (reader.extend ConditionalDirectiveTracker, IncludeDirectiveTracker)
+        (reader.extend IncludeDirectiveTracker) :
+        (reader.extend ConditionalDirectiveTracker, IncludeDirectiveTracker)
     end
   end
 end
