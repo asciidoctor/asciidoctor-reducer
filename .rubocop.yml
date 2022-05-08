@@ -301,12 +301,14 @@ Style/EmptyLiteral:
   Enabled: true
 Style/EndlessMethod:
   Enabled: true
+Style/EnvHome:
+  Enabled: true
 Style/ExplicitBlockArgument:
   Enabled: false # reason: yield is fine
 Style/ExponentialNotation:
   Enabled: true
 Style/FetchEnvVar:
-  Enabled: false # reason: why?
+  Enabled: false # reason: just no
 Style/FileRead:
   Enabled: true
 Style/FileWrite:
@@ -451,7 +453,8 @@ Style/SoleNestedConditional:
 Style/SpecialGlobalVars:
   EnforcedStyle: use_perl_names
 Style/StderrPuts:
-  Enabled: false
+  Enabled: true
+  Exclude: [ lib/asciidoctor/reducer/cli.rb ]
 Style/StringChars:
   Enabled: true
 Style/StringConcatenation:
