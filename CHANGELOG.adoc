@@ -4,12 +4,16 @@
 This document provides a curated view of the changes to Asciidoctor Reducer in each release.
 For a detailed view of what has changed, refer to the {url-repo}/commits/main[commit history] on GitHub.
 
-== Unreleased
+== 1.0.1 (2022-05-08) - @mojavelinux
 
 === Changed
 
 * Use summary from gemspec in help text for `asciidoctor-reducer` command
 * Consistently access `source_lines` from document; use `#replace` to update
+
+=== Details
+
+{url-repo}/releases/tag/v1.0.1[git tag] | {url-repo}/compare/v1.0.0\...v1.0.1[full diff]
 
 == 1.0.0 (2022-04-22) - @mojavelinux
 
