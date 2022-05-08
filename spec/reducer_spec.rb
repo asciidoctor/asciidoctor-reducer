@@ -1880,6 +1880,51 @@ describe Asciidoctor::Reducer do
     end
   end
 
+  it 'should reduce preprocessor conditional inside a file that has been included partially' do
+    run_scenario do
+      include_source <<~'END'
+      not included
+
+      //tag::select[]
+      primary
+      ifdef::flag[]
+      conditional
+      endif::[]
+      //end::select[]
+
+      also not included
+      END
+
+      input_source <<~END
+      :flag:
+
+      before include
+
+      include::#{include_file}[tag=select]
+
+      after include
+      END
+
+      reduce_options sourcemap: true
+      expected_source <<~'END'
+      :flag:
+
+      before include
+
+      primary
+      conditional
+
+      after include
+      END
+
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        (expect doc.blocks).to have_size 3
+        (expect (doc.blocks.map {|it| it.lineno })).to eql [3, 5, 8]
+      end)
+    end
+  end
+
   it 'should resolve include inside true preprocessor conditional' do
     run_scenario do
       input_source <<~'END'
@@ -1937,6 +1982,49 @@ describe Asciidoctor::Reducer do
         delegate.call doc
         (expect doc.blocks).to have_size 2
         (expect (doc.blocks.map {|it| it.lineno })).to eql [1, 3]
+      end)
+    end
+  end
+
+  it 'should resolve include inside true preprocessor conditional in file that has been included partially' do
+    run_scenario do
+      include_source <<~'END'
+      not included
+
+      //tag::select[]
+      ifdef::flag[]
+      include::single-line-paragraph.adoc[]
+      endif::[]
+      //end::select[]
+
+      also not included
+      END
+
+      input_source <<~END
+      :flag:
+
+      before include
+
+      include::#{include_file}[tag=select]
+
+      after include
+      END
+
+      reduce_options sourcemap: true
+      expected_source <<~'END'
+      :flag:
+
+      before include
+
+      single-line paragraph
+
+      after include
+      END
+
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        (expect doc.blocks).to have_size 3
+        (expect (doc.blocks.map {|it| it.lineno })).to eql [3, 5, 7]
       end)
     end
   end

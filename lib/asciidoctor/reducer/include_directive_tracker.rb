@@ -18,7 +18,7 @@ module Asciidoctor::Reducer
             directive_lineno == @lineno && (unresolved = ln.start_with? 'link:')
           ln = %(#{ln.slice 0, (ln.length - 1)}role=include])
         end
-        push_include_replacement directive_lineno, (unresolved ? [ln] : []), unresolved
+        push_include_replacement directive_lineno, (unresolved ? [ln] : []), 0, unresolved
       end
       @x_reducer.clear
       result
@@ -28,8 +28,9 @@ module Asciidoctor::Reducer
       @x_reducer[:include_pushed] = true
       directive_lineno = @lineno - 1 # we're below the include line, which is 1-based
       prev_inc_depth = @include_stack.size
+      offset = lineno > 1 ? lineno - 1 : 0
       result = super
-      push_include_replacement directive_lineno, (@include_stack.size > prev_inc_depth ? lines : [])
+      push_include_replacement directive_lineno, (@include_stack.size > prev_inc_depth ? lines : []), offset
       result
     end
 
@@ -40,12 +41,13 @@ module Asciidoctor::Reducer
 
     private
 
-    def push_include_replacement lineno, lines, unresolved = false
+    def push_include_replacement lineno, lines, offset, unresolved = false
       (inc_replacements = @include_replacements) << {
         into: inc_replacements.pointer,
-        lineno: lineno,
+        lineno: lineno - (inc_replacements.current[:offset] ||= 0),
         line: @x_reducer[:include_directive_line],
         lines: lines,
+        offset: offset,
       }
       inc_replacements.to_end unless unresolved || lines.empty?
       nil

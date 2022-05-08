@@ -8,7 +8,9 @@ module Asciidoctor::Reducer
       directive_lineno = @lineno
       result = super
       return result if @skipping && skip_active
-      drop = @include_replacements.current[:drop] ||= []
+      curr_inc_replacement = @include_replacements.current
+      drop = curr_inc_replacement[:drop] ||= []
+      directive_lineno -= (curr_inc_replacement[:offset] ||= 0)
       if (depth_change = @conditional_stack.size - depth) < 0
         if skip_active
           drop.push(*(drop.pop..directive_lineno))
