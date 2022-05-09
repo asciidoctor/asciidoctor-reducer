@@ -8,7 +8,7 @@ module Asciidoctor::Reducer
         inc_replacements.reverse_each do |it|
           if (into = it[:into])
             target_lines = inc_replacements[into][:lines]
-            # adds extra bit of assurance that we're replacing the correct line
+            # adds extra assurance that we're replacing the correct line
             next unless target_lines[(idx = it[:lineno] - 1)] == it[:line]
           end
           lines = it[:lines]
