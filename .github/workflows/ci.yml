@@ -24,10 +24,10 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        ruby: [jruby-9.3, '2.7', '3.1']
+        ruby: [jruby-9.3.4.0, '2.7', '3.1']
         asciidoctor-version: [~]
         exclude:
-        # remove ubuntu-latest to mark as primary
+        # remove 3.1 on ubuntu-latest to mark as primary
         - os: ubuntu-latest
           ruby: '3.1'
         include:
@@ -65,15 +65,15 @@ jobs:
         bundle config --local path vendor/bundle
         bundle config --local without coverage docs lint
         bundle --jobs 3 --retry 3
-    - name: Install coverage and lint dependencies (primary only)
+    - name: Install lint and coverage dependencies (primary only)
       if: matrix.primary
       run: |
         bundle config unset --local without
         bundle config --local without docs
         bundle --jobs 3 --retry 3
         echo 'COVERAGE=deep' >> $GITHUB_ENV
-    - name: Run tests
-      run: bundle exec rake spec
     - name: Run linter
       if: matrix.primary
       run: bundle exec rake lint
+    - name: Run tests
+      run: bundle exec ruby -w $(bundle exec ruby -e 'print File.join Gem.bindir, %q(rake)') spec
