@@ -277,7 +277,7 @@ describe Asciidoctor::Reducer do
     end
 
     it 'should reduce input to managed File object specified by :to option' do
-      with_tmp_file tmpdir: output_dir do |the_output_file|
+      with_tmp_file %w(out- .adoc), tmpdir: output_dir do |the_output_file|
         run_scenario do
           input_source the_input_source
           output_file the_output_file

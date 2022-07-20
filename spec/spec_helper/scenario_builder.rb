@@ -55,7 +55,7 @@ class ScenarioBuilder < SimpleDelegator
   end
 
   def create_output_file
-    (with_tmp_file %w(tmp- .adoc), tmpdir: output_dir).tap(&:close).path
+    (with_tmp_file %w(out- .adoc), tmpdir: output_dir).tap(&:close).path
   end
 
   def expected_exit_status status = UNDEFINED
