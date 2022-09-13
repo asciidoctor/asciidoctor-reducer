@@ -4,6 +4,12 @@
 This document provides a curated view of the changes to Asciidoctor Reducer in each release.
 For a detailed view of what has changed, refer to the {url-repo}/commits/main[commit history] on GitHub.
 
+== Unreleased
+
+=== Fixed
+
+* Reduce preprocessor directives in file included by include directive with `leveloffset` attribute (#45)
+
 == 1.0.2 (2022-05-09) - @mojavelinux
 
 === Fixed
