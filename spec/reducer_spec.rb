@@ -1483,6 +1483,99 @@ describe Asciidoctor::Reducer do
     end
   end
 
+  it 'should resolve includes inside include with leveloffset attribute' do
+    run_scenario do
+      include_source <<~'END'
+      == Subsection
+
+      include::no-includes.adoc[]
+
+      === Nested Subsection
+
+      include::multiple-paragraphs.adoc[]
+      END
+
+      input_source <<~END
+      == Section
+
+      include::#{include_file_basename}[leveloffset=+1]
+
+      == Another Section
+      END
+
+      reduce_options sourcemap: true
+      expected_source <<~'END'
+      == Section
+
+      :leveloffset: +1
+
+      == Subsection
+
+      no includes here
+
+      just regular paragraph text
+
+      === Nested Subsection
+
+      first paragraph
+
+      second paragraph
+      with two lines
+
+      :leveloffset!:
+
+      == Another Section
+      END
+
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        blocks = doc.find_by context: :section
+        (expect blocks).to have_size 4
+        (expect (blocks.map {|it| it.lineno })).to eql [1, 5, 11, 20]
+      end)
+    end
+  end
+
+  it 'should resolve preprocessor conditional inside include with leveloffset attribute' do
+    run_scenario do
+      include_source <<~'END'
+      == Subsection
+      ifdef::show-details[]
+
+      === Nested Subsection
+      endif::[]
+      END
+
+      input_source <<~END
+      == Section
+
+      include::#{include_file_basename}[leveloffset=+1]
+
+      == Another Section
+      END
+
+      reduce_options sourcemap: true
+      expected_source <<~'END'
+      == Section
+
+      :leveloffset: +1
+
+      == Subsection
+
+      :leveloffset!:
+
+      == Another Section
+      END
+
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        blocks = doc.find_by context: :section
+        (expect blocks).to have_size 3
+        (expect (blocks.map {|it| it.lineno })).to eql [1, 5, 9]
+      end)
+    end
+  end
+
   it 'should resolve include between leveloffset attribute entries' do
     run_scenario do
       include_source <<~'END'

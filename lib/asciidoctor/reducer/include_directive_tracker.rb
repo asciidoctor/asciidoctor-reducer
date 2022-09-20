@@ -30,7 +30,11 @@ module Asciidoctor::Reducer
       prev_inc_depth = @include_stack.size
       offset = lineno > 1 ? lineno - 1 : 0
       result = super
-      push_include_replacement directive_lineno, (@include_stack.size > prev_inc_depth ? lines : []), offset
+      if @include_stack.size > prev_inc_depth
+        inc_lines = lines
+        offset -= 2 if (attrs.key? 'leveloffset') && (inc_lines[0].start_with? ':leveloffset: ') && inc_lines[1]&.empty?
+      end
+      push_include_replacement directive_lineno, inc_lines || [], offset
       result
     end
 
