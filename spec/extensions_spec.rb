@@ -4,7 +4,7 @@ describe Asciidoctor::Reducer::Extensions do
   describe_method '.group' do
     it 'should return extension group' do
       group = subject.call
-      (expect group).to be_kind_of Proc
+      (expect group).to be_a Proc
       doc = Asciidoctor.load []
       reg = (Asciidoctor::Extensions.create described_class.key, &group).activate doc
       (expect reg.preprocessors).to have_size 1
