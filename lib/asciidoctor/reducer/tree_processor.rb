@@ -8,8 +8,12 @@ module Asciidoctor::Reducer
         inc_replacements.reverse_each do |it|
           if (into = it[:into])
             target_lines = inc_replacements[into][:lines]
-            # adds extra assurance that we're replacing the correct line
-            next unless target_lines[(idx = it[:lineno] - 1)] == it[:line]
+            # adds extra assurance that the program is replacing the correct line
+            unless target_lines[(idx = it[:lineno] - 1)] == it[:line]
+              msg = %(include directive to reduce not found; expected: "#{it[:line]}"; got: "#{target_lines[idx]}")
+              doc.logger.error msg
+              next
+            end
           end
           lines = it[:lines]
           unless (drop = it[:drop] || []).empty?

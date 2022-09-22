@@ -6,6 +6,10 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 
 == Unreleased
 
+=== Changed
+
+* Log error message if program cannot locate include directive to reduce (indicates a probable logic error in the program)
+
 === Fixed
 
 * Reduce preprocessor directives in file included by include directive with `leveloffset` attribute (#45)

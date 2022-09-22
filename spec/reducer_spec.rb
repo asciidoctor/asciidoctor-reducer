@@ -1279,7 +1279,7 @@ describe Asciidoctor::Reducer do
     end
   end
 
-  it 'should not replace lines if the target line does not match the expected line' do
+  it '.only should not replace lines if the target line does not match the expected line' do
     run_scenario do
       input_source <<~'END'
       before include
@@ -1309,6 +1309,7 @@ describe Asciidoctor::Reducer do
       after include
       END
 
+      expected_log_messages [{ severity: :ERROR, message: '~include directive to reduce not found;', last: true }]
       verify (proc do |delegate, doc|
         delegate.call doc
         (expect doc.blocks).to have_size 3
