@@ -1,4 +1,5 @@
 name: CI
+run-name: ${{ github.workflow }} ${{ github.event.inputs.release-version }}
 on:
   push:
     branches: ['**']
