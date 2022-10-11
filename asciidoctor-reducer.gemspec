@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.metadata = {
     'bug_tracker_uri' => 'https://github.com/asciidoctor/asciidoctor-reducer/issues',
     'changelog_uri' => 'https://github.com/asciidoctor/asciidoctor-reducer/blob/main/CHANGELOG.adoc',
-    'mailing_list_uri' => 'https://asciidoctor.zulipchat.com',
+    'mailing_list_uri' => 'https://chat.asciidoctor.org',
     'source_code_uri' => 'https://github.com/asciidoctor/asciidoctor-reducer'
   }
 
