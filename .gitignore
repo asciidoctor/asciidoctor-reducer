@@ -1,9 +1,9 @@
+/.bundle/
 /coverage/
 /deep_cover/
-/Gemfile.lock
 /pkg/
 /rdoc/
-/vendor/bundle/
-/.bundle/
+/vendor/
 /.ruby-version
+/Gemfile.lock
 /.yardoc/
