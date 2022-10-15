@@ -15,8 +15,8 @@ module Asciidoctor::Reducer
       result = super
       unless @x_reducer[:include_pushed]
         if ((ln = peek_line true)&.end_with? ']') && !(unresolved = ln.start_with? 'Unresolved directive in ') &&
-            directive_lineno == @lineno && (unresolved = ln.start_with? 'link:') && (ln.end_with? '[]')
-          ln = %(#{ln.chop}role=include])
+            directive_lineno == @lineno && (unresolved = ln.start_with? 'link:') && !(ln.include? '[role=')
+          ln = ln.sub '[', %([role=include#{ln[-2] == '[' ? '' : ','})
         end
         push_include_replacement directive_lineno, (unresolved ? [ln] : []), 0, unresolved
       end

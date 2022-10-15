@@ -4,6 +4,12 @@
 This document provides a curated view of the changes to Asciidoctor Reducer in each release.
 For a detailed view of what has changed, refer to the {url-repo}/commits/main[commit history] on GitHub.
 
+== Unreleased
+
+=== Changed
+
+* insert `role=include` into link macro that replaces include directive more carefully
+
 == 1.0.4 (2022-10-15) - @mojavelinux
 
 === Changed
