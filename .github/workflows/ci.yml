@@ -54,7 +54,12 @@ jobs:
     - name: Set Asciidoctor version
       if: matrix.asciidoctor-version
       run: echo 'ASCIIDOCTOR_VERSION=${{ matrix.asciidoctor-version }}' >> $GITHUB_ENV
-    - name: Install Ruby
+    - name: Enable lint and coverage (primary only)
+      if: matrix.primary
+      run: |
+        echo 'BUNDLE_WITHOUT=' >> $GITHUB_ENV
+        echo 'COVERAGE=deep' >> $GITHUB_ENV
+    - name: Install Ruby (uses cached dependencies for non-scheduled build)
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby }}
@@ -64,12 +69,6 @@ jobs:
       run: |
         bundle config --local path vendor/bundle
         bundle --jobs 3 --retry 3
-    - name: Install lint and coverage dependencies (primary only)
-      if: matrix.primary
-      run: |
-        BUNDLE_WITHOUT=docs bundle --jobs 3 --retry 3
-        echo 'BUNDLE_WITHOUT=docs' >> $GITHUB_ENV
-        echo 'COVERAGE=deep' >> $GITHUB_ENV
     - name: Run linter
       if: matrix.primary
       run: bundle exec rake lint
