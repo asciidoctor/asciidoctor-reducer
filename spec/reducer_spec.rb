@@ -1279,7 +1279,7 @@ describe Asciidoctor::Reducer do
     end
   end
 
-  it '.only should not replace lines if the target line does not match the expected line' do
+  it 'should not replace lines if the target line does not match the expected line' do
     run_scenario do
       input_source <<~'END'
       before include
