@@ -563,7 +563,7 @@ describe Asciidoctor::Reducer::Cli do
         reduce do
           expect do
             subject.run [input_file, '-r', the_ext_file, '--trace']
-          end.to raise_exception ArgumentError, %r/No block specified to process tree processor extension/
+          end.to raise_exception StandardError, %r/No block specified to process tree processor extension/
         end
         finally { Asciidoctor::Extensions.unregister_all }
       end
