@@ -107,9 +107,9 @@ Lint/MissingSuper:
   Enabled: true
 Lint/MixedRegexpCaptureTypes:
   Enabled: true
-Lint/NonAtomicFileOperation:
-  Enabled: true
 Lint/NoReturnInBeginEndBlocks:
+  Enabled: true
+Lint/NonAtomicFileOperation:
   Enabled: true
 Lint/NumberedParameterAssignment:
   Enabled: true
@@ -213,9 +213,9 @@ RSpec/BeNil:
 RSpec/BeforeAfterAll:
   Enabled: true
 RSpec/Capybara/SpecificFinders:
-  Enabled: true
+  Enabled: false
 RSpec/Capybara/SpecificMatcher:
-  Enabled: true
+  Enabled: false
 RSpec/ChangeByZero:
   Enabled: true
 RSpec/ClassCheck:
@@ -252,7 +252,7 @@ RSpec/Pending:
 RSpec/Rails/AvoidSetupHook:
   Enabled: false
 RSpec/Rails/HaveHttpStatus:
-  Enabled: true
+  Enabled: false
 RSpec/SubjectDeclaration:
   Enabled: true
 RSpec/VerifiedDoubleReference:
