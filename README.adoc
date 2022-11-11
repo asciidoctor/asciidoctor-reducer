@@ -277,7 +277,7 @@ name: Reduce README
 on:
   push:
     paths:
-    - README-source.adoc
+    - docs/README-source.adoc
     branches: ['**']
 jobs:
   build:
@@ -288,11 +288,11 @@ jobs:
     - name: Install Asciidoctor Reducer
       run: sudo gem install asciidoctor-reducer
     - name: Reduce README
-      run: asciidoctor-reducer -o README.adoc README-source.adoc
+      run: asciidoctor-reducer -o docs/README.adoc docs/README-source.adoc
     - name: Commit and Push README
       uses: EndBug/add-and-commit@v9
       with:
-        add: README.adoc
+        add: docs/README.adoc
 ----
 
 Now, each time you modify, commit, and push the [.path]_README-source.adoc_ file, the GitHub Action workflow will run, reduce that file, and push the reduced file back to the repository as [.path]_README.adoc_.
