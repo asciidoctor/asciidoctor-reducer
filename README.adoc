@@ -284,7 +284,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Install Asciidoctor Reducer
       run: sudo gem install asciidoctor-reducer
     - name: Reduce README
