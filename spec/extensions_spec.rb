@@ -8,7 +8,7 @@ describe Asciidoctor::Reducer::Extensions do
       doc = Asciidoctor.load []
       reg = (Asciidoctor::Extensions.create described_class.key, &group).activate doc
       (expect reg.preprocessors).to have_size 1
-      (expect reg.treeprocessors).to have_size 1
+      (expect reg.tree_processors).to have_size 1
     end
   end
 
@@ -95,7 +95,7 @@ describe Asciidoctor::Reducer::Extensions do
       doc = Asciidoctor.load []
       reg = Asciidoctor::Extensions::Registry.new.activate doc
       (expect reg.preprocessors).to have_size 1
-      (expect reg.treeprocessors).to have_size 1
+      (expect reg.tree_processors).to have_size 1
     end
   end
 
