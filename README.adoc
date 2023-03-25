@@ -217,7 +217,7 @@ To use the include mapper when using the API, first require the extension:
 
 [,ruby]
 ----
-require 'asciidocotor/reducer/include_mapper/extension'
+require 'asciidoctor/reducer/include_mapper/extension'
 ----
 
 You then need to register the extension when reducing the document:
@@ -243,7 +243,7 @@ You can also register the extension globally:
 
 [,ruby]
 ----
-require 'asciidocotor/reducer/include_mapper'
+require 'asciidoctor/reducer/include_mapper'
 ----
 
 In this case, you don't have to pass it to the API explicitly.
