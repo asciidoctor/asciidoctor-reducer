@@ -83,6 +83,10 @@ Thus, to use the command, pass the AsciiDoc file as the sole argument:
 
  $ asciidoctor-reducer input.adoc
 
+If you only want AsciiDoctor Reducer to process include directives, leaving preprocessor conditional directives untouched, add the `--preserve-conditionals` option:
+
+ $ asciidoctor-reducer --preserve-conditionals input.adoc
+
 By default, the command will output the reduced AsciiDoc document to the terminal (via stdout).
 To write the output to a file, specify an output file using the `-o` option:
 
