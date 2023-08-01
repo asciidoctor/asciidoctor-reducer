@@ -340,7 +340,7 @@ The tests are based on RSpec.
 
 You can run all of the tests using Rake:
 
- $ bundle exec spec
+ $ bundle exec rake spec
 
 For more fine-grained control, you can also run the tests directly using RSpec:
 
@@ -381,7 +381,7 @@ RSpec will only run the specifications that have a description containing the te
 
 To generate a code coverage report when running tests using simplecov, set the `COVERAGE` environment variable as follows when running the tests:
 
- $ COVERAGE=deep bundle exec rake
+ $ COVERAGE=deep bundle exec rake spec
 
 You'll see a total coverage score, a detailed coverage report, and a link to HTML report in the output.
 The HTML report helps you understand which lines and branches were missed, if any.
