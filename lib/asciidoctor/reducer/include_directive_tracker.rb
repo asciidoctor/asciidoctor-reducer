@@ -38,12 +38,12 @@ module Asciidoctor::Reducer
       result
     end
 
+    private
+
     def pop_include
       @include_replacements.up unless @x_reducer[:include_pushed]
       super
     end
-
-    private
 
     def push_include_replacement lineno, lines, offset, unresolved = false
       (inc_replacements = @include_replacements) << {
