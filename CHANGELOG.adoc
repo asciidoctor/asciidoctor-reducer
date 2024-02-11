@@ -4,11 +4,17 @@
 This document provides a curated view of the changes to Asciidoctor Reducer in each release.
 For a detailed view of what has changed, refer to the {url-repo}/commits/main[commit history] on GitHub.
 
+== Unreleased
+
+=== Fixed
+
+* Reduce single line conditionals inside file included by include directive with `leveloffset` attribute (#53)
+
 == 1.0.5 (2022-10-15) - @mojavelinux
 
 === Changed
 
-* insert `role=include` into link macro that replaces include directive more carefully
+* Insert `role=include` into link macro that replaces include directive more carefully
 
 === Details
 
@@ -18,7 +24,7 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 
 === Changed
 
-* don't add role to link that replaces include directive if role is already present
+* Don't add role to link that replaces include directive if role is already present
 
 === Details
 

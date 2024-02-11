@@ -10,17 +10,17 @@ module Asciidoctor::Reducer
       return result if @skipping && skip_active
       curr_inc_replacement = @include_replacements.current
       drop = curr_inc_replacement[:drop] ||= []
-      directive_lineno -= (curr_inc_replacement[:offset] ||= 0)
+      adjusted_directive_lineno = directive_lineno - (curr_inc_replacement[:offset] ||= 0)
       if (depth_change = @conditional_stack.size - depth) < 0
         if skip_active
-          drop.push(*(drop.pop..directive_lineno))
+          drop.push(*(drop.pop..adjusted_directive_lineno))
         else
-          drop << directive_lineno
+          drop << adjusted_directive_lineno
         end
       elsif depth_change > 0 || directive_lineno == @lineno
-        drop << directive_lineno
+        drop << adjusted_directive_lineno
       else
-        drop << [directive_lineno, text]
+        drop << [adjusted_directive_lineno, text]
       end
       result
     end

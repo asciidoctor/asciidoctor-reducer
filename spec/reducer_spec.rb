@@ -1577,6 +1577,57 @@ describe Asciidoctor::Reducer do
     end
   end
 
+  it 'should resolve single line preprocessor conditionals inside include with leveloffset attribute' do
+    run_scenario do
+      include_source <<~'END'
+      ifdef::context[:parent-context: {context}]
+      :context: overview context
+      = Overview
+
+      overview content
+
+      ifdef::parent-context[:context: {parent-context}]
+      ifndef::parent-context[:!context:]
+      END
+
+      input_source <<~END
+      = Document Title
+      :context: original context
+
+      include::#{include_file_basename}[leveloffset=+1]
+
+      fin
+      END
+
+      reduce_options sourcemap: true
+      expected_source <<~'END'
+      = Document Title
+      :context: original context
+
+      :leveloffset: +1
+
+      :parent-context: {context}
+      :context: overview context
+      = Overview
+
+      overview content
+
+      :context: {parent-context}
+
+      :leveloffset!:
+
+      fin
+      END
+
+      verify (proc do |delegate, doc|
+        delegate.call doc
+        blocks = doc.find_by context: :section
+        (expect blocks).to have_size 2
+        (expect (blocks.map {|it| it.lineno })).to eql [1, 8]
+      end)
+    end
+  end
+
   it 'should resolve include between leveloffset attribute entries' do
     run_scenario do
       include_source <<~'END'
