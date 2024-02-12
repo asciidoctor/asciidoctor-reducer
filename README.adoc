@@ -1,6 +1,6 @@
 = {project-name}
 Dan Allen <https://github.com/mojavelinux[@mojavelinux]>
-v1.0.5, 2022-10-15
+v1.0.6, 2024-02-12
 :idprefix:
 :idseparator: -
 ifndef::env-github[:icons: font]
