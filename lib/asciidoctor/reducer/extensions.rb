@@ -13,6 +13,7 @@ module Asciidoctor::Reducer
         next if document.options[:reduced]
         preprocessor Preprocessor
         tree_processor TreeProcessor
+        nil
       end
     end
 
@@ -31,12 +32,13 @@ module Asciidoctor::Reducer
       end
     end
 
-    def register
-      ::Asciidoctor::Extensions.register key, &group
+    def register registry = nil
+      (registry || ::Asciidoctor::Extensions).groups[key] ||= group
     end
 
-    def unregister
-      ::Asciidoctor::Extensions.groups.delete key # NOTE `Extensions.unregister key` fails if groups is not initialized
+    def unregister registry = nil
+      (registry || ::Asciidoctor::Extensions).groups.delete key
+      nil
     end
   end
 end
