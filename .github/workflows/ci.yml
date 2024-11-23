@@ -26,24 +26,24 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        ruby: [jruby-9.3, '2.7', '3.1']
+        ruby: [jruby-9.3, '2.7', '3.3']
         asciidoctor-version: [~]
         exclude:
-        # remove 3.1 on ubuntu-latest to mark as primary
+        # remove 3.3 on ubuntu-latest to mark as primary
         - os: ubuntu-latest
-          ruby: '3.1'
+          ruby: '3.3'
         include:
         - os: ubuntu-latest
           ruby: jruby-9.2
         - os: ubuntu-latest
           ruby: truffleruby
         - os: macos-latest
-          ruby: '3.1'
+          ruby: '3.3'
         - os: ubuntu-latest
-          ruby: '3.1'
+          ruby: '3.3'
           asciidoctor-version: '2.0.15'
         - os: ubuntu-latest
-          ruby: '3.1'
+          ruby: '3.3'
           primary: primary
     runs-on: ${{ matrix.os }}
     env:
