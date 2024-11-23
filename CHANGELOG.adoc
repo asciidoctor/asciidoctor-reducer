@@ -4,6 +4,12 @@
 This document provides a curated view of the changes to Asciidoctor Reducer in each release.
 For a detailed view of what has changed, refer to the {url-repo}/commits/main[commit history] on GitHub.
 
+== Unreleased
+
+=== Added
+
+* Track header attributes in source document and assign to `source_header_attributes` attr reader on Document instance (#59)
+
 == 1.0.6 (2024-02-12) - @mojavelinux
 
 === Fixed

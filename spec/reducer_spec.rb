@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 describe Asciidoctor::Reducer do
+  let :empty_hash do
+    {}
+  end
+
   it 'should be able to require library from Ruby process' do
     # NOTE asciidoctor/reducer/version will already be required by Bundler
     script_file = fixture_file 'print_version.rb'
@@ -43,6 +47,7 @@ describe Asciidoctor::Reducer do
         (expect doc.attr 'docname').to eql (input_file_basename '.adoc')
         (expect doc.attr 'docfile').to eql input_file
         (expect doc.attr 'docdir').to eql (File.dirname input_file)
+        (expect doc.source_header_attributes).to eql empty_hash
       end)
     end
   end
@@ -61,6 +66,7 @@ describe Asciidoctor::Reducer do
         (expect doc.options[:reduced]).to be_falsy
         (expect doc.sourcemap).to be_falsy
         (expect doc.blocks[0].source_location).to be_nil
+        (expect doc.source_header_attributes).to eql empty_hash
       end)
     end
   end
@@ -1704,6 +1710,7 @@ describe Asciidoctor::Reducer do
         (expect (doc.attr? 'sectnums')).to be true
         (expect (doc.attr? 'icons', 'font')).to be true
         (expect (doc.attr? 'toc')).to be true
+        (expect doc.source_header_attributes).to eql 'sectnums' => '', 'icons' => 'font', 'toc' => ''
       end)
     end
   end
@@ -1811,6 +1818,7 @@ describe Asciidoctor::Reducer do
     run_scenario do
       input_source <<~'END'
       = Book Title
+      :chaptersdir: ignored
 
       include::{chaptersdir}/ch1.adoc[]
       END
@@ -1818,6 +1826,7 @@ describe Asciidoctor::Reducer do
       reduce_options attributes: 'chaptersdir=chapters', sourcemap: true
       expected_source <<~'END'
       = Book Title
+      :chaptersdir: ignored
 
       == Chapter One
 
@@ -1828,7 +1837,9 @@ describe Asciidoctor::Reducer do
         delegate.call doc
         blocks = doc.find_by {|it| it.context != :document }
         (expect blocks).to have_size 3
-        (expect (blocks.map {|it| it.lineno })).to eql [1, 3, 5]
+        (expect (blocks.map {|it| it.lineno })).to eql [1, 4, 6]
+        # the hash is empty since the attribute is hard set by the API
+        (expect doc.source_header_attributes).to eql empty_hash
       end)
     end
   end
