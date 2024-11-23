@@ -10,7 +10,7 @@ module Asciidoctor::Reducer
 
     def group
       proc do
-        next if document.options[:reduced]
+        next if document.options[:reduced] # group invoked again if includes are found and sourcemap option is true
         preprocessor Preprocessor
         tree_processor TreeProcessor
         nil
