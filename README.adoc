@@ -320,7 +320,7 @@ Follow the instructions below to learn how to help develop the project or test-d
 Copy the {url-repo}[GitHub repository URL] and pass it to the `git clone` command:
 
 [subs=attributes+]
- $ git clone {url-repo}
+ $ git clone -b v1.0.x {url-repo}
 
 Next, switch to the project directory:
 
