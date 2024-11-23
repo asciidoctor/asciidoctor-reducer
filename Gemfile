@@ -5,6 +5,9 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'asciidoctor', ENV['ASCIIDOCTOR_VERSION'], require: false if ENV.key? 'ASCIIDOCTOR_VERSION'
+if (Gem::Version.new RUBY_VERSION) >= (Gem::Version.new '3.3.0')
+  gem 'logger'
+end
 
 group :coverage do
   gem 'deep-cover-core', '~> 1.1.0', require: false
