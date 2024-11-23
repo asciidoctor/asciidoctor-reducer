@@ -5,6 +5,6 @@ RSpec::Matchers.define :have_source do |expected|
   failure_message do |actual|
     message = %(expected #{actual} to have source #{expected.inspect})
     differ = RSpec::Expectations.differ
-    (RSpec::Matchers::ExpectedsForMultipleDiffs.from expected).message_with_diff message, differ, actual.source
+    (RSpec::Matchers::MultiMatcherDiff.from expected, actual.source).message_with_diff message, differ
   end
 end
