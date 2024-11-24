@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
-require_relative 'include_directive_tracker'
-require_relative 'conditional_directive_tracker'
+unless RUBY_ENGINE == 'opal'
+  require_relative 'include_directive_tracker'
+  require_relative 'conditional_directive_tracker'
+end
 
 module Asciidoctor::Reducer
   class Preprocessor < ::Asciidoctor::Extensions::Preprocessor

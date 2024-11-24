@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
-require 'asciidoctor' unless defined? Asciidoctor.load
-require_relative 'header_attribute_tracker'
-require_relative 'preprocessor'
-require_relative 'tree_processor'
+unless RUBY_ENGINE == 'opal'
+  require 'asciidoctor' unless defined? Asciidoctor.load
+  require_relative 'header_attribute_tracker'
+  require_relative 'preprocessor'
+  require_relative 'tree_processor'
+end
 
 module Asciidoctor::Reducer
   module Extensions

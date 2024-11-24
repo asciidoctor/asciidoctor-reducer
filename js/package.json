@@ -1,0 +1,49 @@
+{
+  "name": "@asciidoctor/reducer",
+  "version": "1.1.0",
+  "description": "An Asciidoctor.js extension to reduce an AsciiDoc document containing includes and conditionals to a single AsciiDoc document.",
+  "license": "MIT",
+  "author": "Dan Allen",
+  "contributors": [
+    "Dan Allen <dan@opendevise.com>"
+  ],
+  "repository": "github:asciidoctor/asciidoctor-reducer",
+  "bugs": {
+    "url": "https://github.com/asciidoctor/asciidoctor-reducer/issues"
+  },
+  "scripts": {
+    "build": "npx -y --package opal-compiler@1.0.13 node npm/transpile.js",
+    "preci": "npm i",
+    "ci": "npm run build",
+    "postci": "npm test",
+    "clean": "npx rimraf dist node_modules",
+    "postpublish": "npx -y downdoc --postpublish",
+    "prepublishOnly": "npx -y downdoc --prepublish",
+    "test": "node --test test/*-test.js"
+  },
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./extensions": "./lib/extensions.js",
+    "./dist/*": "./dist/*",
+    "./package.json": "./package.json"
+  },
+  "devDependencies": {
+    "@asciidoctor/core": "~2"
+  },
+  "files": [
+    "bin",
+    "dist",
+    "lib"
+  ],
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "keywords": [
+    "asciidoc",
+    "asciidoctor",
+    "extension",
+    "include",
+    "preprocessor"
+  ]
+}
