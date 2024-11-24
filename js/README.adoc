@@ -1,0 +1,63 @@
+= Asciidoctor Reducer
+
+An Asciidoctor.js extension that reduces an AsciiDoc document containing include directives to a single AsciiDoc document by expanding the includes reachable from the parent document.
+Additionally, the extension evaluates preprocessor conditionals (unless the option to preserve them is enabled), only keeping those lines from conditions which are true.
+If the document does not contain any preprocessor directives, the extension provides access to the unmodified source.
+
+(The CLI and API are not currently available in the JavaScript version).
+
+== Install
+
+This package depends on the `asciidoctor` package (>= 2.2.0, < 3.0.0), but doesn't declare it as a dependency.
+Therefore, you must install that package when installing this one.
+
+ $ npm i asciidoctor @asciidoctor/reducer
+
+If you're using the extension with Antora, there's no need to install the `asciidoctor` package as Antora provides it.
+
+== Usage
+
+=== Extension
+
+You can use this extension in combination with the load API provided by Asciidoctor.
+If you want to register the extension globally, require the library as follows:
+
+[,js]
+----
+const Asciidoctor = require('asciidoctor')()
+
+require('@asciidoctor/reducer').register()
+----
+
+When you use the Asciidoctor load API, the document will automatically be reduced.
+You can access the reduced source by calling either the `getSource()` or `getSourceLines()` on the loaded document.
+
+[,js]
+----
+const doc = Asciidoctor.loadFile('main.adoc', { safe: 'safe' })
+
+console.log(doc.getSource())
+----
+
+You can pass a registry instance to the `register` method to register the extension with a scoped registry (scoped to the load API call).
+
+[,js]
+----
+const Asciidoctor = require('asciidoctor')()
+
+const registry = Asciidoctor.Extensions.create()
+require('@asciidoctor/reducer').register(registry)
+
+const doc = Asciidoctor.loadFile('main.adoc', { extension_registry: registry, safe: 'safe' })
+----
+
+You can also require `@asciidoctor/reducer/extensions` to access the `Extensions` class.
+
+== Copyright and License
+
+Copyright (C) 2021-present Dan Allen and the individual contributors to this project.
+Use of this software is granted under the terms of the MIT License.
+
+== Trademarks
+
+AsciiDoc(R) and AsciiDoc Language(TM) are trademarks of the Eclipse Foundation, Inc.

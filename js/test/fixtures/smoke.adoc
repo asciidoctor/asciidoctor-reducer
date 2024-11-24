@@ -1,0 +1,7 @@
+= Smoke Test
+
+Text in main document.
+
+include::smoke-include.adoc[]
+
+Text in main document.

@@ -20,6 +20,9 @@ endif::[]
 Additionally, the tool evaluates preprocessor conditionals (unless the option to preserve them is enabled), only keeping those lines from conditions which are true.
 If the document does not contain any preprocessor directives, the tool returns the unmodified source.
 
+TIP: This extension is also published as an npm package named `@asciidoctor/reducer` for use with Asciidoctor.js, and hence, with Antora.
+See the xref:js/README.adoc[README] to find instructions on how to use this package.
+
 == Prerequisites
 
 {project-name} is a Ruby application that you install using Ruby packaging.

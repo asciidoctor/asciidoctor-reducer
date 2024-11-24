@@ -7,13 +7,8 @@ on:
         description: Enter version to release (e.g., 1.0.1).
         required: false
 jobs:
-  activate:
-    runs-on: ubuntu-latest
-    if: github.repository_owner == 'asciidoctor' && github.event_name == 'workflow_dispatch'
-    steps:
-    - run: echo ok go
   perform:
-    needs: activate
+    if: github.repository_owner == 'asciidoctor' && github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     environment: releases
     steps:
@@ -24,19 +19,23 @@ jobs:
       with:
         ruby-version: '3.3'
         bundler-cache: false
-    - name: Configure Bundler
+    - name: Install Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '22'
+    - name: Install Ruby dependencies
       run: |
         bundle config --local path vendor/bundle
         bundle config --local without coverage docs
-    - name: Install dependencies
-      run: bundle --jobs 3 --retry 3
-    - name: Run tests
-      run: bundle exec rake spec
+        bundle --jobs 3 --retry 3
     - name: Run linter
       run: bundle exec rake lint
-    - name: Setup release environment
+    - name: Run tests
+      run: bundle exec rake spec
+    - name: Set up release environment
       run: |
         echo RELEASE_VERSION=${{ github.event.inputs.release-version }} >> $GITHUB_ENV
+        echo RELEASE_NPM_TOKEN=${{ secrets[format('NPM_TOKEN_{0}', github.actor)] }} >> $GITHUB_ENV
         echo RELEASE_RUBYGEMS_API_KEY=${{ secrets[format('RUBYGEMS_API_KEY_{0}', github.actor)] }} >> $GITHUB_ENV
-    - name: Build, tag, and publish gem
+    - name: Build, tag, and publish packages
       run: ./release.sh
