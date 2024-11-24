@@ -7,6 +7,7 @@ describe Asciidoctor::Reducer::Extensions do
       (expect group).to be_a Proc
       doc = Asciidoctor.load []
       reg = (Asciidoctor::Extensions.create described_class.key, &group).activate doc
+      (expect doc.singleton_class.ancestors.map(&:name)).to include 'Asciidoctor::Reducer::HeaderAttributeTracker'
       (expect reg.preprocessors).to have_size 1
       (expect reg.tree_processors).to have_size 1
     end

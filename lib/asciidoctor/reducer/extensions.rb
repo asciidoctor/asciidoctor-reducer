@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'asciidoctor' unless defined? Asciidoctor.load
+require_relative 'header_attribute_tracker'
 require_relative 'preprocessor'
 require_relative 'tree_processor'
 
@@ -10,6 +11,7 @@ module Asciidoctor::Reducer
 
     def group
       proc do
+        document.extend HeaderAttributeTracker
         next if document.options[:reduced] # group invoked again if includes are found and sourcemap option is true
         preprocessor Preprocessor
         tree_processor TreeProcessor
