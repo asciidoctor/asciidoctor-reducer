@@ -4,12 +4,16 @@
 This document provides a curated view of the changes to Asciidoctor Reducer in each release.
 For a detailed view of what has changed, refer to the {url-repo}/commits/main[commit history] on GitHub.
 
-== Unreleased
+== 1.1.0 (2024-11-24) - @mojavelinux
 
 === Added
 
 * Track header attributes in source document and assign to `source_header_attributes` attr reader on Document instance (#59)
 * Add JavaScript build that publishes the `@antora/reducer` an npm package (#57)
+
+=== Details
+
+{url-repo}/releases/tag/v1.1.0[git tag] | {url-repo}/compare/v1.0.6\...v1.1.0[full diff]
 
 == 1.0.6 (2024-02-12) - @mojavelinux
 

@@ -2,6 +2,6 @@
 
 module Asciidoctor
   module Reducer
-    VERSION = '1.1.0-alpha.0'
+    VERSION = '1.1.0'
   end
 end
