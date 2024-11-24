@@ -407,6 +407,10 @@ When running the `asciidoctor-reducer` command from source, you must prefix the 
 
 To avoid having to do this, or to make the `asciidoctor-reducer` command available from anywhere, you need to build the development gem and install it.
 
+== Authors
+
+Asciidoctor Reducer was written by Dan Allen of OpenDevise Inc. and contributed to the Asciidoctor project.
+
 == Copyright and License
 
 Copyright (C) 2021-present Dan Allen.
