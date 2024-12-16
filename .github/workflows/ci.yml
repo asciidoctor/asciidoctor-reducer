@@ -33,7 +33,7 @@ jobs:
         - os: ubuntu-latest
           ruby: '3.3'
         include:
-        - os: ubuntu-latest
+        - os: ubuntu-22.04
           ruby: jruby-9.2
         - os: ubuntu-latest
           ruby: truffleruby
