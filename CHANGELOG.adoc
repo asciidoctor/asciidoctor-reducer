@@ -4,6 +4,12 @@
 This document provides a curated view of the changes to Asciidoctor Reducer in each release.
 For a detailed view of what has changed, refer to the {url-repo}/commits/main[commit history] on GitHub.
 
+== Unreleased
+
+=== Fixed
+
+* Revert to iteration-based flatten in compiled JavaScript if built-in flatten method on array throws range error
+
 == 1.1.0 (2024-11-24) - @mojavelinux
 
 === Added

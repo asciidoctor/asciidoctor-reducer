@@ -23,7 +23,11 @@ module Asciidoctor::Reducer
           end
           target_lines[idx] = lines if target_lines
         end
-        reduced_source_lines = inc_replacements[0][:lines].flatten
+        if RUBY_ENGINE == 'opal'
+          reduced_source_lines = flatten inc_replacements[0][:lines]
+        else
+          reduced_source_lines = inc_replacements[0][:lines].flatten
+        end
         if doc.sourcemap
           logger = doc.logger
           opts = doc.options.merge logger: nil, parse: false, reduced: true
@@ -41,6 +45,32 @@ module Asciidoctor::Reducer
         end
       end
       doc
+    end
+
+    private
+
+    def flatten input_list
+      input_list.flatten
+    rescue ::Exception => ex
+      raise unless `ex.name === 'RangeError'`
+      result = []
+      stack = [[0, input_list, input_list.length]]
+      until stack.empty?
+        idx, list, len = stack.pop
+        while idx < len
+          if Array === (item = list[idx])
+            if (next_idx = idx + 1) < len
+              stack << [next_idx, list, len]
+            end
+            idx = 0
+            len = (list = item).length
+          else
+            result << item
+            idx += 1
+          end
+        end
+      end
+      result
     end
   end
 end
