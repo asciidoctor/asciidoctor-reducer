@@ -51,8 +51,8 @@ module Asciidoctor::Reducer
 
     def flatten input_list
       input_list.flatten
-    rescue ::Exception => ex
-      raise unless `ex.name === 'RangeError'`
+    rescue ::Exception => e # rubocop:disable Lint/RescueException,Lint/UselessAssignment
+      raise unless %x(e.name) == 'RangeError'
       result = []
       stack = [[0, input_list, input_list.length]]
       until stack.empty?
