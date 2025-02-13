@@ -115,21 +115,30 @@ require 'asciidoctor/reducer/api'
 ----
 
 Next, reduce a parent document that contains includes.
-(This works without having to specify the safe mode since the default safe mode when using this API is `:safe`).
 
 [,ruby]
 ----
 doc = Asciidoctor::Reducer.reduce_file 'sample.adoc'
 ----
 
-Finally, you can retrieve the reduced source from the returned document.
+NOTE: The previous call works without having to specify the safe mode since the default safe mode when using this API is `:safe`.
+However, if any include target points to a file in an ancestor directory of `docdir`, you'll need to set the safe mode to `:unsafe` by passing the option `safe: :unsafe`.
+The options that the `reduce_file` method accepts are a superset of the Asciidoctor API options.
+
+The benefit of this return value is that you can access the reduced source as well as the parsed document that corresponds to it.
+Use the following call to retrieve the reduced source from the returned document.
 
 [,ruby]
 ----
 puts doc.source
 ----
 
-The benefit of this approach is that you can access the reduced source and the parsed document that corresponds to it.
+If you want to retrieve the source split into an array of lines, use the following call instead.
+
+[,ruby]
+----
+puts doc.source_lines
+----
 
 If you only want AsciiDoctor Reducer to process include directives, leaving preprocessor conditional directives untouched, set the `:preserve_conditionals` option:
 
