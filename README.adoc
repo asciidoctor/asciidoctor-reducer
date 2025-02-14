@@ -161,7 +161,7 @@ You can write the reduced source directly to a file by passing a file path to th
 Asciidoctor::Reducer.reduce_file 'sample.adoc', to: 'sample-reduced.adoc'
 ----
 
-== Extension
+=== Extension
 
 Instead of using the API for this library, you can use the load API provided by Asciidoctor.
 If you want to register the extension globally, require the library as follows:
