@@ -161,6 +161,36 @@ You can write the reduced source directly to a file by passing a file path to th
 Asciidoctor::Reducer.reduce_file 'sample.adoc', to: 'sample-reduced.adoc'
 ----
 
+=== In Preprocessor
+
+It's generally not safe to read the lines from the reader in an Asciidoctor preprocessor extension because it introduces side effects.
+However, Asciidoctor Reducer offers a workaround for that problem.
+You can use Asciidoctor Reducer to safely retrieve the source lines of the document (with or without resolving preprocessor directives) in order to analyze them or even modify and replace the lines on the reader.
+
+Let's look at how we can retrieve the source lines in an Asciidoctor preprocessor.
+What you do with those lines is then up to you.
+
+[,ruby]
+----
+require 'asciidoctor/reducer/api'
+
+Asciidoctor::Extensions.register do
+  preprocessor do
+    process do |doc, reader|
+      unless doc.options[:extension_registry]&.groups&.include? :reducer
+        reducer_opts = { safe: doc.options[:safe], attributes: doc.options[:attributes].dup }
+        reduced_doc = Asciidoctor::Reducer.reduce_file reader.file, reducer_opts
+        reduced_source_lines = reduced_doc.source_lines
+        ...
+      end
+      reader
+    end
+  end
+end
+----
+
+Since the extension is registered globally, it's necessary to short-circuit it when called by reducer.
+
 === Extension
 
 Instead of using the API for this library, you can use the load API provided by Asciidoctor.
