@@ -154,6 +154,13 @@ If you don't need the parsed document, you can retrieve the reduced source direc
 puts Asciidoctor::Reducer.reduce_file 'sample.adoc', to: String
 ----
 
+You can retrieve the source as an array instead of a string by passing the `Array` type, to the `:to` option:
+
+[,ruby]
+----
+puts Asciidoctor::Reducer.reduce_file 'sample.adoc', to: Array
+----
+
 You can write the reduced source directly to a file by passing a file path to the `:to` option:
 
 [,ruby]

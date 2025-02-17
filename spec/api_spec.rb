@@ -326,6 +326,15 @@ describe Asciidoctor::Reducer do
       end
     end
 
+    it 'should reduce input to string if :to option is Array class' do
+      run_scenario do
+        input_source the_input_source
+        reduce_options to: Array
+        reduce { subject.reduce_file input_file, reduce_options }
+        expected_source the_expected_source.split ?\n
+      end
+    end
+
     it 'should reduce input and send to write method if :to option is StringIO object' do
       run_scenario do
         input_source the_input_source
