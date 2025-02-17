@@ -51,9 +51,11 @@ module Asciidoctor::Reducer
 
     def write doc, to
       return doc unless to && to != '/dev/null'
-      output = doc.source
-      return output if to == ::String
-      output += LF unless output.empty?
+      return doc.source if to == ::String
+      return doc.source_lines if to == ::Array
+      unless (output = doc.source).empty?
+        output += LF
+      end
       if ::Pathname === to || (!(to.respond_to? :write) && (to = ::Pathname.new to.to_s))
         to.dirname.mkpath
         to.write output, encoding: UTF_8, newline: :universal

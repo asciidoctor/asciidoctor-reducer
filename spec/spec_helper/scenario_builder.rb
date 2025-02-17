@@ -75,13 +75,13 @@ class ScenarioBuilder < SimpleDelegator
       when ::Asciidoctor::Document
         (expect result_).to have_source @expected_source
         verify_output_file = true if @output_file
-      when ::String
+      when ::String, ::Array
         (expect result_).to eql @expected_source
       when ::Integer
         (expect result_).to eql @expected_exit_status
         verify_output_file = true if @output_file
       else
-        (expect result_).to (satisfy 'be an Asciidoctor::Document, String, or Integer', &(proc { false }))
+        (expect result_).to (satisfy 'be an Asciidoctor::Document, String, Array, or Integer', &(proc { false }))
       end
       if verify_output_file
         if ::String === @output_file
@@ -96,7 +96,7 @@ class ScenarioBuilder < SimpleDelegator
         (expect actual_source).to eql @expected_source + (@expected_source.empty? ? '' : ?\n)
       end
     end
-    @expected_source = source.chomp
+    @expected_source = ::String === source ? source.chomp : source
   end
 
   def finally &block

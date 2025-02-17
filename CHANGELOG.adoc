@@ -6,6 +6,10 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 
 == Unreleased
 
+=== Added
+
+* Return source lines as array if value of `to` option is `Array` class (#61)
+
 === Fixed
 
 * Revert to iteration-based flatten in compiled JavaScript if built-in flatten method on array throws range error
