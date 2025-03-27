@@ -4,11 +4,15 @@
 This document provides a curated view of the changes to Asciidoctor Reducer in each release.
 For a detailed view of what has changed, refer to the {url-repo}/commits/main[commit history] on GitHub.
 
-== Unreleased
+== 1.1.1 (2025-03-27) - @mojavelinux
 
 === Fixed
 
 * Fall back to iteration-based strategy in compiled JavaScript if built-in Array#flatten method throws RangeError (#63)
+
+=== Details
+
+{url-repo}/releases/tag/v1.1.1[git tag] | {url-repo}/compare/v1.1.0\...v1.1.1[full diff]
 
 == 1.1.0 (2024-11-24) - @mojavelinux
 
