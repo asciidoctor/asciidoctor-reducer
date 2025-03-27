@@ -8,7 +8,7 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 
 === Fixed
 
-* Revert to iteration-based flatten in compiled JavaScript if built-in flatten method on array throws range error
+* Fall back to iteration-based strategy in compiled JavaScript if built-in Array#flatten method throws RangeError (#63)
 
 == 1.1.0 (2024-11-24) - @mojavelinux
 
