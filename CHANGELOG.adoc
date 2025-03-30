@@ -6,6 +6,10 @@ For a detailed view of what has changed, refer to the {url-repo}/commits/main[co
 
 == 1.1.1 (2025-03-27) - @mojavelinux
 
+=== Added
+
+* Return source lines as array if value of `to` option is `Array` class (#61)
+
 === Fixed
 
 * Fall back to iteration-based strategy in compiled JavaScript if built-in Array#flatten method throws RangeError (#63)
