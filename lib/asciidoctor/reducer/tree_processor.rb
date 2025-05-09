@@ -49,28 +49,34 @@ module Asciidoctor::Reducer
 
     private
 
-    def flatten input_list
-      input_list.flatten
-    rescue ::Exception => e # rubocop:disable Lint/RescueException,Lint/UselessAssignment
-      raise unless %x(e.name) == 'RangeError'
-      result = []
-      stack = [[0, input_list, input_list.length]]
-      until stack.empty?
-        idx, list, len = stack.pop
-        while idx < len
-          if Array === (item = list[idx])
-            if (next_idx = idx + 1) < len
-              stack << [next_idx, list, len]
+    if RUBY_ENGINE == 'opal'
+      def flatten input_list
+        input_list.flatten
+      rescue ::Exception => e # rubocop:disable Lint/RescueException
+        raise unless e && %x(e.name) == 'RangeError'
+        result = []
+        stack = [[0, input_list, input_list.length]]
+        until stack.empty?
+          idx, list, len = stack.pop
+          while idx < len
+            if Array === (item = list[idx])
+              if (next_idx = idx + 1) < len
+                stack << [next_idx, list, len]
+              end
+              idx = 0
+              len = (list = item).length
+            else
+              result << item
+              idx += 1
             end
-            idx = 0
-            len = (list = item).length
-          else
-            result << item
-            idx += 1
           end
         end
+        result
       end
-      result
+    else
+      def flatten input_list
+        input_list.flatten
+      end
     end
   end
 end
