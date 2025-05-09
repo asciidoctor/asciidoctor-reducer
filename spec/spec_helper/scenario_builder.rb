@@ -81,7 +81,7 @@ class ScenarioBuilder < SimpleDelegator
         (expect result_).to eql @expected_exit_status
         verify_output_file = true if @output_file
       else
-        (expect result_).to (satisfy 'be an Asciidoctor::Document, String, or Integer', &(proc { false }))
+        (expect result_).to (satisfy 'be an Asciidoctor::Document, String, or Integer', &(proc { false })) # rubocop:disable Style/RedundantParentheses
       end
       if verify_output_file
         if ::String === @output_file

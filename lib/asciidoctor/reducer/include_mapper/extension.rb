@@ -5,7 +5,7 @@ module Asciidoctor::Reducer
     def process doc
       if doc.extensions.groups[:reducer]
         unless (includes = doc.catalog[:includes].map {|name, val| val ? name : %(~#{name}) }).empty?
-          doc.source_lines.concat ['', %(//# includes=#{includes.join ','})]
+          doc.source_lines.push '', %(//# includes=#{includes.join ','})
         end
       elsif (last_line = doc.source_lines[-1])&.start_with? '//# includes='
         doc.catalog[:includes].update ((last_line.slice 13, last_line.length).split ',')

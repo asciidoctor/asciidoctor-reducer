@@ -36,7 +36,7 @@ describe Asciidoctor::Reducer::Extensions do
     end
 
     it 'should add extension group to specified registry if not present' do
-      seed_registry = ::Asciidoctor::Extensions.create :seed do
+      seed_registry = Asciidoctor::Extensions.create :seed do
         tree_processor do
           process do |doc|
             doc.source_lines << '// looks good!'

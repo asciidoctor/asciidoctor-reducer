@@ -6,7 +6,7 @@ module Asciidoctor::Reducer
       instance.singleton_class.send :attr_reader, :source_header_attributes
     end
 
-    def finalize_header(*) # rubocop:disable Style/MethodDefParentheses
+    def finalize_header(*)
       @source_header_attributes = @attributes_modified.each_with_object({}) do |name, accum|
         accum[name] = @attributes[name]
       end

@@ -50,7 +50,7 @@ module Asciidoctor::Reducer
     private
 
     def write doc, to
-      return doc unless to && to != '/dev/null'
+      return doc unless to && to != ::File::NULL
       output = doc.source
       return output if to == ::String
       output += LF unless output.empty?
