@@ -4,12 +4,16 @@
 This document provides a curated view of the changes to Asciidoctor Reducer in each release.
 For a detailed view of what has changed, refer to the {url-repo}/commits/main[commit history] on GitHub.
 
-== Unreleased
+== 1.1.2 (2025-05-09) - @mojavelinux
 
 === Fixed
 
 * Don't define reader for source_header_attributes instance variable if already defined
 * Only catch RangeError when flattening list when using Opal runtime
+
+=== Details
+
+{url-repo}/releases/tag/v1.1.2[git tag] | {url-repo}/compare/v1.1.1\...v1.1.2[full diff]
 
 == 1.1.1 (2025-03-27) - @mojavelinux
 
